@@ -1,9 +1,11 @@
 /* ------------------------------------------------------------------ *
- * Scratch-off colouring pages, bundled under public/scratch/. Loaded at
- * runtime and rendered as the holographic reveal + the coat's scratch
- * guide (see ScratchOff: fetch → read the <path>s → draw in the 100x100
- * box). To add one: drop a .svg (viewBox 0 0 100 100, plain <path>s) in
- * public/scratch/ and add an entry here.
+ * Scratch-off colouring pages, bundled under public/scratch/. Each is a
+ * proper colouring page: closed shapes carry a `fill` (the real picture to
+ * reveal, and the silhouette scratches are clipped to) plus the shared
+ * black outline; detail lines use fill="none". ScratchOff fetches each,
+ * reads the <path> d + fill, and renders in the 100x100 box. To add one:
+ * drop a .svg (viewBox 0 0 100 100; filled shapes + fill="none" details)
+ * in public/scratch/ and add an entry here.
  * ------------------------------------------------------------------ */
 
 export interface ScratchPic {

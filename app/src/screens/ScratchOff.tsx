@@ -4,17 +4,25 @@ import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { SCRATCH_SVGS } from '../scratch/scratchSvgs'
 import { c, fonts } from '../theme'
-import { buildParticles } from '../utils'
 
 const COAT = '#151310'
-const REVEAL_AT = 0.3 // scratch this much and the rest peels away on its own
 
+/** one shape of a colouring page. `fill` is the "real picture" colour and marks
+ * a closed object shape; fill 'none' is a detail line (drawn on top as line-art,
+ * but NOT part of the object silhouette a child scratches into). */
+interface PicPath {
+  d: string
+  fill: string
+}
 /** a colouring page loaded from a bundled SVG (viewBox 0 0 100 100) */
 interface Pic {
   id: string
   name: string
-  paths: string[]
+  paths: PicPath[]
 }
+
+/** what a scratch uncovers: holographic foil, or the real coloured picture */
+type RevealStyle = 'foil' | 'colour'
 
 /** the tools a real scratch-art kit gives a child: a fine wooden pick for
  * detail, a flat edge that scrapes a wide band, and a comb/rake that cuts
@@ -78,8 +86,9 @@ interface ScratchDraft {
   seed: number
   /** index into TOOLS of the last-used scratch tool */
   tool?: number
+  /** which reveal the child chose */
+  style?: RevealStyle
   strokes: Stroke[]
-  done?: boolean
 }
 
 export function ScratchOff() {
@@ -90,9 +99,9 @@ export function ScratchOff() {
   const [picIdx, setPicIdx] = useState(() => Math.max(0, draft.current?.pic ?? 0))
   const [seed, setSeed] = useState(() => draft.current?.seed ?? Math.floor(Math.random() * 360))
   const [toolIdx, setToolIdx] = useState(() => Math.max(0, Math.min(TOOLS.length - 1, draft.current?.tool ?? 0)))
+  const [style, setStyle] = useState<RevealStyle>(() => draft.current?.style ?? 'foil')
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [scratched, setScratched] = useState(0)
-  const [done, setDone] = useState(() => !!draft.current?.done)
 
   const wrapRef = useRef<HTMLDivElement>(null)
   const neonRef = useRef<HTMLCanvasElement>(null)
@@ -104,8 +113,6 @@ export function ScratchOff() {
   const cur = useRef<number[] | null>(null)
   const curTool = useRef<ToolId>('pick') // the tool that cut the in-progress stroke
   const activePtr = useRef<number | null>(null) // one finger at a time
-  const doneRef = useRef(done)
-  doneRef.current = done
   const lastMeasure = useRef(0)
   const lastSfx = useRef(0)
 
@@ -121,7 +128,9 @@ export function ScratchOff() {
         try {
           const txt = await (await fetch(s.src)).text()
           const doc = new DOMParser().parseFromString(txt, 'image/svg+xml')
-          const paths = [...doc.querySelectorAll('path')].map((p) => p.getAttribute('d') || '').filter(Boolean)
+          const paths: PicPath[] = [...doc.querySelectorAll('path')]
+            .map((p) => ({ d: p.getAttribute('d') || '', fill: p.getAttribute('fill') || 'none' }))
+            .filter((p) => p.d)
           return paths.length ? ({ id: s.id, name: s.name, paths } as Pic) : null
         } catch {
           return null
@@ -142,52 +151,83 @@ export function ScratchOff() {
     return new DOMMatrix([s, 0, 0, s, (w - 100 * s) / 2, (h - 100 * s) / 2])
   }
 
-  // ---- painters ----
-  // holographic rainbow foil (what a scratch reveals), with the colouring-page
-  // outline printed dark on top so the picture stays readable on the foil.
-  const paintHolo = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
-    ctx.globalCompositeOperation = 'source-over'
-    const N = 12
-    const base = ctx.createLinearGradient(0, 0, w, h)
-    for (let i = 0; i <= N; i++) base.addColorStop(i / N, `hsl(${Math.round((seed + (i * 360) / N) % 360)}, 92%, 58%)`)
-    ctx.fillStyle = base
-    ctx.fillRect(0, 0, w, h)
-    // a second rainbow the other way, blended, for the iridescent interference
-    const cross = ctx.createLinearGradient(0, h, w, 0)
-    for (let i = 0; i <= N; i++) cross.addColorStop(i / N, `hsla(${Math.round((seed + 140 + (i * 360) / N) % 360)}, 95%, 60%, 0.5)`)
-    ctx.globalCompositeOperation = 'overlay'
-    ctx.fillStyle = cross
-    ctx.fillRect(0, 0, w, h)
-    // bright diagonal foil streaks
-    ctx.globalCompositeOperation = 'soft-light'
-    for (const off of [0.22, 0.55, 0.84]) {
-      const sg = ctx.createLinearGradient(w * (off - 0.13), 0, w * (off + 0.13), h)
-      sg.addColorStop(0, 'rgba(255,255,255,0)')
-      sg.addColorStop(0.5, 'rgba(255,255,255,.65)')
-      sg.addColorStop(1, 'rgba(255,255,255,0)')
-      ctx.fillStyle = sg
-      ctx.fillRect(0, 0, w, h)
-    }
-    // fine glints
-    ctx.globalCompositeOperation = 'source-over'
-    ctx.fillStyle = 'rgba(255,255,255,.55)'
-    const px = Math.max(1, dpr.current)
-    for (let i = 0; i < 80; i++) {
-      const x = (((i * 61) % 100) / 100) * w
-      const y = (((i * 37) % 100) / 100) * h
-      ctx.fillRect(x, y, px, px)
-    }
-    // the colouring-page outline, printed dark so the picture reads on the foil
+  /** the object silhouette (union of the page's FILLED shapes) in canvas px —
+   * scratches are clipped to it, so going over the lines is forgiven: you can
+   * only ever uncover inside the picture. null if the page is pure line-art. */
+  const silhouette = (w: number, h: number): Path2D | null => {
+    const filled = (pic?.paths ?? []).filter((p) => p.fill && p.fill !== 'none')
+    if (!filled.length) return null
     const m = picMatrix(w, h)
-    ctx.strokeStyle = 'rgba(18,14,10,.62)'
-    ctx.lineWidth = Math.max(1.5, m.a * 2.2)
+    const sp = new Path2D()
+    for (const p of filled) sp.addPath(new Path2D(p.d), m)
+    return sp
+  }
+
+  /** stroke every path as the dark line-art, sitting on top of whatever's below */
+  const strokeOutline = (ctx: CanvasRenderingContext2D, w: number, h: number, colour: string, mul = 2.2) => {
+    const m = picMatrix(w, h)
+    ctx.strokeStyle = colour
+    ctx.lineWidth = Math.max(1.4, m.a * mul)
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
-    for (const d of pic?.paths ?? []) {
+    for (const p of pic?.paths ?? []) {
       const sp = new Path2D()
-      sp.addPath(new Path2D(d), m)
+      sp.addPath(new Path2D(p.d), m)
       ctx.stroke(sp)
     }
+  }
+
+  // ---- painters ----
+  // the reveal layer (bottom): holographic foil, or the real coloured picture,
+  // with the line-art printed dark on top so the picture always reads cleanly.
+  const paintReveal = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.clearRect(0, 0, w, h)
+    if (style === 'colour') {
+      const m = picMatrix(w, h)
+      for (const p of pic?.paths ?? []) {
+        if (!p.fill || p.fill === 'none') continue
+        ctx.fillStyle = p.fill
+        const sp = new Path2D()
+        sp.addPath(new Path2D(p.d), m)
+        ctx.fill(sp)
+      }
+    } else {
+      // holographic rainbow foil
+      const N = 12
+      const base = ctx.createLinearGradient(0, 0, w, h)
+      for (let i = 0; i <= N; i++) base.addColorStop(i / N, `hsl(${Math.round((seed + (i * 360) / N) % 360)}, 92%, 58%)`)
+      ctx.fillStyle = base
+      ctx.fillRect(0, 0, w, h)
+      // a second rainbow the other way, blended, for the iridescent interference
+      const cross = ctx.createLinearGradient(0, h, w, 0)
+      for (let i = 0; i <= N; i++) cross.addColorStop(i / N, `hsla(${Math.round((seed + 140 + (i * 360) / N) % 360)}, 95%, 60%, 0.5)`)
+      ctx.globalCompositeOperation = 'overlay'
+      ctx.fillStyle = cross
+      ctx.fillRect(0, 0, w, h)
+      // bright diagonal foil streaks
+      ctx.globalCompositeOperation = 'soft-light'
+      for (const off of [0.22, 0.55, 0.84]) {
+        const sg = ctx.createLinearGradient(w * (off - 0.13), 0, w * (off + 0.13), h)
+        sg.addColorStop(0, 'rgba(255,255,255,0)')
+        sg.addColorStop(0.5, 'rgba(255,255,255,.65)')
+        sg.addColorStop(1, 'rgba(255,255,255,0)')
+        ctx.fillStyle = sg
+        ctx.fillRect(0, 0, w, h)
+      }
+      // fine glints
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.fillStyle = 'rgba(255,255,255,.55)'
+      const px = Math.max(1, dpr.current)
+      for (let i = 0; i < 80; i++) {
+        const x = (((i * 61) % 100) / 100) * w
+        const y = (((i * 37) % 100) / 100) * h
+        ctx.fillRect(x, y, px, px)
+      }
+    }
+    // line-art on top, so overshoot at boundaries reads as framed, not messy
+    ctx.globalCompositeOperation = 'source-over'
+    strokeOutline(ctx, w, h, 'rgba(18,14,10,.7)', 2.2)
   }
 
   const paintCoat = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
@@ -210,16 +250,7 @@ export function ScratchOff() {
       ctx.fillRect(x, y, px, px)
     }
     // faint picture guide so kids can see what they're uncovering + trace it
-    const m = picMatrix(w, h)
-    ctx.strokeStyle = 'rgba(255,255,255,.28)'
-    ctx.lineWidth = Math.max(1.4, m.a * 1.8)
-    ctx.lineJoin = 'round'
-    ctx.lineCap = 'round'
-    for (const d of pic?.paths ?? []) {
-      const sp = new Path2D()
-      sp.addPath(new Path2D(d), m)
-      ctx.stroke(sp)
-    }
+    strokeOutline(ctx, w, h, 'rgba(255,255,255,.28)', 1.8)
     // hint, tucked at the bottom so it doesn't fight the drawing
     ctx.fillStyle = 'rgba(255,255,255,.4)'
     ctx.font = `700 ${Math.round(w * 0.04)}px system-ui, sans-serif`
@@ -236,6 +267,12 @@ export function ScratchOff() {
     const r = W * t.r
     const P: [number, number][] = []
     for (let i = 0; i + 1 < norm.length; i += 2) P.push([norm[i] * W, norm[i + 1] * H])
+
+    ctx.save()
+    // forgiveness: you can only scratch inside the object, so going over the
+    // lines never spills the reveal outside the shape
+    const sil = silhouette(W, H)
+    if (sil) ctx.clip(sil)
     ctx.globalCompositeOperation = 'destination-out'
     ctx.strokeStyle = '#000'
     ctx.fillStyle = '#000'
@@ -267,26 +304,24 @@ export function ScratchOff() {
         }
         ctx.stroke()
       }
-      ctx.globalCompositeOperation = 'source-over'
-      return
-    }
-
-    // pick = a fine round point; flat = a wide square-edged scraper
-    ctx.lineCap = toolId === 'flat' ? 'square' : 'round'
-    ctx.lineWidth = r * 2
-    ctx.beginPath()
-    ctx.moveTo(P[0][0], P[0][1])
-    for (let i = 1; i < P.length; i++) ctx.lineTo(P[i][0], P[i][1])
-    ctx.stroke()
-    // cap at the head so a single tap still scratches
-    const [hx, hy] = P[P.length - 1]
-    if (toolId === 'flat') ctx.fillRect(hx - r, hy - r, r * 2, r * 2)
-    else {
+    } else {
+      // pick = a fine round point; flat = a wide square-edged scraper
+      ctx.lineCap = toolId === 'flat' ? 'square' : 'round'
+      ctx.lineWidth = r * 2
       ctx.beginPath()
-      ctx.arc(hx, hy, r, 0, 7)
-      ctx.fill()
+      ctx.moveTo(P[0][0], P[0][1])
+      for (let i = 1; i < P.length; i++) ctx.lineTo(P[i][0], P[i][1])
+      ctx.stroke()
+      // cap at the head so a single tap still scratches
+      const [hx, hy] = P[P.length - 1]
+      if (toolId === 'flat') ctx.fillRect(hx - r, hy - r, r * 2, r * 2)
+      else {
+        ctx.beginPath()
+        ctx.arc(hx, hy, r, 0, 7)
+        ctx.fill()
+      }
     }
-    ctx.globalCompositeOperation = 'source-over'
+    ctx.restore()
   }
 
   /** repaint both layers from scratch-stroke history (undo / resize / restore) */
@@ -294,7 +329,7 @@ export function ScratchOff() {
     const rc = neonRef.current
     const cc = coatRef.current
     if (!rc || !cc) return
-    paintHolo(rc.getContext('2d')!, rc.width, rc.height)
+    paintReveal(rc.getContext('2d')!, rc.width, rc.height)
     const cctx = cc.getContext('2d')!
     paintCoat(cctx, cc.width, cc.height)
     for (const s of strokes.current) scratchAlong(cctx, s.p, s.t)
@@ -316,17 +351,7 @@ export function ScratchOff() {
 
   const persist = () => {
     // strokes are already normalized 0..1 — store as-is
-    saveDraft('scratch', { pic: picIdx, seed, tool: toolIdx, done: doneRef.current, strokes: strokes.current } satisfies ScratchDraft)
-  }
-
-  const finishReveal = () => {
-    const cc = coatRef.current
-    if (cc) cc.getContext('2d')!.clearRect(0, 0, cc.width, cc.height)
-    setScratched(1)
-    setDone(true)
-    doneRef.current = true
-    play('fw')
-    persist()
+    saveDraft('scratch', { pic: picIdx, seed, tool: toolIdx, style, strokes: strokes.current } satisfies ScratchDraft)
   }
 
   // ---- sizing + (re)build ----
@@ -341,7 +366,7 @@ export function ScratchOff() {
     return () => window.removeEventListener('resize', measureSize)
   }, [])
 
-  // build canvases whenever size / picture / seed changes
+  // build canvases whenever size / picture / seed / reveal-style changes
   useEffect(() => {
     if (size.w < 2) return
     const rc = neonRef.current
@@ -364,14 +389,9 @@ export function ScratchOff() {
     }
     draft.current = null
     repaint()
-    if (doneRef.current) {
-      cc.getContext('2d')!.clearRect(0, 0, cc.width, cc.height)
-      setScratched(1)
-    } else {
-      setScratched(measure())
-    }
+    setScratched(measure())
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, picIdx, seed, pics])
+  }, [size, picIdx, seed, style, pics])
 
   // ---- pointer scratching ----
   const toNorm = (e: { clientX: number; clientY: number }): [number, number] => {
@@ -381,7 +401,7 @@ export function ScratchOff() {
   const down = (e: RPE) => {
     // left button / primary touch only, one finger at a time (a right-click or
     // a second finger must not punch a stray scratch)
-    if (doneRef.current || e.button !== 0 || activePtr.current !== null) return
+    if (e.button !== 0 || activePtr.current !== null) return
     activePtr.current = e.pointerId
     curTool.current = tool.id
     e.currentTarget.setPointerCapture?.(e.pointerId)
@@ -389,17 +409,8 @@ export function ScratchOff() {
     scratchAlong(coatRef.current!.getContext('2d')!, cur.current, curTool.current)
     play('scratch', 0.9 + Math.random() * 0.3)
   }
-  const maybeReveal = () => {
-    if (doneRef.current) return
-    const frac = measure()
-    setScratched(frac)
-    if (frac >= REVEAL_AT) {
-      showToast('ta-daa! 🌈')
-      finishReveal()
-    }
-  }
   const move = (e: RPE) => {
-    if (!cur.current || doneRef.current || e.pointerId !== activePtr.current) return
+    if (!cur.current || e.pointerId !== activePtr.current) return
     const p = toNorm(e)
     const last = cur.current
     const px = last[last.length - 2]
@@ -413,9 +424,11 @@ export function ScratchOff() {
       lastSfx.current = t
       play('scratch', 0.9 + Math.random() * 0.4)
     }
+    // track how much is uncovered only to enable Keep — never to auto-finish;
+    // the child decides when the picture is done.
     if (t - lastMeasure.current > 220) {
       lastMeasure.current = t
-      maybeReveal()
+      setScratched(measure())
     }
   }
   const up = (e: RPE) => {
@@ -424,14 +437,12 @@ export function ScratchOff() {
     if (!cur.current) return
     if (cur.current.length >= 2) strokes.current.push({ t: curTool.current, p: cur.current })
     cur.current = null
-    // a fast swipe can cross the threshold between throttled measures — catch it
-    if (doneRef.current) return
-    maybeReveal()
-    if (!doneRef.current) persist()
+    setScratched(measure())
+    persist()
   }
 
   const undo = () => {
-    if (done || !strokes.current.length) return
+    if (!strokes.current.length) return
     strokes.current.pop()
     repaint()
     setScratched(measure())
@@ -439,11 +450,9 @@ export function ScratchOff() {
     play('select')
   }
   const recover = () => {
-    // a brand-new surprise: a different picture + fresh neon colours. Changing
+    // a brand-new surprise: a different picture + fresh foil colours. Changing
     // picIdx guarantees the build effect reruns and repaints.
     strokes.current = []
-    setDone(false)
-    doneRef.current = false
     setPicIdx((p) => (pics.length ? (p + 1 + Math.floor(Math.random() * (pics.length - 1))) % pics.length : 0))
     setSeed(Math.floor(Math.random() * 360))
     setScratched(0)
@@ -466,19 +475,23 @@ export function ScratchOff() {
     g.drawImage(rc, 0, 0)
     g.drawImage(cc, 0, 0)
     clearDraft('scratch')
-    startFinish({ type: 'scratch', title: `Holographic ${(pic?.name ?? 'picture').toLowerCase()}`, img: out.toDataURL('image/png'), tint: `hsl(${seed}, 92%, 58%)` })
+    const name = (pic?.name ?? 'picture').toLowerCase()
+    startFinish({
+      type: 'scratch',
+      title: style === 'colour' ? `Scratched ${name}` : `Holographic ${name}`,
+      img: out.toDataURL('image/png'),
+      tint: style === 'colour' ? c.pink : `hsl(${seed}, 92%, 58%)`,
+    })
   }
 
   const pickPic = (i: number) => {
     if (i === picIdx) return
     strokes.current = []
-    setDone(false)
-    doneRef.current = false
     setScratched(0)
     setPicIdx(i)
     // persist the new choice now (setPicIdx's value isn't in this closure yet)
     // so a reload before the next scratch keeps the freshly-picked picture
-    saveDraft('scratch', { pic: i, seed, tool: toolIdx, strokes: [], done: false })
+    saveDraft('scratch', { pic: i, seed, tool: toolIdx, style, strokes: [] })
     play('select')
   }
 
@@ -486,9 +499,22 @@ export function ScratchOff() {
     if (i === toolIdx) return
     setToolIdx(i)
     // remember the tool choice without disturbing the artwork in progress
-    saveDraft('scratch', { pic: picIdx, seed, tool: i, done: doneRef.current, strokes: strokes.current })
+    saveDraft('scratch', { pic: picIdx, seed, tool: i, style, strokes: strokes.current })
     play('select')
   }
+
+  const pickStyle = (s: RevealStyle) => {
+    if (s === style) return
+    setStyle(s)
+    // strokes are kept — only the layer being uncovered changes
+    saveDraft('scratch', { pic: picIdx, seed, tool: toolIdx, style: s, strokes: strokes.current })
+    play('select')
+  }
+
+  const STYLES: { id: RevealStyle; name: string; icon: string }[] = [
+    { id: 'foil', name: 'Foil', icon: '✨' },
+    { id: 'colour', name: 'Colour', icon: '🎨' },
+  ]
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
@@ -524,7 +550,7 @@ export function ScratchOff() {
                 width: '100%',
                 height: '100%',
                 display: 'block',
-                animation: calm ? undefined : 'hueShift 12s linear infinite',
+                animation: !calm && style === 'foil' ? 'hueShift 12s linear infinite' : undefined,
               }}
             />
             <canvas
@@ -536,62 +562,42 @@ export function ScratchOff() {
               onContextMenu={(e) => e.preventDefault()}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }}
             />
-            {done && (
-              <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', borderRadius: 3 }}>
-                <div style={{ position: 'absolute', top: 0, bottom: 0, width: 80, background: 'linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent)', animation: 'shim 1.1s ease-out' }} />
-                {buildParticles(calm).map((p, i) => (
-                  <span
-                    key={i}
-                    style={
-                      {
-                        position: 'absolute',
-                        left: '50%',
-                        top: '46%',
-                        width: 8,
-                        height: 12,
-                        borderRadius: 2,
-                        background: p.c,
-                        '--tx': `${p.tx}px`,
-                        '--ty': `${p.ty}px`,
-                        animation: `${calm ? 'conf' : 'fw'} ${p.d}s ease-out ${p.delay}s both`,
-                      } as CSSProperties
-                    }
-                  />
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', padding: '2px 16px 20px' }}>
-        {!done && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: 'min(300px, 82vw)' }}>
-            <div style={{ flex: 1, height: 8, background: c.toggleOff, borderRadius: 5, overflow: 'hidden', border: `1.5px solid ${c.ink}` }}>
-              <div style={{ width: `${Math.min(100, (scratched / REVEAL_AT) * 100)}%`, height: '100%', background: c.teal, transition: 'width .2s' }} />
-            </div>
-          </div>
-        )}
         <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>
-          {done ? 'holographic! press keep →' : scratched > 0.02 ? 'keep scratching…' : 'scratch out the picture — it comes up holographic!'}
+          {scratched > 0.02 ? "keep going — press Keep ✓ when you're happy with it" : 'scratch to reveal — it stays inside the lines!'}
         </div>
-        {!done && (
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
-            <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Tool</span>
-            {TOOLS.map((t, i) => (
-              <button
-                key={t.id}
-                onClick={() => pickTool(i)}
-                aria-pressed={i === toolIdx}
-                title={t.name}
-                style={{ ...chip, minHeight: 38, padding: '8px 12px', background: i === toolIdx ? c.ink : '#fff', color: i === toolIdx ? c.paper : c.ink }}
-              >
-                <span aria-hidden style={{ marginRight: 6 }}>{t.icon}</span>
-                {t.name}
-              </button>
-            ))}
-          </div>
-        )}
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
+          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Reveal</span>
+          {STYLES.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => pickStyle(s.id)}
+              aria-pressed={s.id === style}
+              title={s.name}
+              style={{ ...chip, minHeight: 38, padding: '8px 12px', background: s.id === style ? c.ink : '#fff', color: s.id === style ? c.paper : c.ink }}
+            >
+              <span aria-hidden style={{ marginRight: 6 }}>{s.icon}</span>
+              {s.name}
+            </button>
+          ))}
+          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55, marginLeft: 6 }}>Tool</span>
+          {TOOLS.map((t, i) => (
+            <button
+              key={t.id}
+              onClick={() => pickTool(i)}
+              aria-pressed={i === toolIdx}
+              title={t.name}
+              style={{ ...chip, minHeight: 38, padding: '8px 12px', background: i === toolIdx ? c.ink : '#fff', color: i === toolIdx ? c.paper : c.ink }}
+            >
+              <span aria-hidden style={{ marginRight: 6 }}>{t.icon}</span>
+              {t.name}
+            </button>
+          ))}
+        </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
           <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Picture</span>
           {pics.map((p, i) => (
