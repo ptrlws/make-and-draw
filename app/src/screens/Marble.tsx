@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState, type ChangeEvent as RCE, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useGame } from '../game/context'
 import { loadDraft, saveDraft } from '../game/draftStore'
-import { getModel, putModel } from '../game/modelStore'
 import { saveStock } from '../game/stock'
 import { MarbleStudio, type Op } from '../marble/MarbleStudio'
 import { STL_MODELS } from '../marble/models'
@@ -37,16 +36,14 @@ const squareBtn: CSSProperties = {
 }
 
 export function Marble() {
-  const { go, play, showToast, startFinish, reducedMotion, state } = useGame()
+  const { go, play, startFinish, reducedMotion, state } = useGame()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const studioRef = useRef<MarbleStudio | null>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
 
   const [ink, setInk] = useState(0)
   const [tool, setTool] = useState(0)
   const [phase, setPhase] = useState<'tray' | 'collectible'>('tray')
   const [dipped, setDipped] = useState<string>('cat')
-  const [modelName, setModelName] = useState<string | null>(null)
   const [noGl, setNoGl] = useState(false)
 
   useEffect(() => {
@@ -101,8 +98,7 @@ export function Marble() {
     studioRef.current?.backToTray()
     setPhase('tray')
   }
-  const dipLabel =
-    dipped === 'custom' ? modelName || 'model' : (STL_MODELS.find((m) => m.id === dipped)?.name ?? 'thing')
+  const dipLabel = STL_MODELS.find((m) => m.id === dipped)?.name ?? 'thing'
   const addToCollection = () => {
     const studio = studioRef.current
     if (!studio) return
@@ -118,47 +114,8 @@ export function Marble() {
     startFinish({ type: 'marble', title: 'Marbled paper', img, tint: INKS[ink].c })
   }
 
-  // ---- STL import (the file stays local; parsed to geometry, cached in IDB) ----
-  const importStl = async (buffer: ArrayBuffer, name: string, persist: boolean): Promise<boolean> => {
-    const studio = studioRef.current
-    if (!studio) return false
-    try {
-      const { STLLoader } = await import('three/examples/jsm/loaders/STLLoader.js')
-      const geo = new STLLoader().parse(buffer)
-      if (!studioRef.current) return false
-      studio.registerGeometry('custom', geo)
-      setModelName(name)
-      if (persist) void putModel(name, buffer)
-      return true
-    } catch {
-      return false
-    }
-  }
-  const onStl = (e: RCE<HTMLInputElement>) => {
-    const f = e.target.files?.[0]
-    e.target.value = ''
-    if (!f) return
-    void f.arrayBuffer().then(async (buf) => {
-      const ok = await importStl(buf, f.name.replace(/\.stl$/i, '').slice(0, 24) || 'Model', true)
-      if (ok) dip('custom')
-      else showToast("couldn't read that model")
-    })
-  }
-  // restore a previously-imported model on mount
-  useEffect(() => {
-    let cancelled = false
-    void (async () => {
-      const m = await getModel()
-      if (cancelled || !m) return
-      await importStl(m.bytes, m.name, false)
-    })()
-    return () => {
-      cancelled = true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // load the bundled default STL models into the dip tray
+  // load the bundled STL models (public/models/, listed in marble/models.ts)
+  // into the dip tray — the dip shelf is powered entirely by these assets
   useEffect(() => {
     let cancelled = false
     void (async () => {
@@ -320,15 +277,6 @@ export function Marble() {
                 {m.emoji} {m.name}
               </button>
             ))}
-            {modelName && (
-              <button onClick={() => dip('custom')} style={{ ...chip, background: c.teal, color: c.ink, borderColor: c.ink }}>
-                {modelName.length > 10 ? 'Model' : modelName}
-              </button>
-            )}
-            <button onClick={() => fileRef.current?.click()} style={{ ...chip, background: '#fff', color: c.ink }}>
-              ＋ STL
-            </button>
-            <input ref={fileRef} type="file" accept=".stl" onChange={onStl} style={{ display: 'none' }} />
           </div>
         </div>
       ) : (

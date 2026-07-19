@@ -1,5 +1,6 @@
-import { useRef, useState, type ChangeEvent as RCE, type CSSProperties, type PointerEvent as RPE } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as RPE } from 'react'
 import { IconButton } from '../components/riso'
+import { DOT_SVGS } from '../dots/dotSvgs'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { c, fonts } from '../theme'
@@ -351,8 +352,8 @@ function densePath(pts: Pt[]): string {
   for (let i = 1; i < pts.length; i++) d += ` L ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)}`
   return d + ' Z'
 }
-/** Turn an uploaded SVG drawing into a joinable puzzle. */
-function svgToPuzzle(svgText: string, name: string): Puzzle | null {
+/** Turn a bundled SVG drawing into a joinable puzzle. */
+function svgToPuzzle(svgText: string, name: string, id: string): Puzzle | null {
   const raw = svgToPoints(svgText)
   if (!raw || raw.length < 12) return null
   const fitted = normalize(raw, 244, 320, VW / 2, VH / 2)
@@ -367,7 +368,8 @@ function svgToPuzzle(svgText: string, name: string): Puzzle | null {
   const count = Math.max(20, Math.min(46, Math.round(per / 42)))
   const dots = resample(fitted, count)
   // the REVEAL is the real outline (dense), not a smoothed few-dot blob
-  return { id: 'svg' + Date.now(), name: name || 'Yours', color: SVG_COLORS[Math.floor(Math.random() * SVG_COLORS.length)], dots, path: densePath(fitted) }
+  const color = SVG_COLORS[Math.abs([...id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7)) % SVG_COLORS.length]
+  return { id, name: name || 'Yours', color, dots, path: densePath(fitted) }
 }
 
 const centroid = (pts: Pt[]): Pt => {
@@ -420,21 +422,47 @@ function Preview({ p, spot }: { p: Puzzle; spot: string }) {
 
 export function DotToDot() {
   const { go, play, showToast, startFinish, reducedMotion, state } = useGame()
-  // kid-imported SVG drawings, appended AFTER the built-ins so built-in
-  // indices (and any saved progress) stay stable
-  const [extra, setExtra] = useState<Puzzle[]>(() => {
-    const saved = loadDraft<Puzzle[]>('dot_custom')
-    return Array.isArray(saved) ? saved : []
-  })
-  const ALL = [...PUZZLES, ...extra]
-  const fileRef = useRef<HTMLInputElement>(null)
-  // resume a half-joined shape (reload/back never loses progress)
-  const [init] = useState(() => loadDraft<{ puzIdx: number; n: number }>('dot'))
-  const resume = init != null && init.puzIdx >= 0 && init.puzIdx < ALL.length && init.n > 0
-  const [view, setView] = useState<'pick' | 'play'>(resume ? 'play' : 'pick')
-  const [puzIdx, setPuzIdx] = useState(resume ? init!.puzIdx : 0)
-  const [n, setN] = useState(resume ? Math.min(init!.n, ALL[init!.puzIdx].dots.length) : 0)
+  // dot-to-dot is powered by bundled SVG drawings (public/dots/, dotSvgs.ts);
+  // the parametric shapes are only a fallback if none load.
+  const [svgPuz, setSvgPuz] = useState<Puzzle[]>([])
+  const ALL = svgPuz.length ? svgPuz : PUZZLES
+  const [view, setView] = useState<'pick' | 'play'>('pick')
+  const [puzIdx, setPuzIdx] = useState(0)
+  const [n, setN] = useState(0)
   const [wrong, setWrong] = useState(0)
+
+  // load the bundled SVGs → puzzles, then resume any half-joined shape by id
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      const loaded: Puzzle[] = []
+      for (const s of DOT_SVGS) {
+        try {
+          const res = await fetch(s.src)
+          if (!res.ok) continue
+          const puz = svgToPuzzle(await res.text(), s.name, s.id)
+          if (puz) loaded.push(puz)
+        } catch {
+          /* skip a drawing that fails to load */
+        }
+      }
+      if (cancelled) return
+      if (loaded.length) setSvgPuz(loaded)
+      const list = loaded.length ? loaded : PUZZLES
+      const d = loadDraft<{ id: string; n: number }>('dot')
+      if (d && d.n > 0) {
+        const i = list.findIndex((p) => p.id === d.id)
+        if (i >= 0) {
+          setPuzIdx(i)
+          setN(Math.min(d.n, list[i].dots.length))
+          setView('play')
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const puz = ALL[Math.min(puzIdx, ALL.length - 1)] ?? ALL[0]
   const N = puz.dots.length
@@ -446,37 +474,8 @@ export function DotToDot() {
     setN(0)
     setWrong(0)
     setView('play')
-    saveDraft('dot', { puzIdx: i, n: 0 })
+    saveDraft('dot', { id: ALL[i].id, n: 0 })
     play('page')
-  }
-
-  // import a drawing: sample its outline into evenly-spaced numbered dots
-  const onSvg = (e: RCE<HTMLInputElement>) => {
-    const f = e.target.files?.[0]
-    e.target.value = ''
-    if (!f) return
-    void f.text().then((txt) => {
-      const raw = f.name.replace(/\.svg$/i, '').replace(/[-_]+/g, ' ').trim().slice(0, 14)
-      const title = raw ? raw[0].toUpperCase() + raw.slice(1) : 'Yours'
-      const puzzle = svgToPuzzle(txt, title)
-      if (!puzzle) {
-        play('wrong')
-        showToast("couldn't read that drawing")
-        return
-      }
-      const idx = PUZZLES.length + extra.length // its slot in ALL once appended
-      setExtra((prev) => {
-        const next = [...prev, puzzle]
-        saveDraft('dot_custom', next)
-        return next
-      })
-      setPuzIdx(idx)
-      setN(0)
-      setWrong(0)
-      setView('play')
-      saveDraft('dot', { puzIdx: idx, n: 0 })
-      play('page')
-    })
   }
 
   /** Every connect climbs the ladder — dot 1 sits low, each dot rings one
@@ -497,7 +496,7 @@ export function DotToDot() {
       const nn = n + 1
       setN(nn)
       setWrong(0)
-      saveDraft('dot', { puzIdx, n: nn })
+      saveDraft('dot', { id: puz.id, n: nn })
       connectSound(nn)
     } else {
       play('wrong')
@@ -510,7 +509,7 @@ export function DotToDot() {
     const nn = n - 1
     setN(nn)
     setWrong(0)
-    saveDraft('dot', { puzIdx, n: nn })
+    saveDraft('dot', { id: puz.id, n: nn })
     play('select')
   }
 
@@ -537,7 +536,7 @@ export function DotToDot() {
     if (!connected) return
     setN(nn)
     setWrong(0)
-    saveDraft('dot', { puzIdx, n: nn })
+    saveDraft('dot', { id: puz.id, n: nn })
     connectSound(nn)
   }
   const onDown = (e: RPE<SVGSVGElement>) => {
@@ -585,15 +584,6 @@ export function DotToDot() {
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '4px 16px calc(24px + env(safe-area-inset-bottom))' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            {/* import your own drawing → auto-dotted */}
-            <button
-              onClick={() => fileRef.current?.click()}
-              style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, background: c.card, border: `3px dashed ${c.ink}`, borderRadius: 12, padding: 8, cursor: 'pointer', color: c.ink }}
-            >
-              <div style={{ fontFamily: fonts.display, fontSize: 44, lineHeight: 1 }}>＋</div>
-              <div style={{ fontFamily: fonts.display, fontSize: 15, textTransform: 'uppercase', textAlign: 'center' }}>Your drawing</div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, color: c.hint, textAlign: 'center' }}>drop in an SVG to join up</div>
-            </button>
             {ALL.map((p, i) => {
               const spot = [c.pink, c.blue, c.yellow, c.teal][i % 4]
               return (
@@ -613,7 +603,6 @@ export function DotToDot() {
               )
             })}
           </div>
-          <input ref={fileRef} type="file" accept=".svg,image/svg+xml" onChange={onSvg} style={{ display: 'none' }} />
         </div>
       </div>
     )
@@ -631,7 +620,7 @@ export function DotToDot() {
         <IconButton onClick={undo} ariaLabel="undo last dot" size={44} style={{ fontFamily: fonts.display, fontSize: 20 }}>
           ↶
         </IconButton>
-        <IconButton onClick={() => { setN(0); setWrong(0); saveDraft('dot', { puzIdx, n: 0 }); play('page') }} ariaLabel="reset" size={44} style={{ fontFamily: fonts.display, fontSize: 20 }}>
+        <IconButton onClick={() => { setN(0); setWrong(0); saveDraft('dot', { id: puz.id, n: 0 }); play('page') }} ariaLabel="reset" size={44} style={{ fontFamily: fonts.display, fontSize: 20 }}>
           ⟲
         </IconButton>
         <button
