@@ -7,14 +7,54 @@ import { c, fonts } from '../theme'
 import { buildParticles } from '../utils'
 
 const COAT = '#151310'
-const REVEAL_AT = 0.45 // scratch this much and the rest peels away on its own
-const BRUSH = 0.03 // scratch radius as a fraction of canvas width (thin, precise)
+const REVEAL_AT = 0.3 // scratch this much and the rest peels away on its own
 
 /** a colouring page loaded from a bundled SVG (viewBox 0 0 100 100) */
 interface Pic {
   id: string
   name: string
   paths: string[]
+}
+
+/** the tools a real scratch-art kit gives a child: a fine wooden pick for
+ * detail, a flat edge that scrapes a wide band, and a comb/rake that cuts
+ * several fine grooves at once. r = brush radius as a fraction of canvas width. */
+type ToolId = 'pick' | 'flat' | 'comb'
+interface Tool {
+  id: ToolId
+  name: string
+  icon: string
+  r: number
+}
+const TOOLS: Tool[] = [
+  { id: 'pick', name: 'Pick', icon: '✎', r: 0.008 },
+  { id: 'flat', name: 'Flat', icon: '▬', r: 0.032 },
+  { id: 'comb', name: 'Comb', icon: '≡', r: 0.007 },
+]
+const COMB_TINES = 4
+
+/** one committed scratch: which tool cut it + a flat [nx,ny,…] point list,
+ * normalized 0..1 so undo / resize / rotate all replay to the right place. */
+interface Stroke {
+  t: ToolId
+  p: number[]
+}
+
+/** unit normals per point (perpendicular to local travel), so the comb's
+ * parallel tines follow the stroke rather than always pointing one way. */
+function pointNormals(P: [number, number][]): [number, number][] {
+  const m = P.length
+  if (m < 2) return [[1, 0]]
+  const out: [number, number][] = []
+  for (let i = 0; i < m; i++) {
+    const a = P[Math.max(0, i - 1)]
+    const b = P[Math.min(m - 1, i + 1)]
+    const dx = b[0] - a[0]
+    const dy = b[1] - a[1]
+    const len = Math.hypot(dx, dy) || 1
+    out.push([-dy / len, dx / len])
+  }
+  return out
 }
 
 const chip: CSSProperties = {
@@ -36,8 +76,9 @@ const chip: CSSProperties = {
 interface ScratchDraft {
   pic: number
   seed: number
-  /** each scratch as a flat [nx,ny,nx,ny,…] list, normalized 0..1 */
-  strokes: number[][]
+  /** index into TOOLS of the last-used scratch tool */
+  tool?: number
+  strokes: Stroke[]
   done?: boolean
 }
 
@@ -48,6 +89,7 @@ export function ScratchOff() {
   const [pics, setPics] = useState<Pic[]>([])
   const [picIdx, setPicIdx] = useState(() => Math.max(0, draft.current?.pic ?? 0))
   const [seed, setSeed] = useState(() => draft.current?.seed ?? Math.floor(Math.random() * 360))
+  const [toolIdx, setToolIdx] = useState(() => Math.max(0, Math.min(TOOLS.length - 1, draft.current?.tool ?? 0)))
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [scratched, setScratched] = useState(0)
   const [done, setDone] = useState(() => !!draft.current?.done)
@@ -56,10 +98,11 @@ export function ScratchOff() {
   const neonRef = useRef<HTMLCanvasElement>(null)
   const coatRef = useRef<HTMLCanvasElement>(null)
   const dpr = useRef(1)
-  /** committed scratches as flat [nx,ny,…] normalized 0..1 — resolution-free,
-   * so undo, resize and rotation all replay to the right place. */
-  const strokes = useRef<number[][]>([])
+  /** committed scratches (tool + normalized points) — resolution-free, so
+   * undo, resize and rotation all replay to the right place with the right tool. */
+  const strokes = useRef<Stroke[]>([])
   const cur = useRef<number[] | null>(null)
+  const curTool = useRef<ToolId>('pick') // the tool that cut the in-progress stroke
   const activePtr = useRef<number | null>(null) // one finger at a time
   const doneRef = useRef(done)
   doneRef.current = done
@@ -67,6 +110,7 @@ export function ScratchOff() {
   const lastSfx = useRef(0)
 
   const pic = pics.length ? pics[Math.min(picIdx, pics.length - 1)] : undefined
+  const tool = TOOLS[toolIdx]
   const calm = reducedMotion || state.calm
 
   // load the colouring pages from public/scratch/ once on mount
@@ -184,25 +228,64 @@ export function ScratchOff() {
     ctx.fillText('scratch ✨', w / 2, h * 0.92)
   }
 
-  const scratchAlong = (ctx: CanvasRenderingContext2D, norm: number[]) => {
+  const scratchAlong = (ctx: CanvasRenderingContext2D, norm: number[], toolId: ToolId) => {
     if (norm.length < 2) return
     const W = ctx.canvas.width
     const H = ctx.canvas.height
-    const r = W * BRUSH
+    const t = TOOLS.find((x) => x.id === toolId) ?? TOOLS[0]
+    const r = W * t.r
+    const P: [number, number][] = []
+    for (let i = 0; i + 1 < norm.length; i += 2) P.push([norm[i] * W, norm[i + 1] * H])
     ctx.globalCompositeOperation = 'destination-out'
     ctx.strokeStyle = '#000'
     ctx.fillStyle = '#000'
-    ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
+
+    if (toolId === 'comb') {
+      // a rake: COMB_TINES fine grooves, offset along the local normal so they
+      // stay parallel as the stroke curves
+      ctx.lineCap = 'round'
+      ctx.lineWidth = r * 2
+      const gap = r * 2.8
+      const nrm = pointNormals(P)
+      for (let k = 0; k < COMB_TINES; k++) {
+        const off = (k - (COMB_TINES - 1) / 2) * gap
+        if (P.length < 2) {
+          const [nx, ny] = nrm[0]
+          ctx.beginPath()
+          ctx.arc(P[0][0] + nx * off, P[0][1] + ny * off, r, 0, 7)
+          ctx.fill()
+          continue
+        }
+        ctx.beginPath()
+        for (let i = 0; i < P.length; i++) {
+          const [nx, ny] = nrm[i]
+          const x = P[i][0] + nx * off
+          const y = P[i][1] + ny * off
+          if (i === 0) ctx.moveTo(x, y)
+          else ctx.lineTo(x, y)
+        }
+        ctx.stroke()
+      }
+      ctx.globalCompositeOperation = 'source-over'
+      return
+    }
+
+    // pick = a fine round point; flat = a wide square-edged scraper
+    ctx.lineCap = toolId === 'flat' ? 'square' : 'round'
     ctx.lineWidth = r * 2
     ctx.beginPath()
-    ctx.moveTo(norm[0] * W, norm[1] * H)
-    for (let i = 2; i + 1 < norm.length; i += 2) ctx.lineTo(norm[i] * W, norm[i + 1] * H)
+    ctx.moveTo(P[0][0], P[0][1])
+    for (let i = 1; i < P.length; i++) ctx.lineTo(P[i][0], P[i][1])
     ctx.stroke()
-    // round cap at the head so a single tap still scratches
-    ctx.beginPath()
-    ctx.arc(norm[norm.length - 2] * W, norm[norm.length - 1] * H, r, 0, 7)
-    ctx.fill()
+    // cap at the head so a single tap still scratches
+    const [hx, hy] = P[P.length - 1]
+    if (toolId === 'flat') ctx.fillRect(hx - r, hy - r, r * 2, r * 2)
+    else {
+      ctx.beginPath()
+      ctx.arc(hx, hy, r, 0, 7)
+      ctx.fill()
+    }
     ctx.globalCompositeOperation = 'source-over'
   }
 
@@ -214,7 +297,7 @@ export function ScratchOff() {
     paintHolo(rc.getContext('2d')!, rc.width, rc.height)
     const cctx = cc.getContext('2d')!
     paintCoat(cctx, cc.width, cc.height)
-    for (const s of strokes.current) scratchAlong(cctx, s)
+    for (const s of strokes.current) scratchAlong(cctx, s.p, s.t)
   }
 
   const measure = () => {
@@ -233,7 +316,7 @@ export function ScratchOff() {
 
   const persist = () => {
     // strokes are already normalized 0..1 — store as-is
-    saveDraft('scratch', { pic: picIdx, seed, done: doneRef.current, strokes: strokes.current } satisfies ScratchDraft)
+    saveDraft('scratch', { pic: picIdx, seed, tool: toolIdx, done: doneRef.current, strokes: strokes.current } satisfies ScratchDraft)
   }
 
   const finishReveal = () => {
@@ -274,7 +357,11 @@ export function ScratchOff() {
     // because strokes are resolution-free, a live resize/rotate just repaints
     // them to the right place with no rescale step.
     const dr = draft.current
-    if (dr?.strokes?.length) strokes.current = dr.strokes.map((s) => s.slice())
+    // migrate: older drafts stored strokes as bare number[][] (pick only)
+    const raw = dr?.strokes as unknown as (Stroke | number[])[] | undefined
+    if (raw?.length) {
+      strokes.current = raw.map((s) => (Array.isArray(s) ? { t: 'pick' as ToolId, p: s.slice() } : { t: s.t, p: s.p.slice() }))
+    }
     draft.current = null
     repaint()
     if (doneRef.current) {
@@ -296,9 +383,10 @@ export function ScratchOff() {
     // a second finger must not punch a stray scratch)
     if (doneRef.current || e.button !== 0 || activePtr.current !== null) return
     activePtr.current = e.pointerId
+    curTool.current = tool.id
     e.currentTarget.setPointerCapture?.(e.pointerId)
     cur.current = [...toNorm(e)]
-    scratchAlong(coatRef.current!.getContext('2d')!, cur.current)
+    scratchAlong(coatRef.current!.getContext('2d')!, cur.current, curTool.current)
     play('scratch', 0.9 + Math.random() * 0.3)
   }
   const maybeReveal = () => {
@@ -316,10 +404,10 @@ export function ScratchOff() {
     const last = cur.current
     const px = last[last.length - 2]
     const py = last[last.length - 1]
-    if (Math.hypot(p[0] - px, p[1] - py) < 0.004) return
+    if (Math.hypot(p[0] - px, p[1] - py) < 0.0025) return
     cur.current.push(p[0], p[1])
     // erase just the newest segment (cheap) rather than the whole stroke
-    scratchAlong(coatRef.current!.getContext('2d')!, [px, py, p[0], p[1]])
+    scratchAlong(coatRef.current!.getContext('2d')!, [px, py, p[0], p[1]], curTool.current)
     const t = performance.now()
     if (t - lastSfx.current > 65) {
       lastSfx.current = t
@@ -334,7 +422,7 @@ export function ScratchOff() {
     if (e.pointerId !== activePtr.current) return
     activePtr.current = null
     if (!cur.current) return
-    if (cur.current.length >= 2) strokes.current.push(cur.current)
+    if (cur.current.length >= 2) strokes.current.push({ t: curTool.current, p: cur.current })
     cur.current = null
     // a fast swipe can cross the threshold between throttled measures — catch it
     if (doneRef.current) return
@@ -390,7 +478,15 @@ export function ScratchOff() {
     setPicIdx(i)
     // persist the new choice now (setPicIdx's value isn't in this closure yet)
     // so a reload before the next scratch keeps the freshly-picked picture
-    saveDraft('scratch', { pic: i, seed, strokes: [], done: false })
+    saveDraft('scratch', { pic: i, seed, tool: toolIdx, strokes: [], done: false })
+    play('select')
+  }
+
+  const pickTool = (i: number) => {
+    if (i === toolIdx) return
+    setToolIdx(i)
+    // remember the tool choice without disturbing the artwork in progress
+    saveDraft('scratch', { pic: picIdx, seed, tool: i, done: doneRef.current, strokes: strokes.current })
     play('select')
   }
 
@@ -479,6 +575,23 @@ export function ScratchOff() {
         <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>
           {done ? 'holographic! press keep →' : scratched > 0.02 ? 'keep scratching…' : 'scratch out the picture — it comes up holographic!'}
         </div>
+        {!done && (
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
+            <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Tool</span>
+            {TOOLS.map((t, i) => (
+              <button
+                key={t.id}
+                onClick={() => pickTool(i)}
+                aria-pressed={i === toolIdx}
+                title={t.name}
+                style={{ ...chip, minHeight: 38, padding: '8px 12px', background: i === toolIdx ? c.ink : '#fff', color: i === toolIdx ? c.paper : c.ink }}
+              >
+                <span aria-hidden style={{ marginRight: 6 }}>{t.icon}</span>
+                {t.name}
+              </button>
+            ))}
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
           <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Picture</span>
           {pics.map((p, i) => (
