@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="188" viewBox="0 0 150 188">
+<defs><linearGradient id="meadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe8ff"/><stop offset="0.62" stop-color="#d9f4e6"/><stop offset="1" stop-color="#8fd6a2"/></linearGradient></defs>
+
+<rect width="150" height="188" fill="url(#meadow)"/>
+<path d="M 75 78 L 75 182" stroke="#2f9e5f" stroke-width="7" fill="none" stroke-linecap="round"/>
+<ellipse cx="53" cy="132" rx="20" ry="10" fill="#3fb98a" transform="rotate(-28 53 132)"/>
+<ellipse cx="97" cy="150" rx="20" ry="10" fill="#3fb98a" transform="rotate(28 97 150)"/>
+<ellipse cx="75" cy="52" rx="12" ry="20" fill="#ff5aa0" transform="rotate(0 75 78)"/><ellipse cx="75" cy="52" rx="12" ry="20" fill="#ff5aa0" transform="rotate(45 75 78)"/><ellipse cx="75" cy="52" rx="12" ry="20" fill="#ff5aa0" transform="rotate(90 75 78)"/><ellipse cx="75" cy="52" rx="12" ry="20" fill="#ff5aa0" transform="rotate(135 75 78)"/><ellipse cx="75" cy="52" rx="12" ry="20" fill="#ff5aa0" transform="rotate(180 75 78)"/><ellipse cx="75" cy="52" rx="12" ry="20" fill="#ff5aa0" transform="rotate(225 75 78)"/><ellipse cx="75" cy="52" rx="12" ry="20" fill="#ff5aa0" transform="rotate(270 75 78)"/><ellipse cx="75" cy="52" rx="12" ry="20" fill="#ff5aa0" transform="rotate(315 75 78)"/>
+<circle cx="75" cy="78" r="17" fill="#ffd23f"/>
+<circle cx="75" cy="78" r="9" fill="#ff8a1e"/>
+</svg>

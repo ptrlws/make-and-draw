@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type ChangeEvent as RCE, type CSSPropertie
 import getStroke from 'perfect-freehand'
 import { IconButton } from '../components/riso'
 import { generatePbn, type PbnResult } from '../cbn/pbn'
-import { PBN_SOURCES, preprocess, rasterize } from '../cbn/pbnSources'
+import { CBN_ASSETS } from '../cbn/cbnSources'
+import { preprocess } from '../cbn/pbnSources'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { printHtml } from '../game/exporter'
@@ -99,6 +100,9 @@ export function ColourByNumber() {
   const [srcIdx, setSrcIdx] = useState(() => (draft ? (draft.srcIdx >= 0 ? draft.srcIdx : draft.photo ? -1 : 0) : 0))
   const [detail, setDetail] = useState(() => draft?.detail ?? 1)
   const [pbn, setPbn] = useState<PbnResult | null>(null)
+  // built-in pictures, loaded from public/cbn/ (PNG or SVG) as working-res
+  // ImageData — the same shape the photo path feeds the faceter.
+  const [assets, setAssets] = useState<{ id: string; name: string; img: ImageData }[]>([])
 
   const [pot, setPot] = useState<number | null>(null)
   const [filled, setFilled] = useState<Set<number>>(new Set())
@@ -189,15 +193,48 @@ export function ColourByNumber() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // load the bundled pictures once — each PNG/SVG is decoded through an <img>
+  // and drawn into the working canvas, giving ImageData for the faceter. Same-
+  // origin bundled assets, so getImageData never taints.
+  useEffect(() => {
+    let live = true
+    const loadOne = (src: string) =>
+      new Promise<ImageData | null>((resolve) => {
+        const im = new Image()
+        im.onload = () => {
+          const cv = document.createElement('canvas')
+          cv.width = WK.w
+          cv.height = WK.h
+          const ctx = cv.getContext('2d', { willReadFrequently: true })!
+          ctx.fillStyle = '#f4f1e7'
+          ctx.fillRect(0, 0, WK.w, WK.h)
+          ctx.drawImage(im, 0, 0, WK.w, WK.h)
+          resolve(ctx.getImageData(0, 0, WK.w, WK.h))
+        }
+        im.onerror = () => resolve(null)
+        im.src = src
+      })
+    Promise.all(CBN_ASSETS.map(async (a) => ({ id: a.id, name: a.name, img: await loadOne(a.src) }))).then((loaded) => {
+      if (!live) return
+      const ok = loaded.filter((a): a is { id: string; name: string; img: ImageData } => !!a.img)
+      setAssets(ok)
+      // a stale draft may point past the current library — fall back to the first
+      setSrcIdx((s) => (s >= 0 && s >= ok.length ? 0 : s))
+    })
+    return () => {
+      live = false
+    }
+  }, [])
+
   // srcIdx === -1 means "use the uploaded photo"
-  const srcName = srcIdx < 0 ? 'My photo' : PBN_SOURCES[srcIdx].name
+  const srcName = srcIdx < 0 ? 'My photo' : assets[srcIdx]?.name ?? '…'
 
   // generate the paint-by-numbers facets whenever the source or detail changes
   useEffect(() => {
     setPbn(null)
     const id = window.setTimeout(() => {
       const det = DETAILS[detail]
-      let img: { data: Uint8ClampedArray; width: number; height: number } | null = srcIdx < 0 ? photo : rasterize(PBN_SOURCES[srcIdx], WK.w, WK.h)
+      let img: { data: Uint8ClampedArray; width: number; height: number } | null = srcIdx < 0 ? photo : assets[srcIdx]?.img ?? null
       if (!img) return
       // uploaded photos get the brightness/contrast + edge-aware smooth pre-pass
       if (srcIdx < 0) img = preprocess(img, { brightness: BRIGHT[tune.b], contrast: CONTRAST[tune.c], smooth: SMOOTH[tune.s] })
@@ -220,7 +257,7 @@ export function ColourByNumber() {
       }
     }, 16)
     return () => clearTimeout(id)
-  }, [srcIdx, detail, photo, tune])
+  }, [srcIdx, detail, photo, tune, assets])
 
   // persist the draft on every change — reload/back can never lose a picture
   useEffect(() => {
@@ -403,11 +440,12 @@ export function ColourByNumber() {
       showToast('fill it in first!')
       return
     }
-    const paths = regions
-      .map((r, i) => `<path d="${r.d}" fill="${filled.has(i) ? hexOf(palette[r.n - 1]) : '#f4f1e7'}" stroke="#16130f" stroke-width="0.4" stroke-linejoin="round"/>`)
-      .join('')
+    // same layering as the live view: fills, then paint, then the line-art on
+    // top — so a scribble that went over the lines still reads clean when kept
+    const fills = regions.map((r, i) => `<path d="${r.d}" fill="${filled.has(i) ? hexOf(palette[r.n - 1]) : '#f4f1e7'}"/>`).join('')
     const paint = strokes.map((s) => `<polygon points="${ptsToStr(s.pts)}" fill="${s.color}"/>`).join('')
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${pbn.w} ${pbn.h}'><rect width='${pbn.w}' height='${pbn.h}' fill='#f4f1e7'/>${paths}${paint}</svg>`
+    const lines = regions.map((r) => `<path d="${r.d}" fill="none" stroke="#16130f" stroke-width="0.4" stroke-linejoin="round"/>`).join('')
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${pbn.w} ${pbn.h}'><rect width='${pbn.w}' height='${pbn.h}' fill='#f4f1e7'/>${fills}${paint}${lines}</svg>`
     clearDraft('cbn') // kept — next visit starts a fresh picture
     startFinish({ type: 'cbn', title: srcName, img: 'data:image/svg+xml;utf8,' + encodeURIComponent(svg), tint: hexOf(palette[0] ?? [255, 46, 126]) })
   }
@@ -458,23 +496,47 @@ export function ColourByNumber() {
                 onPointerUp={endDraw}
                 onPointerLeave={endDraw}
               >
-                {regions.map((r, i) => {
-                  const isFilled = filled.has(i)
-                  const active = mode === 'number' && pot === r.n && !isFilled
-                  const col = hexOf(palette[r.n - 1])
-                  return (
-                    <path
-                      key={i}
-                      d={r.d}
-                      fill={isFilled ? col : '#f7f4ea'}
-                      stroke={active ? col : flash === i ? c.pink : '#16130f'}
-                      strokeWidth={active ? 1.3 : 0.4}
-                      strokeLinejoin="round"
-                      style={active ? { strokeDasharray: '2.4 2.4', animation: 'ants .5s linear infinite' } : undefined}
-                      onClick={() => mode === 'number' && tap(i)}
-                    />
-                  )
-                })}
+                {/* 1 — shape fills (also the tap targets) */}
+                {regions.map((r, i) => (
+                  <path
+                    key={'f' + i}
+                    d={r.d}
+                    fill={filled.has(i) ? hexOf(palette[r.n - 1]) : '#f7f4ea'}
+                    onClick={() => mode === 'number' && tap(i)}
+                  />
+                ))}
+                {/* 2 — free paint, tucked UNDER the line-art: going over the lines is forgiven */}
+                {strokes.map((s, i) => (
+                  <polygon key={'s' + i} points={ptsToStr(s.pts)} fill={s.color} style={{ pointerEvents: 'none' }} />
+                ))}
+                {wet.length >= 6 && (
+                  <polygon points={ptsToStr(wet)} fill={pot != null ? hexOf(palette[pot - 1]) : hexOf(palette[0] ?? [255, 46, 126])} opacity={0.9} style={{ pointerEvents: 'none' }} />
+                )}
+                {/* 3 — the line-art, always drawn on top so the picture stays crisp */}
+                {regions.map((r, i) => (
+                  <path key={'o' + i} d={r.d} fill="none" stroke="#16130f" strokeWidth={0.4} strokeLinejoin="round" style={{ pointerEvents: 'none' }} />
+                ))}
+                {/* 4 — glowing outline of every shape waiting for the current colour */}
+                {mode === 'number' &&
+                  pot != null &&
+                  regions.map((r, i) =>
+                    !filled.has(i) && r.n === pot ? (
+                      <path
+                        key={'a' + i}
+                        d={r.d}
+                        fill="none"
+                        stroke={hexOf(palette[r.n - 1])}
+                        strokeWidth={1.3}
+                        strokeLinejoin="round"
+                        style={{ strokeDasharray: '2.4 2.4', animation: 'ants .5s linear infinite', pointerEvents: 'none' }}
+                      />
+                    ) : null,
+                  )}
+                {/* wrong-tap flash */}
+                {flash != null && regions[flash] && (
+                  <path d={regions[flash].d} fill="none" stroke={c.pink} strokeWidth={1.4} strokeLinejoin="round" style={{ pointerEvents: 'none' }} />
+                )}
+                {/* 5 — numbers */}
                 {mode === 'number' &&
                   regions.map((r, i) => {
                     if (filled.has(i)) return null
@@ -498,10 +560,6 @@ export function ColourByNumber() {
                       </text>
                     )
                   })}
-                {strokes.map((s, i) => (
-                  <polygon key={'s' + i} points={ptsToStr(s.pts)} fill={s.color} />
-                ))}
-                {wet.length >= 6 && <polygon points={ptsToStr(wet)} fill={pot != null ? hexOf(palette[pot - 1]) : hexOf(palette[0] ?? [255, 46, 126])} opacity={0.9} />}
               </svg>
             ) : (
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>printing…</div>
@@ -651,7 +709,7 @@ export function ColourByNumber() {
         {/* source picker */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
           <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Print</span>
-          {PBN_SOURCES.map((s, i) => (
+          {assets.map((s, i) => (
             <button
               key={s.id}
               onClick={() => {

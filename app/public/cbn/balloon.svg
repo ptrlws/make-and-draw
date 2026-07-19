@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="188" viewBox="0 0 150 188">
+<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fd0ff"/><stop offset="0.7" stop-color="#bfe8ff"/><stop offset="1" stop-color="#e9f7ff"/></linearGradient></defs>
+
+<rect width="150" height="188" fill="url(#sky)"/>
+<circle cx="17" cy="40" r="9" fill="#ffffff"/><circle cx="26" cy="40" r="9" fill="#ffffff"/><circle cx="35" cy="40" r="9" fill="#ffffff"/><circle cx="111" cy="30" r="9" fill="#ffffff"/><circle cx="120" cy="30" r="9" fill="#ffffff"/><circle cx="129" cy="30" r="9" fill="#ffffff"/><circle cx="119" cy="96" r="9" fill="#ffffff"/><circle cx="128" cy="96" r="9" fill="#ffffff"/><circle cx="137" cy="96" r="9" fill="#ffffff"/>
+<path d="M 75.0 74.0 L 75.0 34.0 A 40.0 40.0 0 0 1 109.6 54.0 Z" fill="#ff2e7e"/><path d="M 75.0 74.0 L 109.6 54.0 A 40.0 40.0 0 0 1 109.6 94.0 Z" fill="#ffb800"/><path d="M 75.0 74.0 L 109.6 94.0 A 40.0 40.0 0 0 1 75.0 114.0 Z" fill="#00a58a"/><path d="M 75.0 74.0 L 75.0 114.0 A 40.0 40.0 0 0 1 40.4 94.0 Z" fill="#0a5af5"/><path d="M 75.0 74.0 L 40.4 94.0 A 40.0 40.0 0 0 1 40.4 54.0 Z" fill="#ff7a1a"/><path d="M 75.0 74.0 L 40.4 54.0 A 40.0 40.0 0 0 1 75.0 34.0 Z" fill="#8f3ac0"/>
+<path d="M 55 106.8 L 95 106.8 L 75 122 Z" fill="#ff2e7e"/>
+<path d="M 63 122 L 66 150 M 87 122 L 84 150" stroke="#6b4a2b" stroke-width="1.5" fill="none"/>
+<rect x="64" y="150" width="22" height="16" rx="2" fill="#8a5a2b"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="188" viewBox="0 0 150 188">
+<defs><linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a5f8c"/><stop offset="1" stop-color="#2ec5c5"/></linearGradient></defs>
+
+<rect width="150" height="188" fill="url(#dusk)"/>
+<circle cx="118" cy="34" r="17" fill="#ffe066"/>
+<path d="M 104 150 Q 138 132 126 96" stroke="#ff8a1e" stroke-width="13" fill="none" stroke-linecap="round"/>
+<ellipse cx="75" cy="140" rx="40" ry="34" fill="#ff8a1e"/>
+<ellipse cx="75" cy="150" rx="20" ry="22" fill="#fff3d6"/>
+<polygon points="53,68 41,34 71,58" fill="#ff8a1e"/>
+<polygon points="97,68 109,34 79,58" fill="#ff8a1e"/>
+<polygon points="55,64 48,44 67,58" fill="#ff4f81"/>
+<polygon points="95,64 102,44 83,58" fill="#ff4f81"/>
+<circle cx="75" cy="82" r="31" fill="#ffa040"/>
+<circle cx="64" cy="80" r="4.5" fill="#16130f"/>
+<circle cx="86" cy="80" r="4.5" fill="#16130f"/>
+<polygon points="70,90 80,90 75,96" fill="#ff4f81"/>
+</svg>
