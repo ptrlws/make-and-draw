@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type PointerEvent as RPE } from 'react'
+import { useRef, useState, type ChangeEvent as RCE, type CSSProperties, type PointerEvent as RPE } from 'react'
 import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
@@ -296,6 +296,71 @@ const PUZZLES: Puzzle[] = [
   build('rocket', 'Rocket', '#00a58a', rocket),
 ]
 
+/* ------------------------------------------------------------------ *
+ * SVG import → dots. Sample the LONGEST geometry in an uploaded SVG at
+ * even arc-length, fit it into the frame, and auto-place numbered dots.
+ * Element transforms are ignored (fine for flat line-art exports) —
+ * normalize() re-centres and scales, so absolute position never matters.
+ * ------------------------------------------------------------------ */
+function svgToPoints(svgText: string, dense = 240): Pt[] | null {
+  try {
+    const clean = svgText.replace(/<\?xml[\s\S]*?\?>/i, '').replace(/<!DOCTYPE[\s\S]*?>/i, '')
+    const holder = document.createElement('div')
+    holder.setAttribute('style', 'position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden')
+    holder.innerHTML = clean
+    const svg = holder.querySelector('svg')
+    if (!svg) return null
+    document.body.appendChild(holder)
+    const geoms = svg.querySelectorAll('path,polygon,polyline,ellipse,circle,rect,line')
+    let best: SVGGeometryElement | null = null
+    let bestLen = 0
+    for (let i = 0; i < geoms.length; i++) {
+      const g = geoms[i] as SVGGeometryElement
+      let len = 0
+      try {
+        len = g.getTotalLength()
+      } catch {
+        len = 0
+      }
+      if (len > bestLen) {
+        bestLen = len
+        best = g
+      }
+    }
+    let pts: Pt[] | null = null
+    if (best && bestLen > 1) {
+      const g = best
+      pts = []
+      for (let i = 0; i < dense; i++) {
+        const p = g.getPointAtLength((i / dense) * bestLen)
+        pts.push([p.x, p.y])
+      }
+    }
+    document.body.removeChild(holder)
+    return pts
+  } catch {
+    return null
+  }
+}
+
+const SVG_COLORS = ['#ff2e7e', '#0a5af5', '#00a58a', '#ffb800']
+/** Turn an uploaded SVG drawing into a joinable puzzle. */
+function svgToPuzzle(svgText: string, name: string): Puzzle | null {
+  const raw = svgToPoints(svgText)
+  if (!raw || raw.length < 8) return null
+  const fitted = normalize(raw, 232, 300, VW / 2, VH / 2)
+  // dot count scales with how wiggly the outline is (its perimeter)
+  let per = 0
+  for (let i = 0; i < fitted.length; i++) {
+    const a = fitted[i]
+    const b = fitted[(i + 1) % fitted.length]
+    per += Math.hypot(b[0] - a[0], b[1] - a[1])
+  }
+  const count = Math.max(16, Math.min(30, Math.round(per / 60)))
+  const dots = resample(fitted, count)
+  return { id: 'svg' + Date.now(), name: name || 'Yours', color: SVG_COLORS[Math.floor(Math.random() * SVG_COLORS.length)], dots, path: smoothPath(dots) }
+}
+
 const centroid = (pts: Pt[]): Pt => {
   let x = 0
   let y = 0
@@ -346,15 +411,23 @@ function Preview({ p, spot }: { p: Puzzle; spot: string }) {
 
 export function DotToDot() {
   const { go, play, showToast, startFinish, reducedMotion, state } = useGame()
+  // kid-imported SVG drawings, appended AFTER the built-ins so built-in
+  // indices (and any saved progress) stay stable
+  const [extra, setExtra] = useState<Puzzle[]>(() => {
+    const saved = loadDraft<Puzzle[]>('dot_custom')
+    return Array.isArray(saved) ? saved : []
+  })
+  const ALL = [...PUZZLES, ...extra]
+  const fileRef = useRef<HTMLInputElement>(null)
   // resume a half-joined shape (reload/back never loses progress)
   const [init] = useState(() => loadDraft<{ puzIdx: number; n: number }>('dot'))
-  const resume = init != null && init.puzIdx >= 0 && init.puzIdx < PUZZLES.length && init.n > 0
+  const resume = init != null && init.puzIdx >= 0 && init.puzIdx < ALL.length && init.n > 0
   const [view, setView] = useState<'pick' | 'play'>(resume ? 'play' : 'pick')
-  const [puzIdx, setPuzIdx] = useState(resume ? init.puzIdx : 0)
-  const [n, setN] = useState(resume ? Math.min(init.n, PUZZLES[init.puzIdx].dots.length) : 0)
+  const [puzIdx, setPuzIdx] = useState(resume ? init!.puzIdx : 0)
+  const [n, setN] = useState(resume ? Math.min(init!.n, ALL[init!.puzIdx].dots.length) : 0)
   const [wrong, setWrong] = useState(0)
 
-  const puz = PUZZLES[puzIdx]
+  const puz = ALL[Math.min(puzIdx, ALL.length - 1)] ?? ALL[0]
   const N = puz.dots.length
   const done = n >= N
   const [ctrx, ctry] = centroid(puz.dots)
@@ -366,6 +439,35 @@ export function DotToDot() {
     setView('play')
     saveDraft('dot', { puzIdx: i, n: 0 })
     play('page')
+  }
+
+  // import a drawing: sample its outline into evenly-spaced numbered dots
+  const onSvg = (e: RCE<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    e.target.value = ''
+    if (!f) return
+    void f.text().then((txt) => {
+      const raw = f.name.replace(/\.svg$/i, '').replace(/[-_]+/g, ' ').trim().slice(0, 14)
+      const title = raw ? raw[0].toUpperCase() + raw.slice(1) : 'Yours'
+      const puzzle = svgToPuzzle(txt, title)
+      if (!puzzle) {
+        play('wrong')
+        showToast("couldn't read that drawing")
+        return
+      }
+      const idx = PUZZLES.length + extra.length // its slot in ALL once appended
+      setExtra((prev) => {
+        const next = [...prev, puzzle]
+        saveDraft('dot_custom', next)
+        return next
+      })
+      setPuzIdx(idx)
+      setN(0)
+      setWrong(0)
+      setView('play')
+      saveDraft('dot', { puzIdx: idx, n: 0 })
+      play('page')
+    })
   }
 
   /** Every connect climbs the ladder — dot 1 sits low, each dot rings one
@@ -474,7 +576,16 @@ export function DotToDot() {
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '4px 16px calc(24px + env(safe-area-inset-bottom))' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            {PUZZLES.map((p, i) => {
+            {/* import your own drawing → auto-dotted */}
+            <button
+              onClick={() => fileRef.current?.click()}
+              style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, background: c.card, border: `3px dashed ${c.ink}`, borderRadius: 12, padding: 8, cursor: 'pointer', color: c.ink }}
+            >
+              <div style={{ fontFamily: fonts.display, fontSize: 44, lineHeight: 1 }}>＋</div>
+              <div style={{ fontFamily: fonts.display, fontSize: 15, textTransform: 'uppercase', textAlign: 'center' }}>Your drawing</div>
+              <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, color: c.hint, textAlign: 'center' }}>drop in an SVG to join up</div>
+            </button>
+            {ALL.map((p, i) => {
               const spot = [c.pink, c.blue, c.yellow, c.teal][i % 4]
               return (
                 <button
@@ -493,6 +604,7 @@ export function DotToDot() {
               )
             })}
           </div>
+          <input ref={fileRef} type="file" accept=".svg,image/svg+xml" onChange={onSvg} style={{ display: 'none' }} />
         </div>
       </div>
     )
