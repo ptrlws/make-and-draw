@@ -368,6 +368,17 @@ export function DotToDot() {
     play('page')
   }
 
+  /** Every connect climbs the ladder — dot 1 sits low, each dot rings one
+   * step higher across two octaves, and the last dot detonates the climax. */
+  const connectSound = (nn: number) => {
+    if (nn >= N) {
+      play('climax')
+      showToast('joined — lovely!')
+    } else {
+      play('step', 0.75 * Math.pow(2, ((nn - 1) / Math.max(1, N - 1)) * 2))
+    }
+  }
+
   const tap = (i: number) => {
     if (done) return
     if (i < n) return // already joined (often via the same touch's sweep)
@@ -376,12 +387,7 @@ export function DotToDot() {
       setN(nn)
       setWrong(0)
       saveDraft('dot', { puzIdx, n: nn })
-      const pent = [1, 1.12, 1.26, 1.34, 1.5]
-      play('pop', pent[nn % pent.length])
-      if (nn >= N) {
-        play('fw')
-        showToast('joined — lovely!')
-      }
+      connectSound(nn)
     } else {
       play('wrong')
       setWrong((w) => w + 1)
@@ -421,12 +427,7 @@ export function DotToDot() {
     setN(nn)
     setWrong(0)
     saveDraft('dot', { puzIdx, n: nn })
-    const pent = [1, 1.12, 1.26, 1.34, 1.5]
-    play('pop', pent[nn % pent.length])
-    if (nn >= N) {
-      play('fw')
-      showToast('joined — lovely!')
-    }
+    connectSound(nn)
   }
   const onDown = (e: RPE<SVGSVGElement>) => {
     if (done) return

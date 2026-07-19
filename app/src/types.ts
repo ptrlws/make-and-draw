@@ -25,6 +25,8 @@ export type Sound =
   | 'fold'
   | 'press'
   | 'peel'
+  | 'climax'
+  | 'step'
 
 export interface GalleryItem {
   id: string

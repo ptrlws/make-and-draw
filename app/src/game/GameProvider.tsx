@@ -112,6 +112,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const play = useCallback(
     (sound: Sound, pitch = 1) => {
+      // every play call is gesture-driven, so it may lazily unlock audio too —
+      // otherwise the first sounds after a resumed session stay silent
+      foley.ensure()
       foley.resume()
       foley.play(sound, stateRef.current.muted, stateRef.current.calm, pitch)
     },

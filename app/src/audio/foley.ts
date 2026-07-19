@@ -23,6 +23,8 @@ const HAPTIC: Partial<Record<Sound, number | number[]>> = {
   fold: 15,
   press: [12, 80, 20],
   peel: 12,
+  climax: [24, 40, 18, 40, 14, 90, 60],
+  step: 8,
 }
 
 export class Foley {
@@ -144,6 +146,12 @@ export class Foley {
         noise(0.035, 2400, null, vol * 0.5, 0, 'highpass')
         break
       }
+      case 'step':
+        // ladder note: like pop but pitch-EXACT, so rising runs actually rise
+        tone(300, 540, 0.11, 'triangle', vol)
+        tone(300, 540, 0.11, 'sine', vol * 0.4)
+        noise(0.03, 2600, null, vol * 0.45, 0, 'highpass')
+        break
       case 'select':
         // soft mechanical tick
         noise(0.03, 3200, null, vol * 0.45, 0, 'highpass')
@@ -193,6 +201,34 @@ export class Foley {
         noise(0.32, 350, 2600, vol * 0.6, 0, 'bandpass', 1.4)
         tone(240, 620, 0.28, 'triangle', vol * 0.3)
         break
+      case 'climax': {
+        // the last-dot payoff: an accelerating pentatonic run sweeping up,
+        // landing on a deep boom + bright major chord + long sparkle tail
+        if (calm) {
+          tone(392, null, 0.4, 'sine', vol * 0.5)
+          tone(523, null, 0.5, 'sine', vol * 0.45, 0.18)
+          tone(659, null, 0.7, 'sine', vol * 0.4, 0.36)
+          noise(0.6, 2400, 4200, vol * 0.2, 0.3, 'bandpass', 1.4)
+          break
+        }
+        const RUN = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24]
+        let at = 0
+        RUN.forEach((semi, i) => {
+          tone(330 * Math.pow(2, semi / 12), null, 0.16, 'triangle', vol * (0.35 + i * 0.045), at)
+          noise(0.03, 2600 + i * 300, null, vol * 0.25, at, 'highpass')
+          at += Math.max(0.028, 0.085 - i * 0.006) // accelerando — it runs away upward
+        })
+        const land = at + 0.03
+        tone(98, 55, 0.55, 'sine', vol * 0.95, land) // the boom
+        tone(1046, null, 0.9, 'sine', vol * 0.6, land)
+        tone(1318, null, 0.85, 'sine', vol * 0.45, land + 0.04)
+        tone(1568, null, 1.0, 'sine', vol * 0.4, land + 0.08)
+        noise(1.0, 5200, 2600, vol * 0.35, land, 'bandpass', 1.2) // sparkle rain
+        for (let i = 0; i < 4; i++) {
+          noise(0.05, 2000 + Math.random() * 2600, null, vol * 0.6, land + 0.1 + i * 0.12, 'bandpass', 2.2)
+        }
+        break
+      }
       case 'fw':
         if (calm) {
           tone(500, 700, 0.25, 'sine', 0.05)
