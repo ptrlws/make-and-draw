@@ -2,18 +2,15 @@ import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as R
 import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
+import { NEON_PICS } from '../scratch/neonPics'
 import { c, fonts } from '../theme'
 import { buildParticles } from '../utils'
 
-/** Rainbow "surprise" styles hiding under the black foil. */
-const STYLES = [
-  { k: 'Rainbow', sat: 88, light: 56 },
-  { k: 'Neon', sat: 100, light: 60 },
-  { k: 'Pastel', sat: 74, light: 79 },
-] as const
-
 const COAT = '#151310'
-const REVEAL_AT = 0.55 // scratch this much and the rest peels away on its own
+const REVEAL_AT = 0.45 // scratch this much and the rest peels away on its own
+const BRUSH = 0.03 // scratch radius as a fraction of canvas width (thin, precise)
+/** neon tube hues, cycled per stroke; a per-card seed rotates the whole set */
+const NEON_HUES = [186, 316, 110, 48, 330, 265]
 
 const chip: CSSProperties = {
   fontFamily: fonts.body,
@@ -32,7 +29,7 @@ const chip: CSSProperties = {
 }
 
 interface ScratchDraft {
-  style: number
+  pic: number
   seed: number
   /** each scratch as a flat [nx,ny,nx,ny,…] list, normalized 0..1 */
   strokes: number[][]
@@ -42,14 +39,14 @@ interface ScratchDraft {
 export function ScratchOff() {
   const { go, play, showToast, startFinish, reducedMotion, state } = useGame()
   const draft = useRef(loadDraft<ScratchDraft>('scratch'))
-  const [style, setStyle] = useState(() => draft.current?.style ?? 0)
+  const [picIdx, setPicIdx] = useState(() => Math.min(draft.current?.pic ?? 0, NEON_PICS.length - 1))
   const [seed, setSeed] = useState(() => draft.current?.seed ?? Math.floor(Math.random() * 360))
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [scratched, setScratched] = useState(0)
   const [done, setDone] = useState(() => !!draft.current?.done)
 
   const wrapRef = useRef<HTMLDivElement>(null)
-  const rainbowRef = useRef<HTMLCanvasElement>(null)
+  const neonRef = useRef<HTMLCanvasElement>(null)
   const coatRef = useRef<HTMLCanvasElement>(null)
   const dpr = useRef(1)
   /** committed scratches as flat [nx,ny,…] normalized 0..1 — resolution-free,
@@ -62,32 +59,48 @@ export function ScratchOff() {
   const lastMeasure = useRef(0)
   const lastSfx = useRef(0)
 
+  const pic = NEON_PICS[picIdx]
   const calm = reducedMotion || state.calm
 
+  // maps the 100x100 drawing box to a centred square inside the canvas
+  const picMatrix = (w: number, h: number) => {
+    const side = Math.min(w, h)
+    const s = (side * 0.76) / 100
+    return new DOMMatrix([s, 0, 0, s, (w - 100 * s) / 2, (h - 100 * s) / 2])
+  }
+
   // ---- painters ----
-  const paintRainbow = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
-    const st = STYLES[style]
+  const paintNeon = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     ctx.globalCompositeOperation = 'source-over'
-    const grad = ctx.createLinearGradient(0, 0, w, h)
-    const N = 12
-    for (let i = 0; i <= N; i++) grad.addColorStop(i / N, `hsl(${(seed + (i * 360) / N) % 360} ${st.sat}% ${st.light}%)`)
-    ctx.fillStyle = grad
+    ctx.fillStyle = '#0b0a12'
     ctx.fillRect(0, 0, w, h)
-    // holographic sheen — deterministic blobs so a restored card matches exactly
-    ctx.globalCompositeOperation = 'overlay'
-    for (let i = 0; i < 6; i++) {
-      const bx = (((seed * 7 + i * 97) % 100) / 100) * w
-      const by = (((seed * 13 + i * 53) % 100) / 100) * h
-      const rr = w * (0.24 + ((i * 37) % 30) / 100)
-      const rg = ctx.createRadialGradient(bx, by, 0, bx, by, rr)
-      rg.addColorStop(0, 'rgba(255,255,255,.5)')
-      rg.addColorStop(1, 'rgba(255,255,255,0)')
-      ctx.fillStyle = rg
-      ctx.beginPath()
-      ctx.arc(bx, by, rr, 0, 7)
-      ctx.fill()
-    }
-    ctx.globalCompositeOperation = 'source-over'
+    const vg = ctx.createRadialGradient(w / 2, h * 0.44, 0, w / 2, h / 2, Math.max(w, h) * 0.62)
+    vg.addColorStop(0, 'rgba(40,26,64,.55)')
+    vg.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = vg
+    ctx.fillRect(0, 0, w, h)
+    const m = picMatrix(w, h)
+    const s = m.a
+    ctx.lineJoin = 'round'
+    ctx.lineCap = 'round'
+    pic.paths.forEach((d, i) => {
+      const sp = new Path2D()
+      sp.addPath(new Path2D(d), m)
+      const hue = (NEON_HUES[i % NEON_HUES.length] + seed) % 360
+      // glowing tube: two blurred colour passes …
+      ctx.shadowColor = `hsl(${hue} 100% 60%)`
+      ctx.shadowBlur = w * 0.02
+      ctx.strokeStyle = `hsl(${hue} 100% 62%)`
+      ctx.lineWidth = Math.max(2, s * 3.4)
+      ctx.stroke(sp)
+      ctx.stroke(sp)
+      // … then a hot near-white core
+      ctx.shadowBlur = 0
+      ctx.strokeStyle = `hsl(${hue} 100% 90%)`
+      ctx.lineWidth = Math.max(1, s * 1.3)
+      ctx.stroke(sp)
+    })
+    ctx.shadowBlur = 0
   }
 
   const paintCoat = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
@@ -109,19 +122,30 @@ export function ScratchOff() {
       const y = (((i * 97) % 100) / 100) * h
       ctx.fillRect(x, y, px, px)
     }
-    // hint
-    ctx.fillStyle = 'rgba(255,255,255,.42)'
-    ctx.font = `700 ${Math.round(w * 0.055)}px system-ui, sans-serif`
+    // faint picture guide so kids can see what they're uncovering + trace it
+    const m = picMatrix(w, h)
+    ctx.strokeStyle = 'rgba(255,255,255,.28)'
+    ctx.lineWidth = Math.max(1.4, m.a * 1.8)
+    ctx.lineJoin = 'round'
+    ctx.lineCap = 'round'
+    for (const d of pic.paths) {
+      const sp = new Path2D()
+      sp.addPath(new Path2D(d), m)
+      ctx.stroke(sp)
+    }
+    // hint, tucked at the bottom so it doesn't fight the drawing
+    ctx.fillStyle = 'rgba(255,255,255,.4)'
+    ctx.font = `700 ${Math.round(w * 0.04)}px system-ui, sans-serif`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText('scratch me ✨', w / 2, h / 2)
+    ctx.fillText('scratch ✨', w / 2, h * 0.92)
   }
 
   const scratchAlong = (ctx: CanvasRenderingContext2D, norm: number[]) => {
     if (norm.length < 2) return
     const W = ctx.canvas.width
     const H = ctx.canvas.height
-    const r = W * 0.055
+    const r = W * BRUSH
     ctx.globalCompositeOperation = 'destination-out'
     ctx.strokeStyle = '#000'
     ctx.fillStyle = '#000'
@@ -141,12 +165,11 @@ export function ScratchOff() {
 
   /** repaint both layers from scratch-stroke history (undo / resize / restore) */
   const repaint = () => {
-    const rc = rainbowRef.current
+    const rc = neonRef.current
     const cc = coatRef.current
     if (!rc || !cc) return
-    const rctx = rc.getContext('2d')!
+    paintNeon(rc.getContext('2d')!, rc.width, rc.height)
     const cctx = cc.getContext('2d')!
-    paintRainbow(rctx, rc.width, rc.height)
     paintCoat(cctx, cc.width, cc.height)
     for (const s of strokes.current) scratchAlong(cctx, s)
   }
@@ -167,7 +190,7 @@ export function ScratchOff() {
 
   const persist = () => {
     // strokes are already normalized 0..1 — store as-is
-    saveDraft('scratch', { style, seed, done: doneRef.current, strokes: strokes.current } satisfies ScratchDraft)
+    saveDraft('scratch', { pic: picIdx, seed, done: doneRef.current, strokes: strokes.current } satisfies ScratchDraft)
   }
 
   const finishReveal = () => {
@@ -192,10 +215,10 @@ export function ScratchOff() {
     return () => window.removeEventListener('resize', measureSize)
   }, [])
 
-  // build canvases whenever size / style / seed changes
+  // build canvases whenever size / picture / seed changes
   useEffect(() => {
     if (size.w < 2) return
-    const rc = rainbowRef.current
+    const rc = neonRef.current
     const cc = coatRef.current
     if (!rc || !cc) return
     const d = Math.min(2, window.devicePixelRatio || 1)
@@ -218,7 +241,7 @@ export function ScratchOff() {
       setScratched(measure())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, style, seed])
+  }, [size, picIdx, seed])
 
   // ---- pointer scratching ----
   const toNorm = (e: { clientX: number; clientY: number }): [number, number] => {
@@ -240,7 +263,7 @@ export function ScratchOff() {
     const frac = measure()
     setScratched(frac)
     if (frac >= REVEAL_AT) {
-      showToast('ta-daa! 🌈')
+      showToast('ta-daa! ✨')
       finishReveal()
     }
   }
@@ -250,12 +273,12 @@ export function ScratchOff() {
     const last = cur.current
     const px = last[last.length - 2]
     const py = last[last.length - 1]
-    if (Math.hypot(p[0] - px, p[1] - py) < 0.006) return
+    if (Math.hypot(p[0] - px, p[1] - py) < 0.004) return
     cur.current.push(p[0], p[1])
     // erase just the newest segment (cheap) rather than the whole stroke
     scratchAlong(coatRef.current!.getContext('2d')!, [px, py, p[0], p[1]])
     const t = performance.now()
-    if (t - lastSfx.current > 70) {
+    if (t - lastSfx.current > 65) {
       lastSfx.current = t
       play('scratch', 0.9 + Math.random() * 0.4)
     }
@@ -285,19 +308,19 @@ export function ScratchOff() {
     play('select')
   }
   const recover = () => {
-    // fresh coat + a brand-new surprise underneath. Bump the seed by a
-    // guaranteed-nonzero amount so the build effect always reruns (a plain
-    // random seed could collide with the current one and skip the repaint).
+    // a brand-new surprise: a different picture + fresh neon colours. Changing
+    // picIdx guarantees the build effect reruns and repaints.
     strokes.current = []
     setDone(false)
     doneRef.current = false
-    setSeed((s) => (s + 1 + Math.floor(Math.random() * 359)) % 360)
+    setPicIdx((p) => (p + 1 + Math.floor(Math.random() * (NEON_PICS.length - 1))) % NEON_PICS.length)
+    setSeed(Math.floor(Math.random() * 360))
     setScratched(0)
     clearDraft('scratch')
     play('page')
   }
   const keep = () => {
-    const rc = rainbowRef.current
+    const rc = neonRef.current
     const cc = coatRef.current
     if (!rc || !cc) return
     if (scratched < 0.02) {
@@ -312,19 +335,19 @@ export function ScratchOff() {
     g.drawImage(rc, 0, 0)
     g.drawImage(cc, 0, 0)
     clearDraft('scratch')
-    startFinish({ type: 'scratch', title: 'Scratch art', img: out.toDataURL('image/png'), tint: `hsl(${seed} 85% 55%)` })
+    startFinish({ type: 'scratch', title: `Neon ${pic.name.toLowerCase()}`, img: out.toDataURL('image/png'), tint: `hsl(${(NEON_HUES[0] + seed) % 360} 100% 60%)` })
   }
 
-  const pickStyle = (i: number) => {
-    if (i === style) return
+  const pickPic = (i: number) => {
+    if (i === picIdx) return
     strokes.current = []
     setDone(false)
     doneRef.current = false
     setScratched(0)
-    setStyle(i)
-    // persist the new choice now (setStyle's value isn't in this closure yet)
-    // so a reload before the next scratch keeps the freshly-picked style
-    saveDraft('scratch', { style: i, seed, strokes: [], done: false })
+    setPicIdx(i)
+    // persist the new choice now (setPicIdx's value isn't in this closure yet)
+    // so a reload before the next scratch keeps the freshly-picked picture
+    saveDraft('scratch', { pic: i, seed, strokes: [], done: false })
     play('select')
   }
 
@@ -355,14 +378,14 @@ export function ScratchOff() {
             style={{ position: 'relative', width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', touchAction: 'none' }}
           >
             <canvas
-              ref={rainbowRef}
+              ref={neonRef}
               style={{
                 position: 'absolute',
                 inset: 0,
                 width: '100%',
                 height: '100%',
                 display: 'block',
-                animation: calm ? undefined : 'hueShift 9s linear infinite',
+                animation: calm ? undefined : 'hueShift 12s linear infinite',
               }}
             />
             <canvas
@@ -411,18 +434,18 @@ export function ScratchOff() {
           </div>
         )}
         <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>
-          {done ? 'a rainbow! press keep →' : scratched > 0.02 ? 'keep scratching…' : 'scratch the black to find colours'}
+          {done ? 'a neon picture! press keep →' : scratched > 0.02 ? 'keep scratching…' : 'scratch the black to reveal the picture'}
         </div>
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Under</span>
-          {STYLES.map((s, i) => (
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
+          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Picture</span>
+          {NEON_PICS.map((p, i) => (
             <button
-              key={s.k}
-              onClick={() => pickStyle(i)}
-              aria-pressed={i === style}
-              style={{ ...chip, minHeight: 40, background: i === style ? c.ink : '#fff', color: i === style ? c.paper : c.ink }}
+              key={p.id}
+              onClick={() => pickPic(i)}
+              aria-pressed={i === picIdx}
+              style={{ ...chip, minHeight: 38, padding: '8px 11px', background: i === picIdx ? c.ink : '#fff', color: i === picIdx ? c.paper : c.ink }}
             >
-              {s.k}
+              {p.name}
             </button>
           ))}
         </div>
