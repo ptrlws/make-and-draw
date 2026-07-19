@@ -9,8 +9,6 @@ import { buildParticles } from '../utils'
 const COAT = '#151310'
 const REVEAL_AT = 0.45 // scratch this much and the rest peels away on its own
 const BRUSH = 0.03 // scratch radius as a fraction of canvas width (thin, precise)
-/** neon tube hues, cycled per stroke; a per-card seed rotates the whole set */
-const NEON_HUES = [186, 316, 110, 48, 330, 265]
 
 const chip: CSSProperties = {
   fontFamily: fonts.body,
@@ -70,37 +68,51 @@ export function ScratchOff() {
   }
 
   // ---- painters ----
-  const paintNeon = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
+  // holographic rainbow foil (what a scratch reveals), with the colouring-page
+  // outline printed dark on top so the picture stays readable on the foil.
+  const paintHolo = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     ctx.globalCompositeOperation = 'source-over'
-    ctx.fillStyle = '#0b0a12'
+    const N = 12
+    const base = ctx.createLinearGradient(0, 0, w, h)
+    for (let i = 0; i <= N; i++) base.addColorStop(i / N, `hsl(${Math.round((seed + (i * 360) / N) % 360)}, 92%, 58%)`)
+    ctx.fillStyle = base
     ctx.fillRect(0, 0, w, h)
-    const vg = ctx.createRadialGradient(w / 2, h * 0.44, 0, w / 2, h / 2, Math.max(w, h) * 0.62)
-    vg.addColorStop(0, 'rgba(40,26,64,.55)')
-    vg.addColorStop(1, 'rgba(0,0,0,0)')
-    ctx.fillStyle = vg
+    // a second rainbow the other way, blended, for the iridescent interference
+    const cross = ctx.createLinearGradient(0, h, w, 0)
+    for (let i = 0; i <= N; i++) cross.addColorStop(i / N, `hsla(${Math.round((seed + 140 + (i * 360) / N) % 360)}, 95%, 60%, 0.5)`)
+    ctx.globalCompositeOperation = 'overlay'
+    ctx.fillStyle = cross
     ctx.fillRect(0, 0, w, h)
+    // bright diagonal foil streaks
+    ctx.globalCompositeOperation = 'soft-light'
+    for (const off of [0.22, 0.55, 0.84]) {
+      const sg = ctx.createLinearGradient(w * (off - 0.13), 0, w * (off + 0.13), h)
+      sg.addColorStop(0, 'rgba(255,255,255,0)')
+      sg.addColorStop(0.5, 'rgba(255,255,255,.65)')
+      sg.addColorStop(1, 'rgba(255,255,255,0)')
+      ctx.fillStyle = sg
+      ctx.fillRect(0, 0, w, h)
+    }
+    // fine glints
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.fillStyle = 'rgba(255,255,255,.55)'
+    const px = Math.max(1, dpr.current)
+    for (let i = 0; i < 80; i++) {
+      const x = (((i * 61) % 100) / 100) * w
+      const y = (((i * 37) % 100) / 100) * h
+      ctx.fillRect(x, y, px, px)
+    }
+    // the colouring-page outline, printed dark so the picture reads on the foil
     const m = picMatrix(w, h)
-    const s = m.a
+    ctx.strokeStyle = 'rgba(18,14,10,.62)'
+    ctx.lineWidth = Math.max(1.5, m.a * 2.2)
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
-    pic.paths.forEach((d, i) => {
+    for (const d of pic.paths) {
       const sp = new Path2D()
       sp.addPath(new Path2D(d), m)
-      const hue = (NEON_HUES[i % NEON_HUES.length] + seed) % 360
-      // glowing tube: two blurred colour passes …
-      ctx.shadowColor = `hsl(${hue} 100% 60%)`
-      ctx.shadowBlur = w * 0.02
-      ctx.strokeStyle = `hsl(${hue} 100% 62%)`
-      ctx.lineWidth = Math.max(2, s * 3.4)
       ctx.stroke(sp)
-      ctx.stroke(sp)
-      // … then a hot near-white core
-      ctx.shadowBlur = 0
-      ctx.strokeStyle = `hsl(${hue} 100% 90%)`
-      ctx.lineWidth = Math.max(1, s * 1.3)
-      ctx.stroke(sp)
-    })
-    ctx.shadowBlur = 0
+    }
   }
 
   const paintCoat = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
@@ -168,7 +180,7 @@ export function ScratchOff() {
     const rc = neonRef.current
     const cc = coatRef.current
     if (!rc || !cc) return
-    paintNeon(rc.getContext('2d')!, rc.width, rc.height)
+    paintHolo(rc.getContext('2d')!, rc.width, rc.height)
     const cctx = cc.getContext('2d')!
     paintCoat(cctx, cc.width, cc.height)
     for (const s of strokes.current) scratchAlong(cctx, s)
@@ -263,7 +275,7 @@ export function ScratchOff() {
     const frac = measure()
     setScratched(frac)
     if (frac >= REVEAL_AT) {
-      showToast('ta-daa! ✨')
+      showToast('ta-daa! 🌈')
       finishReveal()
     }
   }
@@ -335,7 +347,7 @@ export function ScratchOff() {
     g.drawImage(rc, 0, 0)
     g.drawImage(cc, 0, 0)
     clearDraft('scratch')
-    startFinish({ type: 'scratch', title: `Neon ${pic.name.toLowerCase()}`, img: out.toDataURL('image/png'), tint: `hsl(${(NEON_HUES[0] + seed) % 360} 100% 60%)` })
+    startFinish({ type: 'scratch', title: `Holographic ${pic.name.toLowerCase()}`, img: out.toDataURL('image/png'), tint: `hsl(${seed}, 92%, 58%)` })
   }
 
   const pickPic = (i: number) => {
@@ -434,7 +446,7 @@ export function ScratchOff() {
           </div>
         )}
         <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>
-          {done ? 'a neon picture! press keep →' : scratched > 0.02 ? 'keep scratching…' : 'scratch the black to reveal the picture'}
+          {done ? 'holographic! press keep →' : scratched > 0.02 ? 'keep scratching…' : 'scratch out the picture — it comes up holographic!'}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
           <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Picture</span>
