@@ -252,7 +252,7 @@ export function PatternLab() {
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
         <div style={{ position: 'relative', background: '#fff', border: `3px solid ${c.ink}`, borderRadius: 6, boxShadow: `6px 6px 0 ${c.pink}`, padding: 10 }}>
-          <div ref={wrapRef} style={{ width: 'min(460px, 88vw)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden' }}>
+          <div ref={wrapRef} style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden' }}>
             <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none', cursor: 'crosshair' }} />
           </div>
         </div>

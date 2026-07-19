@@ -435,7 +435,7 @@ export function ColourByNumber() {
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
         <div style={{ position: 'relative', background: '#fff', border: `3px solid ${c.ink}`, borderRadius: 6, boxShadow: `6px 6px 0 ${palette[0] ? hexOf(palette[0]) : c.pink}`, padding: 8 }}>
           <div
-            style={{ width: 'min(420px, 86vw)', aspectRatio: `${WK.w} / ${WK.h}`, borderRadius: 3, overflow: 'hidden', background: '#f4f1e7', touchAction: 'none', animation: done ? 'wobble .8s ease-in-out .2s' : undefined, position: 'relative' }}
+            style={{ width: 'min(480px, 86vw, 57vh)', aspectRatio: `${WK.w} / ${WK.h}`, borderRadius: 3, overflow: 'hidden', background: '#f4f1e7', touchAction: 'none', animation: done ? 'wobble .8s ease-in-out .2s' : undefined, position: 'relative' }}
             onPointerDown={onZoomDown}
             onPointerMove={onZoomMove}
             onPointerUp={onZoomUp}

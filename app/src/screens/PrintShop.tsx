@@ -284,7 +284,7 @@ export function PrintShop() {
             transition: 'transform .2s ease',
           }}
         >
-          <div ref={wrapRef} style={{ width: 'min(460px, 88vw)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', position: 'relative' }}>
+          <div ref={wrapRef} style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', position: 'relative' }}>
             <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none', cursor: 'crosshair' }} />
             {pressing && (
               <div

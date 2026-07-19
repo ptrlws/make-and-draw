@@ -216,7 +216,7 @@ export function Marble() {
         <div
           style={{
             position: 'relative',
-            width: 'min(520px, 92vw)',
+            width: 'min(560px, 92vw, 74vh)',
             aspectRatio: '1 / 1',
             maxHeight: '100%',
             background: '#fff',

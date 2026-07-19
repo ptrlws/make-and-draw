@@ -400,7 +400,7 @@ export function StickerCollage() {
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
         <div style={{ position: 'relative', background: '#fff', border: `3px solid ${c.ink}`, borderRadius: 6, boxShadow: `6px 6px 0 ${c.blue}`, padding: 10 }}>
-          <div ref={wrapRef} style={{ width: 'min(460px, 88vw)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', touchAction: 'none' }}>
+          <div ref={wrapRef} style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', touchAction: 'none' }}>
             {size.w > 0 && (
               <Stage
                 ref={stageRef}
