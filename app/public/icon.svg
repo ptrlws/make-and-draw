@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#f3ebd8"/>
+  <circle cx="352" cy="160" r="120" fill="#ff2e7e" opacity=".92"/>
+  <circle cx="160" cy="352" r="120" fill="#0a5af5" opacity=".85" style="mix-blend-mode:multiply"/>
+  <circle cx="256" cy="256" r="86" fill="#ffb800" style="mix-blend-mode:multiply"/>
+  <text x="256" y="300" text-anchor="middle" font-family="Anton, 'Arial Black', sans-serif" font-size="150" font-weight="900" fill="#16130f" letter-spacing="-4">M&amp;D</text>
+</svg>

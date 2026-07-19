@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&family=Gochi+Hand&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:'Nunito',system-ui,sans-serif;color:#3a322a;background:#e6d9bf;overflow:hidden}
+a{color:#c85a3c}a:hover{color:#a8452b}
+input{font-family:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes wagg{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes wob{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-7px) rotate(-4deg)}60%{transform:translateX(7px) rotate(4deg)}}
+@keyframes popin{0%{transform:scale(.4);opacity:.3}60%{transform:scale(1.14)}100%{transform:scale(1);opacity:1}}
+@keyframes shim{0%{transform:translateX(-120%) skewX(-18deg)}100%{transform:translateX(320%) skewX(-18deg)}}
+@keyframes fw{0%{transform:translate(0,0) scale(.2);opacity:1}22%{transform:translate(calc(var(--tx)*.38),calc(var(--ty)*.38)) scale(1.2);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(.3);opacity:0}}
+@keyframes conf{0%{transform:translate(0,-10px) rotate(0);opacity:0}12%{opacity:1}100%{transform:translate(var(--tx),105vh) rotate(var(--tr));opacity:.85}}
+@keyframes rise{0%{transform:translateY(14px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes dipLift{0%{transform:translate(-50%,45%) scale(.65);opacity:0}45%{opacity:1}72%{transform:translate(-50%,-58%) scale(1.06)}100%{transform:translate(-50%,-50%) scale(1)}}
+@keyframes flutt{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.05s!important}}
+</style>
+</helmet>
+
+<div style="position:relative;width:100vw;height:100vh;overflow:hidden;background:#f3ebd8;background-image:radial-gradient(circle at 22% 30%,rgba(120,90,40,.05) 1px,transparent 1.6px),radial-gradient(circle at 72% 66%,rgba(120,90,40,.05) 1px,transparent 1.6px);background-size:27px 27px,33px 33px">
+
+<!-- ============ NAME ENTRY ============ -->
+<sc-if value="{{ isName }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="width:min(440px,92vw);background:#fffdf6;border:3px solid #3a322a;border-radius:26px 30px 24px 28px;box-shadow:5px 7px 0 rgba(58,50,42,.16);padding:34px 28px 30px;text-align:center;position:relative;animation:rise .5s ease">
+    <div style="position:absolute;top:-15px;left:50%;transform:translateX(-50%) rotate(-3deg);width:90px;height:26px;background:rgba(244,192,38,.6);border-left:1px dashed #fff;border-right:1px dashed #fff"></div>
+    <div style="display:flex;justify-content:center;gap:7px;margin-bottom:4px">
+      <div style="width:15px;height:56px;background:#f2779f;border:2.5px solid #3a322a;border-radius:4px 4px 6px 6px;transform:rotate(-8deg)"></div>
+      <div style="width:15px;height:64px;background:#2fb8b3;border:2.5px solid #3a322a;border-radius:4px 4px 6px 6px;transform:rotate(3deg)"></div>
+      <div style="width:15px;height:52px;background:#f4c026;border:2.5px solid #3a322a;border-radius:4px 4px 6px 6px;transform:rotate(-4deg)"></div>
+    </div>
+    <div style="font-family:'Gochi Hand',cursive;font-size:24px;color:#c85a3c;transform:rotate(-2deg)">Esther's</div>
+    <div style="font-family:'Baloo 2';font-weight:800;font-size:38px;line-height:1;letter-spacing:-.5px">Make &amp; Draw</div>
+    <div style="font-family:'Gochi Hand',cursive;font-size:20px;color:#6b5d48;margin:18px 0 12px">Hello! what's your name?</div>
+    <input id="emd-name" type="text" maxlength="14" placeholder="type here" autocomplete="off"
+      oninput="{{ onNameInput }}" onkeydown="{{ onNameKey }}"
+      style="width:100%;max-width:300px;text-align:center;font-family:'Baloo 2';font-weight:700;font-size:26px;color:#3a322a;background:#fff;border:3px solid #3a322a;border-radius:16px;padding:12px 14px;outline:none;box-shadow:inset 0 2px 0 rgba(58,50,42,.06)">
+    <div style="margin-top:20px">
+      <button onclick="{{ confirmName }}" style="font-family:'Baloo 2';font-weight:800;font-size:22px;color:#fff;background:#c85a3c;border:3px solid #3a322a;border-radius:18px;padding:14px 34px;box-shadow:0 5px 0 #3a322a;min-height:64px">that's me! →</button>
+    </div>
+    <div style="font-family:'Nunito';font-weight:600;font-size:12px;color:#a8956f;margin-top:16px">it goes on the cover of your gallery book</div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ HOME (shelves) ============ -->
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;inset:0;overflow:auto">
+  <div style="max-width:640px;margin:0 auto;min-height:100%">
+    <div style="position:sticky;top:0;z-index:6;background:rgba(243,235,216,.94);backdrop-filter:blur(3px);padding:16px 18px 12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="line-height:.82">
+          <div style="font-family:'Gochi Hand',cursive;font-size:19px;color:#c85a3c;transform:rotate(-3deg)">{{ possessive }}</div>
+          <div style="font-family:'Baloo 2';font-weight:800;font-size:30px;letter-spacing:-.5px">Make &amp; Draw</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onclick="{{ toggleMute }}" aria-label="sound" style="position:relative;width:48px;height:48px;border-radius:50%;background:#fffdf6;border:2.5px solid #3a322a;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 #3a322a;transform:rotate(-4deg)">
+            <span style="display:flex;align-items:center"><span style="width:6px;height:9px;background:#3a322a"></span><span style="width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:10px solid #3a322a;margin-left:-1px"></span></span>
+            <sc-if value="{{ muted }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;width:34px;height:3px;background:#c85a3c;transform:rotate(-32deg);border-radius:2px"></span></sc-if>
+          </button>
+          <button onclick="{{ openSettings }}" aria-label="settings" style="width:48px;height:48px;border-radius:50%;background:#fffdf6;border:2.5px solid #3a322a;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 4px 0 #3a322a;transform:rotate(3deg)"><span style="width:5px;height:5px;border-radius:50%;background:#3a322a"></span><span style="width:5px;height:5px;border-radius:50%;background:#3a322a"></span><span style="width:5px;height:5px;border-radius:50%;background:#3a322a"></span></button>
+        </div>
+      </div>
+      <div style="font-family:'Gochi Hand',cursive;font-size:18px;color:#7a6a52;margin-top:6px">Hi {{ name }}! let's make a mess →</div>
+    </div>
+
+    <div style="padding:6px 15px 26px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <button onclick="{{ k.marble }}" style="text-align:center;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:20px 15px 22px 16px;padding:12px 11px 14px;box-shadow:3px 4px 0 rgba(58,50,42,.16);transform:rotate(-2deg)">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-4deg);width:54px;height:20px;background:rgba(47,184,179,.5)"></div>
+        <div style="height:84px;border:2px solid #3a322a;border-radius:9px;background:repeating-linear-gradient(45deg,#2fb8b3 0 9px,#5fd0cb 9px 18px)"></div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:18px;margin-top:8px">marble inks</div>
+      </button>
+      <button onclick="{{ k.cbn }}" style="text-align:center;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:16px 21px 15px 22px;padding:12px 11px 14px;box-shadow:3px 4px 0 rgba(58,50,42,.16);transform:rotate(1.8deg)">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(5deg);width:54px;height:20px;background:rgba(63,143,214,.5)"></div>
+        <div style="height:84px;border:2px solid #3a322a;border-radius:9px;background:#fdfaf0;display:flex;align-items:center;justify-content:center;gap:5px;font-family:'Baloo 2';font-weight:800;font-size:17px"><span style="color:#3f8fd6">1</span><span style="color:#d9714e">2</span><span style="color:#63b34a">3</span><span style="color:#9a6bd1">4</span></div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:18px;margin-top:8px">colour by number</div>
+      </button>
+      <button onclick="{{ k.moulds }}" style="text-align:center;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:22px 16px 20px 15px;padding:12px 11px 14px;box-shadow:3px 4px 0 rgba(58,50,42,.16);transform:rotate(1.4deg)">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-6deg);width:54px;height:20px;background:rgba(217,113,78,.5)"></div>
+        <div style="height:84px;border:2px solid #3a322a;border-radius:9px;background:repeating-linear-gradient(45deg,#d9714e 0 9px,#e79877 9px 18px)"></div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:18px;margin-top:8px">moulds</div>
+      </button>
+      <button onclick="{{ k.squishy }}" style="text-align:center;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:15px 22px 16px 21px;padding:12px 11px 14px;box-shadow:3px 4px 0 rgba(58,50,42,.16);transform:rotate(-2.2deg)">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(4deg);width:54px;height:20px;background:rgba(242,119,159,.5)"></div>
+        <div style="height:84px;border:2px solid #3a322a;border-radius:9px;background:repeating-linear-gradient(45deg,#f2779f 0 9px,#f7a3bd 9px 18px)"></div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:18px;margin-top:8px">squishies</div>
+      </button>
+      <button onclick="{{ k.dot }}" style="text-align:center;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:21px 15px 22px 16px;padding:12px 11px 14px;box-shadow:3px 4px 0 rgba(58,50,42,.16);transform:rotate(2deg)">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-5deg);width:54px;height:20px;background:rgba(244,192,38,.55)"></div>
+        <div style="height:84px;border:2px solid #3a322a;border-radius:9px;background:#fdfaf0;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2';font-weight:800;font-size:24px;color:#d9a81a">1·2·3</div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:18px;margin-top:8px">dot-to-dot</div>
+      </button>
+      <button onclick="{{ k.jigsaw }}" style="text-align:center;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:16px 21px 15px 22px;padding:12px 11px 14px;box-shadow:3px 4px 0 rgba(58,50,42,.16);transform:rotate(-1.6deg)">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(6deg);width:54px;height:20px;background:rgba(99,179,74,.5)"></div>
+        <div style="height:84px;border:2px solid #3a322a;border-radius:9px;background:repeating-linear-gradient(45deg,#63b34a 0 9px,#8bc978 9px 18px)"></div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:18px;margin-top:8px">jigsaws</div>
+      </button>
+      <button onclick="{{ k.sticker }}" style="text-align:center;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:22px 16px 21px 15px;padding:12px 11px 14px;box-shadow:3px 4px 0 rgba(58,50,42,.16);transform:rotate(1.5deg)">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-4deg);width:54px;height:20px;background:rgba(154,107,209,.5)"></div>
+        <div style="height:84px;border:2px solid #3a322a;border-radius:9px;background:repeating-linear-gradient(45deg,#9a6bd1 0 9px,#b795dd 9px 18px)"></div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:18px;margin-top:8px">stickers</div>
+      </button>
+      <button onclick="{{ k.butterfly }}" style="text-align:center;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:15px 22px 16px 21px;padding:12px 11px 14px;box-shadow:3px 4px 0 rgba(58,50,42,.16);transform:rotate(-2deg)">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(5deg);width:54px;height:20px;background:rgba(242,145,61,.55)"></div>
+        <div style="height:84px;border:2px solid #3a322a;border-radius:9px;background:repeating-linear-gradient(45deg,#f2913d 0 9px,#f7b479 9px 18px)"></div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:18px;margin-top:8px">butterflies</div>
+      </button>
+
+      <button onclick="{{ openBook }}" style="grid-column:1/-1;text-align:left;position:relative;background:#fffdf6;border:2.5px solid #3a322a;border-radius:18px 20px 17px 21px;padding:14px;box-shadow:3px 4px 0 rgba(58,50,42,.18);transform:rotate(-.6deg);display:flex;align-items:center;gap:14px;margin-top:2px">
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%) rotate(-3deg);width:70px;height:22px;background:rgba(224,166,63,.6)"></div>
+        <div style="width:70px;height:80px;flex:none;background:#e0a63f;border:2.5px solid #3a322a;border-radius:5px 10px 10px 5px;position:relative"><div style="position:absolute;left:0;top:0;bottom:0;width:10px;background:#c78f30;border-right:2px solid #3a322a"></div><div style="position:absolute;left:16px;right:6px;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2';font-weight:800;font-size:12px;color:#fff;text-align:center;line-height:1.05">Gallery<br>Book</div></div>
+        <div><div style="font-family:'Gochi Hand',cursive;font-size:22px;line-height:1">{{ possessive }} gallery book</div><div style="font-family:'Nunito';font-weight:700;font-size:12px;color:#8a7a5f;margin-top:3px">{{ galleryCount }} things you've made →</div></div>
+      </button>
+      <div style="grid-column:1/-1;display:flex;justify-content:center;margin-top:4px">
+        <div style="width:160px;height:76px;background:#f7e07a;border:2px solid #d9c24e;box-shadow:2px 3px 0 rgba(58,50,42,.14);transform:rotate(-3deg);display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Gochi Hand',cursive;font-size:16px;color:#6b5d2e;padding:8px;animation:bob 3.4s ease-in-out infinite">more kits coming soon!</div>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ MARBLE ============ -->
+<sc-if value="{{ isMarble }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column">
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(243,235,216,.95)">
+    <button onclick="{{ goHome }}" aria-label="back" style="width:52px;height:52px;border-radius:50%;background:#fffdf6;border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;font-family:'Baloo 2';font-weight:800;font-size:26px;color:#3a322a;line-height:1">‹</button>
+    <div style="font-family:'Gochi Hand',cursive;font-size:22px;flex:1">marble painting</div>
+    <button onclick="{{ marbleReset }}" style="font-family:'Nunito';font-weight:800;font-size:14px;color:#3a322a;background:#fff;border:2.5px solid #3a322a;border-radius:13px;padding:8px 12px;box-shadow:0 3px 0 #3a322a;min-height:48px">start again</button>
+    <button onclick="{{ marbleFinish }}" style="font-family:'Baloo 2';font-weight:800;font-size:16px;color:#fff;background:#c85a3c;border:2.5px solid #3a322a;border-radius:15px;padding:10px 18px;box-shadow:0 4px 0 #3a322a;min-height:52px;display:flex;align-items:center;gap:7px"><span style="width:11px;height:11px;background:#fff;transform:rotate(45deg);border:2px solid #f4c026"></span>Finish</button>
+  </div>
+  <div style="{{ marbleBodyStyle }}">
+    <div style="position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:14px">
+      <div id="mk-tray" style="position:relative;width:min(100%,560px);aspect-ratio:1/1;max-height:100%;border:4px solid #3a322a;border-radius:18px;box-shadow:5px 6px 0 rgba(58,50,42,.16),inset 0 0 0 6px #fff;overflow:hidden;background:#eef3f0;touch-action:none">
+        <canvas id="mk-cv" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+        <div id="mk-paper" style="{{ marblePaperStyle }}"></div>
+        <div style="{{ marbleToyStyle }}">
+          <div style="position:absolute;left:20px;bottom:26px;width:200px;height:74px;border-radius:18px 26px 12px 12px;border:4px solid #3a322a;background-image:{{ marbleToyBg }};background-size:cover;background-position:center"></div>
+          <div style="position:absolute;left:58px;top:12px;width:96px;height:52px;border-radius:14px 14px 4px 4px;border:4px solid #3a322a;background:rgba(255,255,255,.32)"></div>
+          <div style="position:absolute;left:40px;bottom:6px;width:44px;height:44px;border-radius:50%;background:#2b2620;border:4px solid #4a3f34"></div>
+          <div style="position:absolute;left:156px;bottom:6px;width:44px;height:44px;border-radius:50%;background:#2b2620;border:4px solid #4a3f34"></div>
+        </div>
+        <sc-if value="{{ marblePaint }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:0;right:0;bottom:0;text-align:center;font-family:'Gochi Hand',cursive;font-size:16px;color:rgba(58,50,42,.5);padding:8px;pointer-events:none">tap to drip • drag to swirl</div></sc-if>
+      </div>
+    </div>
+    <div style="{{ marbleTrayStyle }}">
+      <div style="font-family:'Gochi Hand',cursive;font-size:15px;color:#7a6a52;width:100%;text-align:center">{{ marbleHint }}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%">
+        <sc-for list="{{ inks }}" as="ink" hint-placeholder-count="4">
+          <button onclick="{{ ink.pick }}" style="{{ ink.style }}"></button>
+        </sc-for>
+        <button onclick="{{ toggleComb }}" style="{{ combStyle }}"><span style="display:flex;gap:3px;align-items:flex-end"><span style="width:3px;height:14px;background:currentColor"></span><span style="width:3px;height:18px;background:currentColor"></span><span style="width:3px;height:14px;background:currentColor"></span><span style="width:3px;height:18px;background:currentColor"></span></span></button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%">
+        <button onclick="{{ marbleUndo }}" aria-label="undo" style="width:56px;height:56px;border-radius:16px;background:#fff;border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;font-family:'Baloo 2';font-weight:800;font-size:24px;color:#3a322a;flex:none">↶</button>
+        <button onclick="{{ marblePrint }}" style="font-family:'Baloo 2';font-weight:800;font-size:15px;color:#3a322a;background:#f4c026;border:2.5px solid #3a322a;border-radius:15px;padding:10px 12px;box-shadow:0 4px 0 #3a322a;min-height:56px;flex:1;min-width:112px">make a print</button>
+        <button onclick="{{ marbleDip }}" style="font-family:'Baloo 2';font-weight:800;font-size:15px;color:#3a322a;background:#7cc0e8;border:2.5px solid #3a322a;border-radius:15px;padding:10px 12px;box-shadow:0 4px 0 #3a322a;min-height:56px;flex:1;min-width:112px">dip a toy</button>
+      </div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ COLOUR BY NUMBER ============ -->
+<sc-if value="{{ isCbn }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column">
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(243,235,216,.95)">
+    <button onclick="{{ goHome }}" aria-label="back" style="width:52px;height:52px;border-radius:50%;background:#fffdf6;border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;font-family:'Baloo 2';font-weight:800;font-size:26px;line-height:1">‹</button>
+    <div style="font-family:'Gochi Hand',cursive;font-size:22px;flex:1">colour by number</div>
+    <button onclick="{{ toggleDots }}" style="font-family:'Nunito';font-weight:800;font-size:14px;color:#3a322a;background:#fff;border:2.5px solid #3a322a;border-radius:13px;padding:8px 12px;box-shadow:0 3px 0 #3a322a;min-height:48px">{{ dotsLabel }}</button>
+    <button onclick="{{ cbnFinish }}" style="{{ cbnFinishStyle }}"><span style="width:11px;height:11px;background:#fff;transform:rotate(45deg);border:2px solid #f4c026"></span>Finish</button>
+  </div>
+  <div style="{{ cbnBodyStyle }}">
+    <div style="position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:16px">
+      <div style="position:relative;width:min(100%,460px);aspect-ratio:300/348;max-height:100%;background:#fffdf6;border:3px solid #3a322a;border-radius:14px;box-shadow:5px 6px 0 rgba(58,50,42,.16);overflow:hidden">
+        <div style="position:absolute;inset:0;transform-origin:top left" id="cbn-stage">
+          <sc-for list="{{ regions }}" as="rg" hint-placeholder-count="10">
+            <button onclick="{{ rg.tap }}" style="{{ rg.style }}"><span style="{{ rg.labelStyle }}">{{ rg.label }}</span></button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ cbnDone }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;pointer-events:none;overflow:hidden"><div style="position:absolute;top:0;bottom:0;width:60px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);animation:shim 1.1s ease-out"></div></div></sc-if>
+      </div>
+    </div>
+    <div style="{{ cbnPotsStyle }}">
+      <div style="font-family:'Gochi Hand',cursive;font-size:15px;color:#7a6a52;width:100%;text-align:center">{{ cbnHint }}</div>
+      <sc-for list="{{ pots }}" as="pot" hint-placeholder-count="4">
+        <button onclick="{{ pot.pick }}" style="{{ pot.style }}">{{ pot.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ GALLERY BOOK ============ -->
+<sc-if value="{{ isBook }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;background:#e9dcbf;background-image:radial-gradient(circle at 30% 40%,rgba(120,90,40,.06) 1px,transparent 1.6px);background-size:30px 30px">
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+    <button onclick="{{ goHome }}" aria-label="back" style="width:52px;height:52px;border-radius:50%;background:#fffdf6;border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;font-family:'Baloo 2';font-weight:800;font-size:26px;line-height:1">‹</button>
+    <div style="font-family:'Gochi Hand',cursive;font-size:22px;flex:1">{{ possessive }} gallery book</div>
+    <button onclick="{{ shareToast }}" aria-label="share" style="width:52px;height:52px;border-radius:14px;background:#fffdf6;border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;display:flex;align-items:center;justify-content:center"><span style="width:14px;height:14px;border:2.5px solid #3a322a;border-bottom:none;border-radius:3px 3px 0 0;position:relative"><span style="position:absolute;left:50%;top:-7px;transform:translateX(-50%);width:2.5px;height:9px;background:#3a322a"></span></span></button>
+  </div>
+
+  <sc-if value="{{ bookClosed }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px">
+    <button onclick="{{ openCover }}" style="position:relative;width:min(360px,80vw);aspect-ratio:3/3.7;background:#d98a3c;border:4px solid #3a322a;border-radius:8px 20px 20px 8px;box-shadow:8px 10px 0 rgba(58,50,42,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;animation:bob 4s ease-in-out infinite">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:22px;background:#c2762e;border-right:3px solid #3a322a;border-radius:6px 0 0 6px"></div>
+      <div style="position:absolute;right:6px;top:10px;bottom:10px;width:9px;background:repeating-linear-gradient(#fdfaf0 0 4px,#e6d8bc 4px 7px);border-radius:0 4px 4px 0"></div>
+      <div style="font-family:'Gochi Hand',cursive;font-size:34px;color:#4a2f0e;transform:rotate(-3deg);line-height:.8">{{ possessive }}</div>
+      <div style="font-family:'Baloo 2';font-weight:800;font-size:30px;color:#fff;text-align:center;line-height:1;text-shadow:0 2px 0 rgba(74,47,14,.4)">Gallery<br>Book</div>
+      <div style="width:44px;height:44px;background:#c85a3c;transform:rotate(45deg);border:3px solid #fff;margin-top:8px"></div>
+      <div style="font-family:'Nunito';font-weight:800;font-size:13px;color:#4a2f0e;margin-top:12px">tap to open</div>
+    </button>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ bookOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px 8px 16px;gap:0">
+    <div style="{{ spreadStyle }}">
+      <!-- left page -->
+      <div style="flex:1;background:#fdfaf0;border:2.5px solid #3a322a;border-right:none;border-radius:12px 0 0 12px;box-shadow:inset -14px 0 24px -14px rgba(58,50,42,.3);padding:20px 18px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px;position:relative">
+        <div style="font-family:'Gochi Hand',cursive;font-size:22px;color:#c85a3c;transform:rotate(-2deg)">{{ leftKicker }}</div>
+        <div style="font-family:'Baloo 2';font-weight:800;font-size:26px;line-height:1.05">{{ leftTitle }}</div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:16px;color:#7a6a52">{{ leftNote }}</div>
+        <div style="{{ leftDecoStyle }}">{{ leftDeco }}</div>
+      </div>
+      <!-- right page -->
+      <div style="flex:1;background:#fffdf6;border:2.5px solid #3a322a;border-radius:0 12px 12px 0;box-shadow:inset 14px 0 24px -14px rgba(58,50,42,.3);padding:18px;display:flex;align-items:center;justify-content:center;position:relative">
+        <div style="{{ artFrameStyle }}">{{ bookArt }}</div>
+        <div style="position:absolute;bottom:8px;right:12px;font-family:'Nunito';font-weight:800;font-size:11px;color:#a8956f">{{ pageNum }}</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:20px;padding-bottom:18px">
+    <button onclick="{{ bookPrev }}" style="width:60px;height:60px;border-radius:50%;background:#fffdf6;border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;font-family:'Baloo 2';font-weight:800;font-size:28px;line-height:1">‹</button>
+    <div style="font-family:'Gochi Hand',cursive;font-size:16px;color:#7a6a52;min-width:90px;text-align:center">{{ bookCounter }}</div>
+    <button onclick="{{ bookNext }}" style="width:60px;height:60px;border-radius:50%;background:#fffdf6;border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;font-family:'Baloo 2';font-weight:800;font-size:28px;line-height:1">›</button>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ============ STUB EASEL ============ -->
+<sc-if value="{{ isStub }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column">
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+    <button onclick="{{ goHome }}" aria-label="back" style="width:52px;height:52px;border-radius:50%;background:#fffdf6;border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;font-family:'Baloo 2';font-weight:800;font-size:26px;line-height:1">‹</button>
+    <div style="font-family:'Gochi Hand',cursive;font-size:22px">{{ stubName }}</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:24px">
+    <div style="position:relative;width:min(320px,78vw);aspect-ratio:1/1.05;display:flex;align-items:center;justify-content:center">
+      <div style="width:76%;height:80%;background:#fffdf6;border:3px solid #3a322a;border-radius:10px;box-shadow:4px 5px 0 rgba(58,50,42,.16);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transform:rotate(-1.5deg)">
+        <div style="width:64px;height:64px;border-radius:50%;background:{{ stubTint }};border:3px solid #3a322a;position:relative;animation:wagg 3s ease-in-out infinite"><div style="position:absolute;inset:14px;border:3px dashed rgba(255,255,255,.75);border-radius:50%"></div></div>
+        <div style="font-family:'Gochi Hand',cursive;font-size:26px;color:#c85a3c">still drying!</div>
+        <div style="font-family:'Nunito';font-weight:700;font-size:14px;color:#7a6a52;text-align:center;max-width:200px">this kit is nearly ready. come back very soon!</div>
+      </div>
+      <div style="position:absolute;bottom:0;left:16%;width:14px;height:34%;background:#c2762e;border:2.5px solid #3a322a;transform:rotate(20deg);transform-origin:top"></div>
+      <div style="position:absolute;bottom:0;right:16%;width:14px;height:34%;background:#c2762e;border:2.5px solid #3a322a;transform:rotate(-20deg);transform-origin:top"></div>
+    </div>
+    <button onclick="{{ goHome }}" style="font-family:'Baloo 2';font-weight:800;font-size:18px;color:#fff;background:#c85a3c;border:3px solid #3a322a;border-radius:16px;padding:13px 28px;box-shadow:0 5px 0 #3a322a;min-height:60px">back to the shelves</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ SETTINGS ============ -->
+<sc-if value="{{ settingsOpen }}" hint-placeholder-val="{{ false }}">
+<div onclick="{{ closeSettings }}" style="position:absolute;inset:0;z-index:40;background:rgba(58,50,42,.4);display:flex;align-items:center;justify-content:center;padding:22px">
+  <div onclick="{{ stop }}" style="width:min(380px,92vw);background:#fffdf6;border:3px solid #3a322a;border-radius:22px;box-shadow:5px 7px 0 rgba(58,50,42,.2);padding:24px;animation:rise .35s ease">
+    <div style="font-family:'Baloo 2';font-weight:800;font-size:24px;margin-bottom:4px">Settings</div>
+    <div style="font-family:'Nunito';font-weight:700;font-size:13px;color:#8a7a5f;margin-bottom:18px">for grown-ups</div>
+    <button onclick="{{ toggleMute }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#fff;border:2.5px solid #3a322a;border-radius:15px;padding:14px 16px;margin-bottom:12px;box-shadow:0 3px 0 #3a322a">
+      <span style="font-family:'Baloo 2';font-weight:700;font-size:17px">Sound</span>
+      <span style="{{ soundPill }}"><span style="{{ soundKnob }}"></span></span>
+    </button>
+    <button onclick="{{ toggleCalm }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#fff;border:2.5px solid #3a322a;border-radius:15px;padding:14px 16px;margin-bottom:8px;box-shadow:0 3px 0 #3a322a">
+      <span style="text-align:left"><span style="font-family:'Baloo 2';font-weight:700;font-size:17px;display:block">Calm mode</span><span style="font-family:'Nunito';font-weight:600;font-size:12px;color:#8a7a5f">gentle confetti, less motion</span></span>
+      <span style="{{ calmPill }}"><span style="{{ calmKnob }}"></span></span>
+    </button>
+    <div style="font-family:'Nunito';font-weight:600;font-size:12px;color:#a8956f;text-align:center;margin:14px 0 4px">Playing as {{ name }} · saved on this device</div>
+    <button onclick="{{ closeSettings }}" style="width:100%;font-family:'Baloo 2';font-weight:800;font-size:18px;color:#fff;background:#c85a3c;border:2.5px solid #3a322a;border-radius:15px;padding:13px;box-shadow:0 4px 0 #3a322a;margin-top:8px;min-height:56px">all done</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ FINISHING RITUAL ============ -->
+<sc-if value="{{ finishing }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:60;background:rgba(58,50,42,.55);overflow:hidden;display:flex;align-items:center;justify-content:center">
+  {{ burst }}
+  <div style="{{ finishArtStyle }}">
+    <div style="{{ finishThumbStyle }}">{{ finishArt }}</div>
+  </div>
+  <sc-if value="{{ finishText }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;right:0;bottom:16%;text-align:center;font-family:'Gochi Hand',cursive;font-size:26px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.4);animation:rise .4s ease">{{ finishText }}</div></sc-if>
+</div>
+</sc-if>
+
+<!-- ============ TOAST ============ -->
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:80;background:#3a322a;color:#fff;font-family:'Baloo 2';font-weight:700;font-size:15px;padding:12px 20px;border-radius:14px;box-shadow:0 6px 16px rgba(0,0,0,.3);animation:rise .3s ease;white-space:nowrap">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{},&quot;calmMode&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Play&quot;},&quot;sound&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Play&quot;},&quot;difficulty&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;easy&quot;,&quot;medium&quot;,&quot;hard&quot;],&quot;default&quot;:&quot;medium&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Play&quot;},&quot;skipNameEntry&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Play&quot;}}">
+class Component extends DCLogic {
+  state = {
+    ready:false, name:null, screen:'name', landscape:false,
+    muted:false, calm:false, settingsOpen:false,
+    gallery:[], toast:null, finishing:null,
+    mkInk:0, mkComb:false, mkPhase:'paint',
+    cbnPot:null, cbnFills:{}, cbnDots:false, cbnDone:false, cbnWobble:null,
+    bookOpened:false, bookIdx:0
+  };
+
+  INKS = [{c:'#2fb8b3',d:'#229a95'},{c:'#f2913d',d:'#d9702a'},{c:'#f2779f',d:'#d94f7c'},{c:'#f4c026',d:'#d9a81a'}];
+  POTS = [{c:'#f4c026',d:'#d9a81a',n:1},{c:'#f2779f',d:'#d94f7c',n:2},{c:'#63b34a',d:'#4a9636',n:3},{c:'#7cc0e8',d:'#4b98c9',n:4}];
+
+  componentDidMount(){
+    let s={}; try{ s=JSON.parse(localStorage.getItem('emd_v1'))||{}; }catch(e){}
+    const seed = {
+      name: s.name || null,
+      screen: s.name ? 'home' : (this.props.skipNameEntry ? 'home' : 'name'),
+      muted: s.muted!=null ? s.muted : (this.props.sound===false),
+      calm: s.calm!=null ? s.calm : !!this.props.calmMode,
+      gallery: (s.gallery && s.gallery.length) ? s.gallery : this.sampleGallery(),
+      ready:true
+    };
+    if(seed.screen==='home' && !seed.name) seed.name='Esther';
+    this.setState(seed);
+    this._onResize = ()=> this.setState({landscape: window.innerWidth > window.innerHeight && window.innerWidth > 760});
+    window.addEventListener('resize', this._onResize); this._onResize();
+    try{ this.reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches; }catch(e){ this.reduced=false; }
+  }
+  componentWillUnmount(){ window.removeEventListener('resize', this._onResize); }
+  componentDidUpdate(pp, ps){
+    ps = ps || {};
+    if(['name','muted','calm','gallery'].some(k=>ps[k]!==this.state[k])) this.persist();
+  }
+  persist(){ try{ localStorage.setItem('emd_v1', JSON.stringify({name:this.state.name,muted:this.state.muted,calm:this.state.calm,gallery:this.state.gallery})); }catch(e){} }
+
+  sampleGallery(){ return [
+    {id:'s1', type:'marble', title:'Swirly Print', tint:'#2fb8b3'},
+    {id:'s2', type:'cbn', title:'My Flower', tint:'#f2779f'},
+    {id:'s3', type:'dot', title:'Wiggly Fish', tint:'#f4c026'},
+    {id:'s4', type:'sticker', title:'Garden Scene', tint:'#63b34a'}
+  ]; }
+
+  // ---------- audio ----------
+  ensureAudio(){ if(this.actx) return; try{ this.actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  play(type){ if(this.state.muted || !this.actx) return; const now=this.actx.currentTime; const vol=this.state.calm?0.06:0.12;
+    const tone=(f,f2,dur,wave,v)=>{ const o=this.actx.createOscillator(),g=this.actx.createGain(); o.type=wave||'sine'; o.frequency.setValueAtTime(f,now); if(f2)o.frequency.exponentialRampToValueAtTime(f2,now+dur); g.gain.setValueAtTime(v||vol,now); g.gain.exponentialRampToValueAtTime(0.0001,now+dur); o.connect(g).connect(this.actx.destination); o.start(now); o.stop(now+dur); };
+    if(type==='drip') tone(660,180,0.18);
+    else if(type==='swirl') tone(220,300,0.12,'sine',vol*0.5);
+    else if(type==='pop') tone(300,520,0.12,'triangle');
+    else if(type==='page') tone(140,90,0.16,'sawtooth',vol*0.5);
+    else if(type==='wrong') tone(200,160,0.16,'sine',vol*0.6);
+    else if(type==='fw'){ if(this.state.calm){tone(500,700,0.2,'sine',0.05);return;} for(let i=0;i<4;i++) setTimeout(()=>tone(400+Math.random()*500,120,0.14,'triangle'), i*90); }
+  }
+
+  showToast(msg){ this.setState({toast:msg}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:null}),1900); }
+
+  // ---------- nav ----------
+  go(screen){ this.ensureAudio(); this.setState({screen, settingsOpen:false}); }
+  openKit(kit){ this.ensureAudio(); this.play('page');
+    if(kit==='marble'){ this.setState({screen:'marble', mkPhase:'paint', mkInk:0, mkComb:false}); setTimeout(()=>this.initMarble(),60); }
+    else if(kit==='cbn'){ this.setState({screen:'cbn', cbnPot:null, cbnFills:{}, cbnDone:false}); }
+    else { this.setState({screen:'stub', stubKit:kit}); }
+  }
+
+  confirmName(){ this.ensureAudio(); const n=(this._name||'').trim().slice(0,14) || 'Esther';
+    this.setState({name:n, screen:'home'}); this.play('pop'); }
+
+  // ---------- marble ----------
+  initMarble(tries){ tries=tries||0; const cv=document.getElementById('mk-cv'), wrap=document.getElementById('mk-tray');
+    if(!cv||!wrap||wrap.clientWidth<20){ if(tries<30) requestAnimationFrame(()=>this.initMarble(tries+1)); return; }
+    const dpr=Math.min(2,window.devicePixelRatio||1); const W=wrap.clientWidth, H=wrap.clientHeight;
+    cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.fillStyle='#eef3f0'; ctx.fillRect(0,0,W,H);
+    this.mk={cv,ctx,W,H,dpr,drawing:false,last:null,moved:false,ns:0,undo:[]};
+    const pos=e=>{ const r=cv.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; };
+    cv.onpointerdown=e=>{ e.preventDefault(); if(this.state.mkPhase!=='paint')return; try{cv.setPointerCapture(e.pointerId);}catch(_){} this.mkSnap(); this.mk.drawing=true; this.mk.moved=false; this.mk.last=pos(e); };
+    cv.onpointermove=e=>{ if(!this.mk.drawing)return; const p=pos(e); if(Math.hypot(p.x-this.mk.last.x,p.y-this.mk.last.y)>2){ this.mk.moved=true; this.mkSmear(this.mk.last,p); this.mk.last=p; if((this.mk.ns++%7)===0)this.play('swirl'); } };
+    cv.onpointerup=e=>{ if(!this.mk.drawing)return; const p=pos(e); if(!this.mk.moved){ this.mk.undo.pop(); this.mkDrip(p.x,p.y); } this.mk.drawing=false; };
+  }
+  mkSnap(){ if(!this.mk)return; try{ this.mk.undo.push(this.mk.ctx.getImageData(0,0,this.mk.cv.width,this.mk.cv.height)); if(this.mk.undo.length>10)this.mk.undo.shift(); }catch(e){} }
+  mkDrip(x,y){ const {ctx}=this.mk; const ink=this.INKS[this.state.mkInk]; const rings=[[26,ink.c],[17,ink.d],[9,'#fff'],[4,ink.c]];
+    rings.forEach(([r,c])=>{ ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fillStyle=c; ctx.globalAlpha=c==='#fff'?0.6:1; ctx.fill(); }); ctx.globalAlpha=1; this.play('drip'); }
+  mkSmear(a,b){ const {ctx,cv,dpr}=this.mk; const r=this.state.mkComb?36:22; ctx.save(); ctx.beginPath(); ctx.arc(b.x,b.y,r,0,7); ctx.clip();
+    ctx.drawImage(cv,(a.x-r)*dpr,(a.y-r)*dpr,2*r*dpr,2*r*dpr, b.x-r,b.y-r,2*r,2*r); ctx.restore(); }
+  marbleUndo(){ if(!this.mk||!this.mk.undo.length)return; const img=this.mk.undo.pop(); this.mk.ctx.putImageData(img,0,0); this.play('page'); }
+  marbleReset(){ if(!this.mk)return; this.mkSnap(); this.mk.ctx.fillStyle='#eef3f0'; this.mk.ctx.fillRect(0,0,this.mk.W,this.mk.H); this.setState({mkPhase:'paint'}); this.play('page'); }
+  marblePrint(){ if(!this.mk)return; this._print=this.mk.cv.toDataURL('image/png'); this.play('page');
+    this.setState({mkPhase:'lower'});
+    setTimeout(()=>{ this.setState({mkPhase:'peel'}); this.play('page'); },700);
+    setTimeout(()=>{ this.setState({mkPhase:'print'}); },1650);
+  }
+  marbleDip(){ if(!this.mk)return; this._print=this.mk.cv.toDataURL('image/png'); this._toy=null; this.play('drip'); this.setState({mkPhase:'toy'});
+    const im=new Image(); im.onload=()=>{ try{ this._toy=this.renderToyCanvas(im); }catch(e){} }; im.src=this._print; }
+  marbleFinish(){ if(!this.mk)return; const p=this.state.mkPhase;
+    const img = p==='toy' ? (this._toy||this._print) : (p==='print' ? this._print : this.mk.cv.toDataURL('image/png'));
+    this.startFinish({type:'marble', title: p==='toy'?'Marbled Toy':'Marble Print', img, tint:this.INKS[this.state.mkInk].c}); }
+  renderToyCanvas(img){ const c=document.createElement('canvas'); c.width=240; c.height=150; const x=c.getContext('2d');
+    const rr=(px,py,w,h,r)=>{ x.beginPath(); x.moveTo(px+r,py); x.arcTo(px+w,py,px+w,py+h,r); x.arcTo(px+w,py+h,px,py+h,r); x.arcTo(px,py+h,px,py,r); x.arcTo(px,py,px+w,py,r); x.closePath(); };
+    x.save(); rr(20,50,200,74,16); x.clip(); x.drawImage(img,20,50,200,74); x.restore();
+    x.lineWidth=4; x.strokeStyle='#3a322a'; rr(20,50,200,74,16); x.stroke();
+    x.fillStyle='rgba(255,255,255,.32)'; rr(58,12,96,52,12); x.fill(); rr(58,12,96,52,12); x.stroke();
+    [62,178].forEach(wx=>{ x.beginPath(); x.arc(wx,124,22,0,7); x.fillStyle='#2b2620'; x.fill(); x.lineWidth=4; x.strokeStyle='#4a3f34'; x.stroke(); });
+    return c.toDataURL('image/png'); }
+
+  // ---------- colour by number ----------
+  petalCount(){ return this.props.difficulty==='easy'?4:(this.props.difficulty==='hard'?8:6); }
+  buildRegions(){ const P=this.petalCount(); const cx=150, cy=140, R=60; const reg=[];
+    reg.push({id:'bg', n:4, shape:'rect', x:0,y:0,w:300,h:348});
+    for(let i=0;i<P;i++){ const a=(-90 + i*360/P)*Math.PI/180; reg.push({id:'p'+i, n:2, shape:'circle', x:cx+R*Math.cos(a)-33, y:cy+R*Math.sin(a)-33, w:66,h:66}); }
+    reg.push({id:'stem', n:3, shape:'rect', x:143,y:196,w:14,h:120,rad:'7px'});
+    reg.push({id:'l1', n:3, shape:'diamond', x:96,y:236,w:44,h:44});
+    reg.push({id:'l2', n:3, shape:'diamond', x:160,y:250,w:44,h:44});
+    reg.push({id:'ctr', n:1, shape:'circle', x:cx-38, y:cy-38, w:76,h:76});
+    return reg;
+  }
+  regionColor(n){ const p=this.POTS.find(p=>p.n===n); return p?p.c:'#fff'; }
+  pickPot(n){ this.ensureAudio(); this.setState({cbnPot:n}); this.play('pop'); }
+  tapRegion(id,n){ if(this.state.cbnFills[id]) return; const pot=this.state.cbnPot;
+    if(pot==null){ this.showToast('pick a paint pot first!'); this.wobble(id); return; }
+    if(pot===n){ const f={...this.state.cbnFills, [id]:n}; const total=this.buildRegions().length; const done=Object.keys(f).length>=total;
+      this.setState({cbnFills:f, cbnDone:done}); this.play('pop'); if(done){ this.play('fw'); this.showToast('all done — beautiful!'); } }
+    else { this.wobble(id); this.play('wrong'); }
+  }
+  wobble(id){ this.setState({cbnWobble:id}); clearTimeout(this._wb); this._wb=setTimeout(()=>this.setState({cbnWobble:null}),450); }
+  toggleDots(){ this.setState(s=>({cbnDots:!s.cbnDots})); }
+  cbnFinish(){ if(!this.state.cbnDone){ this.showToast('fill every bit first!'); return; } this.startFinish({type:'cbn', title:'My Flower', tint:'#f2779f', fills:{...this.state.cbnFills}, petals:this.petalCount()}); }
+
+  // ---------- finishing ritual ----------
+  startFinish(item){ this.ensureAudio(); const calm=this.state.calm||this.reduced;
+    const parts=[]; const N=calm?22:26; for(let i=0;i<N;i++){ const a=Math.random()*Math.PI*2; const dist=(calm?0:1)*(120+Math.random()*220); parts.push({tx:Math.cos(a)*dist, ty:Math.sin(a)*(calm?0:dist), tr:(Math.random()*720-360)+'deg', c:['#f4c026','#f2779f','#2fb8b3','#63b34a','#f2913d','#9a6bd1'][i%6], d:0.6+Math.random()*0.5, delay:Math.random()*0.25}); }
+    this.setState({finishing:{...item, phase:'gather', parts, calm}});
+    setTimeout(()=>{ this.setState(s=>({finishing:{...s.finishing,phase:'burst'}})); this.play('fw'); },420);
+    setTimeout(()=>{ this.setState(s=>({finishing:{...s.finishing,phase:'fly',text:'into '+this.poss()+' book!'}})); },1550);
+    setTimeout(()=>{ const g=[{id:'g'+Date.now(), type:item.type, title:item.title, tint:item.tint, img:item.img, fills:item.fills, petals:item.petals}, ...this.state.gallery];
+      this.setState({gallery:g, finishing:null, screen:'home'}); this.showToast('added to '+this.poss()+' book!'); },2600);
+  }
+
+  poss(){ const n=this.state.name||'Esther'; return n + (/s$/i.test(n)?"'":"'s"); }
+
+  // ---------- render helpers ----------
+  toolbarWrap(landscape){ return landscape
+    ? 'display:flex;flex-direction:row;flex:1;min-height:0'
+    : 'display:flex;flex-direction:column;flex:1;min-height:0'; }
+  trayWrap(landscape){ const base='background:rgba(255,253,246,.92);border:2.5px solid #3a322a;box-shadow:0 4px 0 rgba(58,50,42,.14);display:flex;flex-direction:column;align-items:center;gap:12px;border-radius:20px;';
+    return landscape
+      ? base+'width:204px;flex:none;margin:12px 12px 12px 0;padding:16px 12px;overflow-y:auto'
+      : base+'width:auto;margin:0 12px 12px;padding:14px 12px'; }
+
+  renderMarbleArt(){ return React.createElement('img',{src:this._print, style:{width:'100%',height:'100%',objectFit:'cover',display:'block'}}); }
+  renderFlower(fills, petals){ // mini flower from fills for book/finish thumbs
+    const P=petals||6, el=[], cx=50,cy=46,R=22;
+    el.push(React.createElement('div',{key:'bg',style:{position:'absolute',inset:0,background:this.regionColor(4),borderRadius:'8px'}}));
+    for(let i=0;i<P;i++){ const a=(-90+i*360/P)*Math.PI/180; el.push(React.createElement('div',{key:'p'+i,style:{position:'absolute',left:cx+R*Math.cos(a)-11+'%',top:cy+R*Math.sin(a)-11+'%',width:'22%',height:'22%',borderRadius:'50%',background:this.regionColor(2),border:'1.5px solid #3a322a'}})); }
+    el.push(React.createElement('div',{key:'st',style:{position:'absolute',left:'47%',top:'56%',width:'6%',height:'34%',background:this.regionColor(3),border:'1.5px solid #3a322a'}}));
+    el.push(React.createElement('div',{key:'c',style:{position:'absolute',left:cx-13+'%',top:cy-13+'%',width:'26%',height:'26%',borderRadius:'50%',background:this.regionColor(1),border:'1.5px solid #3a322a'}}));
+    return React.createElement('div',{style:{position:'relative',width:'100%',height:'100%'}},el);
+  }
+  renderMotif(item){ // gallery thumbs by type
+    const t=item.tint||'#2fb8b3';
+    if(item.img) return React.createElement('img',{src:item.img,style:{width:'100%',height:'100%',objectFit:'cover',display:'block'}});
+    if(item.type==='cbn') return this.renderFlower(item.fills,item.petals);
+    const bg={marble:`repeating-linear-gradient(45deg,${t} 0 10px,#fff8 10px 20px)`, dot:'#fdfaf0', sticker:`repeating-linear-gradient(-45deg,${t} 0 12px,#fff9 12px 24px)`, jigsaw:`repeating-linear-gradient(45deg,${t} 0 10px,#fff8 10px 20px)`, cbn:'#fdfaf0'}[item.type]||t;
+    return React.createElement('div',{style:{width:'100%',height:'100%',background:bg,display:'flex',alignItems:'center',justifyContent:'center'}},
+      item.type==='dot'?React.createElement('div',{style:{fontFamily:"'Baloo 2'",fontWeight:800,fontSize:'26px',color:'#d9a81a'}},'1·2·3'):null); }
+
+  renderBurst(){ const f=this.state.finishing; if(!f||f.phase!=='burst') return null;
+    const anim = f.calm ? 'conf' : 'fw';
+    return React.createElement('div',{style:{position:'absolute',left:'50%',top:'50%',pointerEvents:'none'}},
+      f.parts.map((p,i)=>React.createElement('div',{key:i, style:{position:'absolute',width:f.calm?'11px':'13px',height:f.calm?'11px':'13px',marginLeft:'-6px',marginTop:'-6px',borderRadius:i%2?'50%':'2px',background:p.c,'--tx':p.tx+'px','--ty':(f.calm?(-40+Math.random()*30):p.ty)+'px','--tr':p.tr,animation:`${anim} ${p.d}s ${p.delay}s ease-out forwards`}})));
+  }
+
+  renderVals(){
+    const S=this.state, L=S.landscape;
+    const isName=S.screen==='name', isHome=S.screen==='home', isMarble=S.screen==='marble', isCbn=S.screen==='cbn', isBook=S.screen==='book', isStub=S.screen==='stub';
+    const name=S.name||'Esther';
+
+    // marble tray/phase styles
+    const paperBase='position:absolute;left:8%;right:8%;top:6%;bottom:6%;border-radius:6px;border:3px solid rgba(58,50,42,.25);transition:transform .8s cubic-bezier(.4,1.3,.4,1),opacity .5s;box-shadow:0 12px 24px rgba(0,0,0,.2);';
+    let marblePaperStyle, marblePaint=(S.mkPhase==='paint');
+    if(S.mkPhase==='paint') marblePaperStyle=paperBase+'background:#fffdf6;transform:translateY(-140%) rotate(-2deg);opacity:0';
+    else if(S.mkPhase==='lower') marblePaperStyle=paperBase+'background:#fffdf6;transform:translateY(0)';
+    else if(S.mkPhase==='peel') marblePaperStyle=paperBase+`background:#fffdf6 center/cover url(${this._print||''});transform:translateY(-6%) rotate(3deg) scale(.98)`;
+    else if(S.mkPhase==='print') marblePaperStyle=paperBase+`background:#fff center/cover url(${this._print||''});transform:translateY(0) rotate(-1deg);box-shadow:6px 8px 0 rgba(58,50,42,.2)`;
+    else if(S.mkPhase==='toy') marblePaperStyle=paperBase+'opacity:0;transform:translateY(-140%)';
+    const marbleToyStyle=`position:absolute;left:50%;top:50%;width:240px;height:150px;z-index:4;transform:translate(-50%,-50%);display:${S.mkPhase==='toy'?'block':'none'};`+(S.mkPhase==='toy'?'animation:dipLift .9s cubic-bezier(.4,1.3,.4,1) both;':'');
+    const marbleToyBg=(S.mkPhase==='toy'&&this._print)?`url(${this._print})`:'none';
+
+    const inks=this.INKS.map((ink,i)=>({ pick:()=>this.setState({mkInk:i}),
+      style:`width:52px;height:52px;border-radius:50%;background:${ink.c};border:${S.mkInk===i?'4px solid #3a322a':'3px solid rgba(58,50,42,.35)'};box-shadow:0 4px 0 ${ink.d}${S.mkInk===i?';transform:scale(1.12)':''};transition:transform .15s` }));
+    const combStyle=`width:56px;height:56px;border-radius:16px;background:${S.mkComb?'#3a322a':'#fff'};color:${S.mkComb?'#fff':'#3a322a'};border:2.5px solid #3a322a;box-shadow:0 4px 0 #3a322a;display:flex;align-items:center;justify-content:center`;
+    const marbleHint = S.mkPhase==='print' ? 'lovely! press Finish →' : (S.mkPhase==='toy' ? 'your toy is marbled! press Finish →' : 'pick a colour, then play in the tray');
+
+    // toy overlay handled inside tray via phase; reuse paper element for print. Toy = simple car filled w/ print
+    // cbn
+    const regs=this.buildRegions();
+    const regions=regs.map(r=>{ const filled=S.cbnFills[r.id]; const col=filled?this.regionColor(filled):'#fffdf6';
+      const isDia=r.shape==='diamond';
+      let sty=`position:absolute;left:${r.x/300*100}%;top:${r.y/348*100}%;width:${r.w/300*100}%;height:${r.h/348*100}%;border:2px solid #3a322a;background:${col};display:flex;align-items:center;justify-content:center;padding:0;`;
+      if(r.shape==='circle') sty+='border-radius:50%;';
+      else if(isDia) sty+='border-radius:6px;transform:rotate(45deg);';
+      else sty+='border-radius:'+(r.rad||'4px')+';';
+      sty+= (r.id==='bg'?'z-index:0;':'z-index:2;');
+      sty+= (S.cbnWobble===r.id?'animation:wob .4s;':'');
+      const dot=(!filled && S.cbnDots);
+      let lst='font-family:"Baloo 2";font-weight:800;line-height:1;pointer-events:none;';
+      if(isDia) lst+='display:inline-block;transform:rotate(-45deg);';
+      if(filled) lst+='color:transparent;';
+      else if(dot) lst+='color:'+this.regionColor(r.n)+';font-size:clamp(18px,5.5vw,30px);';
+      else lst+='color:'+(r.id==='bg'?'#b9c4cf':'#8a7a5f')+';font-size:clamp(13px,3.6vw,22px);';
+      const label= filled ? '' : (dot ? '\u25CF' : r.n);
+      return { id:r.id, tap:()=>this.tapRegion(r.id,r.n), style:sty, labelStyle:lst, label };
+    });
+
+    const pots=this.POTS.map(p=>({ pick:()=>this.pickPot(p.n),
+      style:`width:56px;height:56px;border-radius:14px 14px 16px 16px;background:${p.c};border:${S.cbnPot===p.n?'4px solid #3a322a':'3px solid rgba(58,50,42,.4)'};box-shadow:0 5px 0 ${p.d}${S.cbnPot===p.n?';transform:translateY(-3px)':''};font-family:'Baloo 2';font-weight:800;font-size:22px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s`,
+      label:S.cbnDots?'':p.n }));
+    const cbnHint = S.cbnDone ? 'finished! press Finish →' : (S.cbnPot==null ? 'tap a paint pot to begin' : 'now tap the matching numbers');
+    const cbnFinishStyle = `font-family:'Baloo 2';font-weight:800;font-size:16px;color:#fff;background:${S.cbnDone?'#c85a3c':'#c9bfa6'};border:2.5px solid #3a322a;border-radius:15px;padding:10px 18px;box-shadow:0 4px 0 #3a322a;min-height:52px;display:flex;align-items:center;gap:7px`;
+
+    // book
+    const pages = this.state.gallery;
+    const idx = Math.max(0, Math.min(S.bookIdx, pages.length-1));
+    const cur = pages[idx] || {type:'marble',title:'—',tint:'#ccc'};
+    const kick = {marble:'you painted',cbn:'you coloured',dot:'you joined',jigsaw:'you solved',sticker:'you made',butterfly:'you grew'}[cur.type]||'you made';
+    const notes = {marble:'swirled all by yourself',cbn:'every number in its place',dot:'dot by dot by dot',jigsaw:'from your own drawing',sticker:'every sticker found its home',butterfly:'fluttering in the house'}[cur.type]||'made with love';
+    const spreadStyle = (L?'flex-direction:row;width:min(720px,94vw);height:min(78vh,540px)':'flex-direction:row;width:min(96vw,520px);height:min(66vh,460px)')+';display:flex;box-shadow:0 16px 30px -12px rgba(58,50,42,.4)';
+    const artFrameStyle='width:100%;height:100%;border:2.5px solid #3a322a;border-radius:8px;overflow:hidden;background:#fff;box-shadow:2px 3px 0 rgba(58,50,42,.14);transform:rotate(-1deg)';
+    const leftDecoStyle='width:70px;height:70px;margin-top:6px;'+({marble:'',cbn:'',dot:'',sticker:''}[cur.type]!=null?'':'');
+
+    // settings pills
+    const pill=(on)=>`width:52px;height:30px;border-radius:16px;border:2.5px solid #3a322a;background:${on?'#63b34a':'#e6dcc4'};display:flex;align-items:center;padding:2px;transition:background .2s`;
+    const knob=(on)=>`width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #3a322a;transform:translateX(${on?'22px':'0'});transition:transform .2s`;
+
+    // finishing art
+    const f=S.finishing;
+    let finishArtStyle='position:absolute;left:50%;top:50%;transition:transform .8s cubic-bezier(.4,1.2,.3,1),opacity .6s;';
+    if(f){ if(f.phase==='gather') finishArtStyle+='transform:translate(-50%,-50%) scale(.6);opacity:.9';
+      else if(f.phase==='burst') finishArtStyle+='transform:translate(-50%,-50%) scale(1);opacity:1';
+      else finishArtStyle+='transform:translate(-50%,-50%) translate(38vw,-40vh) scale(.15) rotate(20deg);opacity:.2'; }
+    const finishThumbStyle='width:min(52vw,240px);height:min(52vw,240px);border:4px solid #fff;border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.4);background:#fff';
+    const finishArt = f ? (f.type==='cbn' ? this.renderFlower(f.fills,f.petals) : this.renderMotif(f)) : null;
+
+    return {
+      ready:S.ready, isName,isHome,isMarble,isCbn,isBook,isStub,
+      name, possessive:this.poss(), galleryCount:this.state.gallery.length,
+      muted:S.muted, settingsOpen:S.settingsOpen, calm:S.calm,
+      onNameInput:(e)=>{ this._name=e.target.value; }, onNameKey:(e)=>{ if(e.key==='Enter') this.confirmName(); },
+      confirmName:()=>this.confirmName(),
+      k:{ marble:()=>this.openKit('marble'), cbn:()=>this.openKit('cbn'), moulds:()=>this.openKit('moulds'), squishy:()=>this.openKit('squishy'), dot:()=>this.openKit('dot'), jigsaw:()=>this.openKit('jigsaw'), sticker:()=>this.openKit('sticker'), butterfly:()=>this.openKit('butterfly') },
+      goHome:()=>this.go('home'), openBook:()=>{ this.ensureAudio(); this.setState({screen:'book'}); }, openSettings:()=>this.setState({settingsOpen:true}), closeSettings:()=>this.setState({settingsOpen:false}), stop:(e)=>e.stopPropagation(),
+      toggleMute:()=>{ this.ensureAudio(); this.setState(s=>({muted:!s.muted})); }, toggleCalm:()=>this.setState(s=>({calm:!s.calm})),
+      soundPill:pill(!S.muted), soundKnob:knob(!S.muted), calmPill:pill(S.calm), calmKnob:knob(S.calm),
+      // marble
+      marbleBodyStyle:this.toolbarWrap(L), marbleTrayStyle:this.trayWrap(L), marblePaperStyle, marblePaint:marblePaint, marbleToyStyle, marbleToyBg,
+      inks, combStyle, marbleHint,
+      toggleComb:()=>this.setState(s=>({mkComb:!s.mkComb})), marbleUndo:()=>this.marbleUndo(), marbleReset:()=>this.marbleReset(), marblePrint:()=>this.marblePrint(), marbleDip:()=>this.marbleDip(), marbleFinish:()=>this.marbleFinish(),
+      // cbn
+      cbnBodyStyle:this.toolbarWrap(L), cbnPotsStyle:this.trayWrap(L), regions, pots, cbnHint, cbnDone:S.cbnDone, cbnFinishStyle,
+      dotsLabel:S.cbnDots?'1·2·3':'• dots', toggleDots:()=>this.toggleDots(), cbnFinish:()=>this.cbnFinish(),
+      // stub
+      stubName:{moulds:'moulds',squishy:'squishies',dot:'dot-to-dot',jigsaw:'jigsaws',sticker:'sticker scenes',butterfly:'butterfly painting'}[S.stubKit]||'this kit',
+      stubTint:{moulds:'#d9714e',squishy:'#f2779f',dot:'#f4c026',jigsaw:'#63b34a',sticker:'#9a6bd1',butterfly:'#f2913d'}[S.stubKit]||'#2fb8b3',
+      // book
+      bookClosed:!S.bookOpened, bookOpen:S.bookOpened, openCover:()=>{ this.play('page'); this.setState({bookOpened:true}); },
+      spreadStyle, artFrameStyle, artFrameStyle, bookArt:this.renderMotif(cur),
+      leftKicker:kick, leftTitle:cur.title, leftNote:notes, leftDeco:'', leftDecoStyle:'display:none',
+      pageNum:'no. '+(idx+1), bookCounter:(idx+1)+' of '+pages.length,
+      bookPrev:()=>{ if(idx>0){ this.play('page'); this.setState({bookIdx:idx-1}); } }, bookNext:()=>{ if(idx<pages.length-1){ this.play('page'); this.setState({bookIdx:idx+1}); } },
+      shareToast:()=>this.showToast('sharing is for grown-ups'),
+      // finishing + toast
+      finishing:!!f, burst:this.renderBurst(), finishArtStyle, finishThumbStyle, finishArt, finishText:f&&f.text?f.text:null,
+      toast:S.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+/* ------------------------------------------------------------------ *
+ * Make & Draw — global reset, base type, motion keyframes.
+ * Fonts (Anton + Inter Variable) are self-hosted via @fontsource.
+ * ------------------------------------------------------------------ */
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+/* Dynamic viewport height: keeps the bottom tool/CTA row above the
+ * mobile-Safari toolbar (100vh overshoots the visible viewport). */
+#root {
+  height: 100vh; /* fallback for browsers without dvh */
+  height: 100dvh;
+}
+
+body {
+  font-family: 'Inter Variable', Inter, system-ui, sans-serif;
+  color: #16130f;
+  background: #ebe7d9;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* kiosk feel: no rubber-band / pull-to-refresh on touch devices */
+  overscroll-behavior: none;
+}
+
+a {
+  color: #ff2e7e;
+}
+a:hover {
+  color: #d81b60;
+}
+
+input {
+  font-family: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+/* Press-down: the whole UI is built on hard offset shadows, so buttons
+ * should sink into their shadow when pressed — makes it feel physical. */
+button:active {
+  transform: translate(2px, 3px);
+  transition: transform 0.06s ease;
+}
+
+/* On-brand keyboard focus ring (replaces the UA default the custom
+ * button styling would otherwise swamp). Mouse clicks don't trigger it. */
+:focus-visible {
+  outline: 3px solid #0a5af5;
+  outline-offset: 2px;
+}
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ---- Motion keyframes (the app's shared vocabulary of movement) ---- */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes wagg {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(2.5deg); }
+}
+@keyframes wob {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-7px) rotate(-4deg); }
+  60% { transform: translateX(7px) rotate(4deg); }
+}
+@keyframes popin {
+  0% { transform: scale(.4); opacity: .3; }
+  60% { transform: scale(1.14); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(3px); }
+}
+/* butterfly fold-and-press: the left page swings over, then peels back */
+@keyframes foldOver {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(-180deg); }
+}
+@keyframes foldBack {
+  from { transform: rotateY(-180deg); }
+  to { transform: rotateY(0deg); }
+}
+/* dot-to-dot reveal: the finished outline draws itself, then fills */
+@keyframes drawPath {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes fillIn {
+  from { fill-opacity: 0; }
+  to { fill-opacity: 1; }
+}
+@keyframes wobble {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  30% { transform: rotate(-2.5deg) scale(1.03); }
+  60% { transform: rotate(2deg) scale(1.01); }
+}
+/* print shop: the roller bar sweeps down the plate */
+@keyframes pressSweep {
+  from { transform: translateY(-140%); }
+  to { transform: translateY(1050%); }
+}
+@keyframes shim {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(320%) skewX(-18deg); }
+}
+@keyframes fw {
+  0% { transform: translate(0, 0) scale(.2); opacity: 1; }
+  22% { transform: translate(calc(var(--tx) * .38), calc(var(--ty) * .38)) scale(1.2); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(.3); opacity: 0; }
+}
+@keyframes conf {
+  0% { transform: translate(0, -10px) rotate(0); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(var(--tx), 105vh) rotate(var(--tr)); opacity: .85; }
+}
+@keyframes rise {
+  0% { transform: translateY(14px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes pageturn {
+  0% { transform: rotateY(-105deg); opacity: .25; }
+  60% { opacity: 1; }
+  100% { transform: rotateY(0deg); opacity: 1; }
+}
+@keyframes dipLift {
+  0% { transform: translate(-50%, 45%) scale(.65); opacity: 0; }
+  45% { opacity: 1; }
+  72% { transform: translate(-50%, -58%) scale(1.06); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes flutt {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
+}
+/* expanding "tap me next" ring for dot-to-dot */
+@keyframes ping {
+  0% { transform: scale(1); opacity: 0.75; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+/* marching-ants for the active paint-by-numbers cells (CSS-driven, no re-render) */
+@keyframes ants {
+  to { stroke-dashoffset: -16; }
+}
+/* finishing ritual: squash-stretch pop as the burst fires ... */
+@keyframes popBurst {
+  0% { transform: translate(-50%, -50%) scale(0.6); }
+  55% { transform: translate(-50%, -50%) scale(1.1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+/* ... then a curved arc up-and-over toward the book corner. */
+@keyframes flyToBook {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  30% { transform: translate(-50%, -50%) translate(-3vw, -15vh) scale(1.08); opacity: 1; }
+  100% { transform: translate(-50%, -50%) translate(40vw, -42vh) scale(0.14) rotate(22deg); opacity: 0; }
+}
+
+/* Respect the OS "reduce motion" preference (calm mode is also honored in JS). */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: .001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .05s !important;
+  }
+}

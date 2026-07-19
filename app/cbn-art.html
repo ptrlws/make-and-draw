@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Colour by Number — art direction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@600;800&display=swap" rel="stylesheet" />
+    <style>
+      :root { --paper:#f4f1e7; --ink:#16130f; --pink:#ff2e7e; --blue:#0a5af5; --yellow:#ffb800; --teal:#00a58a; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: var(--paper); color: var(--ink);
+        font-family: "Archivo", system-ui, sans-serif;
+        background-image: radial-gradient(rgba(22,19,15,.05) 0.5px, transparent 0.6px); background-size: 3px 3px;
+        padding: 30px 20px 60px;
+      }
+      .kick { text-align:center; font-size:12px; letter-spacing:.24em; text-transform:uppercase; font-weight:800; opacity:.55; }
+      h1 { text-align:center; font-family:"Anton",sans-serif; font-weight:400; font-size:clamp(30px,7vw,52px); text-transform:uppercase; margin:4px 0 6px; }
+      .sub { text-align:center; font-size:14px; opacity:.7; max-width:52ch; margin:0 auto 30px; }
+      .grid { max-width: 940px; margin: 0 auto; display:flex; flex-direction:column; gap:26px; }
+      .row { display:flex; gap:22px; align-items:center; flex-wrap:wrap; justify-content:center; }
+      .piece { display:flex; flex-direction:column; align-items:center; gap:8px; }
+      .plabel { font-family:"Anton",sans-serif; font-size:15px; text-transform:uppercase; letter-spacing:.02em; }
+      .caption { font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:800; opacity:.5; }
+      .frame { background:#fff; border:3px solid var(--ink); border-radius:6px; padding:10px; box-shadow:6px 6px 0 var(--pink); }
+      .frame.b { box-shadow:6px 6px 0 var(--blue); }
+      svg { display:block; width:200px; height:250px; border-radius:3px; }
+      .name { min-width:120px; text-align:right; }
+      .name .n { font-family:"Anton",sans-serif; font-size:24px; text-transform:uppercase; line-height:1; }
+      .name .d { font-size:12px; opacity:.65; margin-top:4px; }
+      @media (max-width:720px){ .name{text-align:center;min-width:0} }
+    </style>
+  </head>
+  <body>
+    <p class="kick">Make &amp; Draw · colour by number</p>
+    <h1>Art direction</h1>
+    <p class="sub">A cohesive set of bold screenprint prints you colour in — one visual language (flat shapes, confident ink outlines, the studio's spot inks). Left = "to&nbsp;colour" (numbered), right = filled in.</p>
+    <div class="grid" id="grid"></div>
+
+    <script>
+      const COL = { 1: '#ffb800', 2: '#ff2e7e', 3: '#00a58a', 4: '#0a5af5' }
+      const INK = '#16130f'
+
+      // ray generator for the sunburst
+      function rays(cx, cy, rIn, rOut, count, n) {
+        const out = []
+        for (let i = 0; i < count; i++) {
+          const a0 = (i / count) * Math.PI * 2
+          const a1 = ((i + 0.52) / count) * Math.PI * 2
+          const p = (a, r) => `${(cx + Math.cos(a) * r).toFixed(1)} ${(cy + Math.sin(a) * r).toFixed(1)}`
+          out.push({ t: 'path', d: `M${p(a0, rIn)} L${p(a0, rOut)} L${p(a1, rOut)} L${p(a1, rIn)} Z`, n, label: [cx + Math.cos((a0 + a1) / 2) * (rOut - 8), cy + Math.sin((a0 + a1) / 2) * (rOut - 8)] })
+        }
+        return out
+      }
+
+      const leaf = (tx, ty, rot, sc, n) => ({
+        t: 'path', n, transform: `translate(${tx} ${ty}) rotate(${rot}) scale(${sc})`,
+        d: 'M0 0 C 22 22 22 46 0 66 C -22 46 -22 22 0 0 Z', label: [tx, ty + 30 * sc],
+      })
+
+      const PICTURES = [
+        {
+          id: 'landscape', name: 'Sunrise', desc: 'a bold minimal landscape',
+          vb: '0 0 240 300',
+          regions: [
+            { t: 'rect', x: 0, y: 0, w: 240, h: 300, n: 4, label: [42, 40] },
+            { t: 'circle', cx: 168, cy: 84, r: 46, n: 1, label: [168, 84] },
+            { t: 'path', d: 'M0 196 Q70 158 132 188 Q192 216 240 184 L240 300 L0 300 Z', n: 3, label: [40, 220] },
+            { t: 'path', d: 'M0 242 Q84 214 152 242 Q202 262 240 250 L240 300 L0 300 Z', n: 2, label: [120, 276] },
+            { t: 'circle', cx: 60, cy: 256, r: 9, n: 1, label: [60, 256] },
+            { t: 'circle', cx: 176, cy: 268, r: 9, n: 1, label: [176, 268] },
+          ],
+        },
+        {
+          id: 'botanical', name: 'House plant', desc: 'a leafy still-life',
+          vb: '0 0 240 300',
+          regions: [
+            { t: 'rect', x: 0, y: 0, w: 240, h: 300, n: 4, label: [40, 40] },
+            leaf(120, 150, 0, 1.05, 3),
+            leaf(96, 168, -34, 0.95, 3),
+            leaf(146, 168, 34, 0.95, 3),
+            leaf(84, 196, -60, 0.8, 1),
+            leaf(158, 196, 60, 0.8, 1),
+            { t: 'path', d: 'M92 232 L150 232 L142 292 L100 292 Z', n: 2, label: [121, 264] },
+            { t: 'rect', x: 84, y: 222, w: 74, h: 14, n: 2, label: [121, 229] },
+          ],
+        },
+        {
+          id: 'sunburst', name: 'Sunburst', desc: 'a graphic op-art disc',
+          vb: '0 0 240 300',
+          regions: [
+            { t: 'rect', x: 0, y: 0, w: 240, h: 300, n: 2, label: [40, 40] },
+            ...rays(120, 150, 74, 118, 12, 4),
+            { t: 'circle', cx: 120, cy: 150, r: 74, n: 1, label: [120, 92] },
+            { t: 'circle', cx: 120, cy: 150, r: 50, n: 3, label: [120, 116] },
+            { t: 'circle', cx: 120, cy: 150, r: 28, n: 4, label: [120, 150] },
+          ],
+        },
+      ]
+
+      function svgFor(pic, mode) {
+        const ns = 'http://www.w3.org/2000/svg'
+        const svg = document.createElementNS(ns, 'svg')
+        svg.setAttribute('viewBox', pic.vb)
+        for (const r of pic.regions) {
+          let el
+          if (r.t === 'circle') { el = document.createElementNS(ns, 'circle'); el.setAttribute('cx', r.cx); el.setAttribute('cy', r.cy); el.setAttribute('r', r.r) }
+          else if (r.t === 'rect') { el = document.createElementNS(ns, 'rect'); el.setAttribute('x', r.x); el.setAttribute('y', r.y); el.setAttribute('width', r.w); el.setAttribute('height', r.h) }
+          else { el = document.createElementNS(ns, 'path'); el.setAttribute('d', r.d) }
+          if (r.transform) el.setAttribute('transform', r.transform)
+          el.setAttribute('fill', mode === 'colour' ? COL[r.n] : '#faf8f0')
+          el.setAttribute('stroke', INK)
+          el.setAttribute('stroke-width', 2.5)
+          el.setAttribute('stroke-linejoin', 'round')
+          svg.appendChild(el)
+          if (mode === 'numbers' && r.label) {
+            const t = document.createElementNS(ns, 'text')
+            t.setAttribute('x', r.label[0]); t.setAttribute('y', r.label[1] + 5)
+            t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-family', 'Archivo, sans-serif')
+            t.setAttribute('font-weight', '800'); t.setAttribute('font-size', '15'); t.setAttribute('fill', INK)
+            t.textContent = r.n
+            svg.appendChild(t)
+          }
+        }
+        return svg
+      }
+
+      const grid = document.getElementById('grid')
+      PICTURES.forEach((pic, i) => {
+        const row = document.createElement('div'); row.className = 'row'
+        const name = document.createElement('div'); name.className = 'name'
+        name.innerHTML = `<div class="n">${pic.name}</div><div class="d">${pic.desc}</div>`
+        const mk = (mode, cap) => {
+          const p = document.createElement('div'); p.className = 'piece'
+          const f = document.createElement('div'); f.className = 'frame' + (i % 2 ? ' b' : '')
+          f.appendChild(svgFor(pic, mode))
+          const c = document.createElement('div'); c.className = 'caption'; c.textContent = cap
+          p.append(f, c); return p
+        }
+        row.append(name, mk('numbers', 'to colour'), mk('colour', 'coloured'))
+        grid.appendChild(row)
+      })
+    </script>
+  </body>
+</html>

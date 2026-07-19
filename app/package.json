@@ -1,0 +1,32 @@
+{
+  "name": "emakedraw",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Esther's Make & Draw — a touch-first craft-play studio for children (React recreation of the EMakeDraw design handoff).",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@dimforge/rapier2d-compat": "^0.19.3",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource/anton": "^5.2.7",
+    "@types/three": "^0.185.1",
+    "konva": "^10.3.0",
+    "perfect-freehand": "^1.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-konva": "^18.2.16",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.7"
+  }
+}
