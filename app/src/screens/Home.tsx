@@ -25,6 +25,8 @@ function resumableKits(): KitId[] {
   if ((bf?.committed?.length ?? 0) + (bf?.fresh?.length ?? 0) + (bf?.strokes?.length ?? 0) > 0) out.push('butterfly')
   const st = loadDraft<{ stickers?: unknown[] }>('sticker')
   if (st?.stickers?.length) out.push('sticker')
+  const scr = loadDraft<{ strokes?: unknown[]; done?: boolean }>('scratch')
+  if (scr?.strokes?.length || scr?.done) out.push('scratch')
   return out
 }
 

@@ -25,6 +25,7 @@ const HAPTIC: Partial<Record<Sound, number | number[]>> = {
   peel: 12,
   climax: [24, 40, 18, 40, 14, 90, 60],
   step: 8,
+  scratch: 6,
 }
 
 export class Foley {
@@ -151,6 +152,11 @@ export class Foley {
         tone(300, 540, 0.11, 'triangle', vol)
         tone(300, 540, 0.11, 'sine', vol * 0.4)
         noise(0.03, 2600, null, vol * 0.45, 0, 'highpass')
+        break
+      case 'scratch':
+        // dry gritty foil scrape — short bright bandpassed noise
+        noise(0.06, 3600, 2200, vol * 0.5, 0, 'bandpass', 0.6)
+        noise(0.04, 6000, null, vol * 0.25, 0, 'highpass')
         break
       case 'select':
         // soft mechanical tick

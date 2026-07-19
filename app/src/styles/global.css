@@ -119,6 +119,10 @@ button:focus:not(:focus-visible) {
   30% { transform: rotate(-2.5deg) scale(1.03); }
   60% { transform: rotate(2deg) scale(1.01); }
 }
+/* scratch-off: the revealed rainbow slowly shimmers through the hue wheel */
+@keyframes hueShift {
+  to { filter: hue-rotate(360deg); }
+}
 /* print shop: the roller bar sweeps down the plate */
 @keyframes pressSweep {
   from { transform: translateY(-140%); }

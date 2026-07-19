@@ -108,6 +108,31 @@ export function KitEmblem({ id, ink = c.paper, accent = c.ink }: { id: KitId; in
           <rect x={58.5} y={16} width={3} height={40} rx={1.5} fill={ink} />
         </svg>
       )
+    case 'scratch':
+      // black foil card scratched to reveal rainbow underneath
+      return (
+        <svg {...common}>
+          <defs>
+            <linearGradient id="scratchRainbow" x1="24" y1="60" x2="96" y2="12" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stopColor="#ff2e7e" />
+              <stop offset="0.35" stopColor="#ffb800" />
+              <stop offset="0.7" stopColor="#2fb8b3" />
+              <stop offset="1" stopColor="#0a5af5" />
+            </linearGradient>
+          </defs>
+          <rect x={22} y={10} width={76} height={52} rx={7} fill={accent} />
+          {[
+            [30, 52, 52, 20],
+            [44, 56, 70, 22],
+            [58, 58, 84, 26],
+          ].map(([x1, y1, x2, y2], i) => (
+            <path key={i} d={`M${x1} ${y1} L${x2} ${y2}`} stroke="url(#scratchRainbow)" strokeWidth={7} strokeLinecap="round" />
+          ))}
+          {/* foil glints on the unscratched coat */}
+          <circle cx={80} cy={20} r={2} fill={ink} opacity={0.5} />
+          <circle cx={34} cy={26} r={1.6} fill={ink} opacity={0.4} />
+        </svg>
+      )
     default:
       return null
   }

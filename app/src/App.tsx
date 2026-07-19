@@ -18,6 +18,7 @@ const PrintShop = lazy(() => import('./screens/PrintShop').then((m) => ({ defaul
 const StickerCollage = lazy(() => import('./screens/StickerCollage').then((m) => ({ default: m.StickerCollage })))
 const DotToDot = lazy(() => import('./screens/DotToDot').then((m) => ({ default: m.DotToDot })))
 const Butterfly = lazy(() => import('./screens/Butterfly').then((m) => ({ default: m.Butterfly })))
+const ScratchOff = lazy(() => import('./screens/ScratchOff').then((m) => ({ default: m.ScratchOff })))
 
 function Loading() {
   return (
@@ -61,6 +62,8 @@ function CurrentScreen() {
       return <DotToDot />
     case 'butterfly':
       return <Butterfly />
+    case 'scratch':
+      return <ScratchOff />
     case 'book':
       return <Book />
     default:

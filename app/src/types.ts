@@ -1,10 +1,10 @@
-export type Screen = 'name' | 'home' | 'marble' | 'cbn' | 'pattern' | 'print' | 'sticker' | 'dot' | 'butterfly' | 'book'
+export type Screen = 'name' | 'home' | 'marble' | 'cbn' | 'pattern' | 'print' | 'sticker' | 'dot' | 'butterfly' | 'scratch' | 'book'
 
 /** Every kit tile on the shelf — all playable. */
-export type KitId = 'marble' | 'cbn' | 'pattern' | 'print' | 'dot' | 'sticker' | 'butterfly'
+export type KitId = 'marble' | 'cbn' | 'pattern' | 'print' | 'dot' | 'sticker' | 'butterfly' | 'scratch'
 
 /** Creation types that can live in the gallery book. */
-export type GalleryType = 'marble' | 'cbn' | 'pattern' | 'print' | 'dot' | 'sticker' | 'jigsaw' | 'butterfly'
+export type GalleryType = 'marble' | 'cbn' | 'pattern' | 'print' | 'dot' | 'sticker' | 'jigsaw' | 'butterfly' | 'scratch'
 
 export type Difficulty = 'easy' | 'medium' | 'hard'
 
@@ -27,6 +27,7 @@ export type Sound =
   | 'peel'
   | 'climax'
   | 'step'
+  | 'scratch'
 
 export interface GalleryItem {
   id: string

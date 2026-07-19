@@ -17,6 +17,7 @@ const KICKER: Record<GalleryType, string> = {
   jigsaw: 'you solved',
   sticker: 'you made',
   butterfly: 'you mirrored',
+  scratch: 'you scratched',
 }
 const NOTE: Record<GalleryType, string> = {
   marble: 'dipped, one of a kind',
@@ -27,6 +28,7 @@ const NOTE: Record<GalleryType, string> = {
   jigsaw: 'from your own drawing',
   sticker: 'every sticker found its home',
   butterfly: 'painted in perfect mirror',
+  scratch: 'scratched to reveal the rainbow',
 }
 
 /** A finished piece links back to the kit that made it. */
@@ -38,6 +40,7 @@ const TYPE_TO_KIT: Partial<Record<GalleryType, KitId>> = {
   dot: 'dot',
   sticker: 'sticker',
   butterfly: 'butterfly',
+  scratch: 'scratch',
 }
 
 export function Book() {

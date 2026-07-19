@@ -106,4 +106,15 @@ export const KITS: KitDef[] = [
     radius: '15px 22px 16px 21px',
     art: { kind: 'stripe', color: '#f2913d', color2: '#f7b479' },
   },
+  {
+    id: 'scratch',
+    label: 'scratch art',
+    ready: true,
+    blurb: 'scratch off to find rainbows',
+    tape: 'rgba(22,19,15,.5)',
+    tapeRot: -5,
+    cardRot: 1.6,
+    radius: '20px 16px 21px 15px',
+    art: { kind: 'stripe', color: '#16130f', color2: '#3a352c' },
+  },
 ]
