@@ -26,10 +26,6 @@ const hex = (h: string): [number, number, number] => {
 }
 const PAPER = hex(tokens.paper)
 const INK_RGB = INKS.map((i) => hex(i.c))
-// A near-paper white used only for the concentric-ring "stone" contrast —
-// not surfaced as a user swatch (INKS stays the 4 spot inks everywhere).
-const LIGHT_CI = INK_RGB.length
-INK_RGB.push([0.98, 0.97, 0.93])
 
 export type Op =
   | { k: 'drop'; x: number; y: number; r: number; ci: number }
@@ -314,8 +310,7 @@ export class MarbleStudio {
     }
 
     this.attach()
-    this.clearField()
-    this.seed()
+    this.clearField() // start on EMPTY water — the child builds the marble
     this.render()
   }
 
@@ -416,18 +411,19 @@ export class MarbleStudio {
     this.current = []
     this.last = this.toField(e)
 
-    // the ink appears the INSTANT the finger touches — a full suminagashi
-    // stone right away, blooming outward in growing rings while held
+    // one drop of ink hits the water the INSTANT the finger touches, then
+    // keeps spreading while held. It's a single solid stone of the chosen
+    // ink — the fluid's area-preserving displacement pushes whatever is
+    // already floating out into rings, so real marbling emerges as you layer
+    // colours and swirl (no fake bullseye).
     const [x, y] = this.last
-    const lay = (r: number, ci: number) => {
-      const op: Op = { k: 'drop', x, y, r, ci }
+    const lay = (r: number) => {
+      const op: Op = { k: 'drop', x, y, r, ci: this.ink }
       this.current!.push(op)
       this.applyOp(op)
     }
     this.holdR = this.DROP_R
-    lay(this.holdR, this.ink)
-    lay(this.holdR * 0.6, LIGHT_CI)
-    lay(this.holdR * 0.3, this.ink)
+    lay(this.holdR)
     this.render()
     this.onSound?.('drip', 1 + Math.random() * 0.15)
     this.holdCount = 0
@@ -438,8 +434,8 @@ export class MarbleStudio {
         return
       }
       this.holdCount++
-      this.holdR = Math.min(this.DROP_R * 3.1, this.holdR * 1.24)
-      lay(this.holdR, this.holdCount % 2 ? LIGHT_CI : this.ink)
+      this.holdR = Math.min(this.DROP_R * 3.1, this.holdR * 1.2)
+      lay(this.holdR) // the same stone spreads wider — pushing prior ink outward
       this.render()
       // the plop deepens as the stone grows
       this.onSound?.('drip', Math.max(0.5, 0.95 - this.holdCount * 0.06))
@@ -528,49 +524,6 @@ export class MarbleStudio {
     if (this.tool === 1) return { comb: 1, tines: 5, space: this.CW * 0.95, sigma: this.SW * 0.5 }
     if (this.tool === 2) return { comb: 1, tines: 12, space: this.CW * 0.4, sigma: this.SW * 0.3 }
     return { comb: 0, tines: 1, space: 0, sigma: this.SW }
-  }
-  /** A gentle starter marble so the tray is never a blank first impression. */
-  private seed() {
-    const W = this.W
-    const H = this.H
-    const R = this.DROP_R
-    const MAX = this.MAXSTEP
-    const ops: Op[] = []
-    const stones: [number, number, number[]][] = [
-      [0.3, 0.66, [0, 2, 3]],
-      [0.64, 0.7, [1, 0, 2]],
-      [0.76, 0.44, [2, 1, 3]],
-      [0.4, 0.4, [3, 0, 1]],
-      [0.56, 0.28, [0, 1, 2]],
-      [0.26, 0.34, [1, 3, 0]],
-    ]
-    for (const [nx, ny, cols] of stones) {
-      const cx = nx * W
-      const cy = ny * H
-      ops.push({ k: 'drop', x: cx, y: cy, r: R * 1.5, ci: cols[0] })
-      ops.push({ k: 'drop', x: cx, y: cy, r: R * 0.92, ci: cols[1] })
-      ops.push({ k: 'drop', x: cx, y: cy, r: R * 0.44, ci: cols[2] })
-    }
-    const cx = 0.5 * W
-    const cy = 0.5 * H
-    let px = cx + 0.32 * W
-    let py = cy
-    for (let a = 0; a < Math.PI * 3.2; a += 0.16) {
-      const rad = (0.32 - a * 0.013) * W
-      const nx = cx + Math.cos(a) * rad
-      const ny = cy + Math.sin(a) * rad
-      const dx = nx - px
-      const dy = ny - py
-      const dl = Math.hypot(dx, dy) || 1
-      ops.push({ k: 'stroke', x: nx, y: ny, dx: dx / dl, dy: dy / dl, amp: Math.min(dl, MAX), sigma: this.SW, comb: 0 })
-      px = nx
-      py = ny
-    }
-    for (let i = 0; i < 6; i++) {
-      ops.push({ k: 'stroke', x: 0.5 * W, y: (0.12 + i * 0.15) * H, dx: i % 2 ? 1 : -1, dy: 0, amp: MAX, sigma: this.CW * 0.55, comb: 1 })
-    }
-    this.baseOps = ops
-    for (const op of ops) this.applyOp(op)
   }
   private rebuild() {
     this.clearField()
