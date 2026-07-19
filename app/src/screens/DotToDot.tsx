@@ -302,7 +302,7 @@ const PUZZLES: Puzzle[] = [
  * Element transforms are ignored (fine for flat line-art exports) —
  * normalize() re-centres and scales, so absolute position never matters.
  * ------------------------------------------------------------------ */
-function svgToPoints(svgText: string, dense = 240): Pt[] | null {
+function svgToPoints(svgText: string, dense = 400): Pt[] | null {
   try {
     const clean = svgText.replace(/<\?xml[\s\S]*?\?>/i, '').replace(/<!DOCTYPE[\s\S]*?>/i, '')
     const holder = document.createElement('div')
@@ -344,21 +344,30 @@ function svgToPoints(svgText: string, dense = 240): Pt[] | null {
 }
 
 const SVG_COLORS = ['#ff2e7e', '#0a5af5', '#00a58a', '#ffb800']
+/** A faithful reveal path straight from the sampled outline — a dense polyline
+ * that keeps every leg, ear and tail (unlike smoothing a handful of dots). */
+function densePath(pts: Pt[]): string {
+  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`
+  for (let i = 1; i < pts.length; i++) d += ` L ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)}`
+  return d + ' Z'
+}
 /** Turn an uploaded SVG drawing into a joinable puzzle. */
 function svgToPuzzle(svgText: string, name: string): Puzzle | null {
   const raw = svgToPoints(svgText)
-  if (!raw || raw.length < 8) return null
-  const fitted = normalize(raw, 232, 300, VW / 2, VH / 2)
-  // dot count scales with how wiggly the outline is (its perimeter)
+  if (!raw || raw.length < 12) return null
+  const fitted = normalize(raw, 244, 320, VW / 2, VH / 2)
+  // dot count scales with how detailed the outline is (its perimeter), with a
+  // higher ceiling so a real drawing (legs, ears, tail) stays recognisable
   let per = 0
   for (let i = 0; i < fitted.length; i++) {
     const a = fitted[i]
     const b = fitted[(i + 1) % fitted.length]
     per += Math.hypot(b[0] - a[0], b[1] - a[1])
   }
-  const count = Math.max(16, Math.min(30, Math.round(per / 60)))
+  const count = Math.max(20, Math.min(46, Math.round(per / 42)))
   const dots = resample(fitted, count)
-  return { id: 'svg' + Date.now(), name: name || 'Yours', color: SVG_COLORS[Math.floor(Math.random() * SVG_COLORS.length)], dots, path: smoothPath(dots) }
+  // the REVEAL is the real outline (dense), not a smoothed few-dot blob
+  return { id: 'svg' + Date.now(), name: name || 'Yours', color: SVG_COLORS[Math.floor(Math.random() * SVG_COLORS.length)], dots, path: densePath(fitted) }
 }
 
 const centroid = (pts: Pt[]): Pt => {
