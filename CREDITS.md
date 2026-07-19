@@ -1,5 +1,11 @@
 # Credits & third-party attributions
 
+## Origin
+
+**Make & Draw was Esther's idea.** The whole app began with her — the concept
+and the wish for a calm, ad-free craft studio for kids are hers. Primary
+creative credit belongs to Esther.
+
 ## 3D models (marble dipping)
 
 The marble activity can import STL models to "dip". The following models were

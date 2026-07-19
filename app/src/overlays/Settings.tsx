@@ -199,11 +199,17 @@ export function Settings() {
               {state.name ? 'change name' : 'add a name'}
             </button>
           </div>
-          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 12, lineHeight: 1.4, color: c.sub, textAlign: 'center', margin: '2px 0 8px', padding: '8px 10px', background: 'rgba(47,184,179,.1)', border: `1.5px solid rgba(47,184,179,.45)`, borderRadius: 8 }}>
+          <button
+            onClick={() => {
+              closeSettings()
+              go('grownups')
+            }}
+            style={{ display: 'block', width: '100%', fontFamily: fonts.body, fontWeight: 700, fontSize: 12, lineHeight: 1.4, color: c.sub, textAlign: 'center', margin: '2px 0 8px', padding: '8px 10px', background: 'rgba(47,184,179,.1)', border: `1.5px solid rgba(47,184,179,.45)`, borderRadius: 8, cursor: 'pointer' }}
+          >
             No ads · no accounts · no tracking.
             <br />
-            Art stays on this device unless <em>you</em> share it.
-          </div>
+            Art stays on this device unless <em>you</em> share it. <span style={{ textDecoration: 'underline' }}>Read more →</span>
+          </button>
           <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 10.5, lineHeight: 1.35, color: c.faint, textAlign: 'center', marginBottom: 6 }}>
             Imported 3D models © their authors — low-poly cat &amp; dog by Matthias L, Balloon Dog by TheCraftyMaker (Printables). Personal use; see CREDITS.
           </div>

@@ -31,7 +31,7 @@ function resumableKits(): KitId[] {
 }
 
 export function Home() {
-  const { state, openKit, openBook, openSettings, toggleMute } = useGame()
+  const { state, openKit, openBook, openSettings, toggleMute, go } = useGame()
   const name = state.name
   const [resume] = useState(resumableKits)
 
@@ -167,6 +167,31 @@ export function Home() {
               <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.sub, marginTop: 4 }}>{plural(state.gallery.length, 'thing')} you've made →</div>
             </div>
           </button>
+        </div>
+
+        {/* a quiet doorway for parents — no ads, no tracking, nothing to buy */}
+        <div style={{ padding: '0 15px 30px', textAlign: 'center' }}>
+          <button
+            onClick={() => go('grownups')}
+            style={{
+              fontFamily: fonts.body,
+              fontWeight: 800,
+              fontSize: 12,
+              letterSpacing: '.08em',
+              textTransform: 'uppercase',
+              color: c.hint,
+              background: 'none',
+              border: '2px solid rgba(22,19,15,.18)',
+              borderRadius: 999,
+              padding: '9px 18px',
+              cursor: 'pointer',
+            }}
+          >
+            For grown-ups →
+          </button>
+          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.04em', color: c.faint, marginTop: 12 }}>
+            An idea by Esther 💡
+          </div>
         </div>
       </div>
     </div>

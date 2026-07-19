@@ -2,6 +2,7 @@ import { Component, lazy, Suspense, type ReactNode } from 'react'
 import { GameProvider } from './game/GameProvider'
 import { useGame } from './game/context'
 import { Book } from './screens/Book'
+import { GrownUps } from './screens/GrownUps'
 import { Home } from './screens/Home'
 import { NameEntry } from './screens/NameEntry'
 import { FinishingRitual } from './overlays/FinishingRitual'
@@ -66,6 +67,8 @@ function CurrentScreen() {
       return <ScratchOff />
     case 'book':
       return <Book />
+    case 'grownups':
+      return <GrownUps />
     default:
       return null
   }
