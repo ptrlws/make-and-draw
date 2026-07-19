@@ -2,13 +2,20 @@ import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as R
 import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
-import { NEON_PICS } from '../scratch/neonPics'
+import { SCRATCH_SVGS } from '../scratch/scratchSvgs'
 import { c, fonts } from '../theme'
 import { buildParticles } from '../utils'
 
 const COAT = '#151310'
 const REVEAL_AT = 0.45 // scratch this much and the rest peels away on its own
 const BRUSH = 0.03 // scratch radius as a fraction of canvas width (thin, precise)
+
+/** a colouring page loaded from a bundled SVG (viewBox 0 0 100 100) */
+interface Pic {
+  id: string
+  name: string
+  paths: string[]
+}
 
 const chip: CSSProperties = {
   fontFamily: fonts.body,
@@ -37,7 +44,9 @@ interface ScratchDraft {
 export function ScratchOff() {
   const { go, play, showToast, startFinish, reducedMotion, state } = useGame()
   const draft = useRef(loadDraft<ScratchDraft>('scratch'))
-  const [picIdx, setPicIdx] = useState(() => Math.min(draft.current?.pic ?? 0, NEON_PICS.length - 1))
+  // colouring pages are pulled from public/scratch/ (scratchSvgs.ts), not inline
+  const [pics, setPics] = useState<Pic[]>([])
+  const [picIdx, setPicIdx] = useState(() => Math.max(0, draft.current?.pic ?? 0))
   const [seed, setSeed] = useState(() => draft.current?.seed ?? Math.floor(Math.random() * 360))
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [scratched, setScratched] = useState(0)
@@ -57,8 +66,30 @@ export function ScratchOff() {
   const lastMeasure = useRef(0)
   const lastSfx = useRef(0)
 
-  const pic = NEON_PICS[picIdx]
+  const pic = pics.length ? pics[Math.min(picIdx, pics.length - 1)] : undefined
   const calm = reducedMotion || state.calm
+
+  // load the colouring pages from public/scratch/ once on mount
+  useEffect(() => {
+    let live = true
+    Promise.all(
+      SCRATCH_SVGS.map(async (s) => {
+        try {
+          const txt = await (await fetch(s.src)).text()
+          const doc = new DOMParser().parseFromString(txt, 'image/svg+xml')
+          const paths = [...doc.querySelectorAll('path')].map((p) => p.getAttribute('d') || '').filter(Boolean)
+          return paths.length ? ({ id: s.id, name: s.name, paths } as Pic) : null
+        } catch {
+          return null
+        }
+      }),
+    ).then((loaded) => {
+      if (live) setPics(loaded.filter((p): p is Pic => !!p))
+    })
+    return () => {
+      live = false
+    }
+  }, [])
 
   // maps the 100x100 drawing box to a centred square inside the canvas
   const picMatrix = (w: number, h: number) => {
@@ -108,7 +139,7 @@ export function ScratchOff() {
     ctx.lineWidth = Math.max(1.5, m.a * 2.2)
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
-    for (const d of pic.paths) {
+    for (const d of pic?.paths ?? []) {
       const sp = new Path2D()
       sp.addPath(new Path2D(d), m)
       ctx.stroke(sp)
@@ -140,7 +171,7 @@ export function ScratchOff() {
     ctx.lineWidth = Math.max(1.4, m.a * 1.8)
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
-    for (const d of pic.paths) {
+    for (const d of pic?.paths ?? []) {
       const sp = new Path2D()
       sp.addPath(new Path2D(d), m)
       ctx.stroke(sp)
@@ -253,7 +284,7 @@ export function ScratchOff() {
       setScratched(measure())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size, picIdx, seed])
+  }, [size, picIdx, seed, pics])
 
   // ---- pointer scratching ----
   const toNorm = (e: { clientX: number; clientY: number }): [number, number] => {
@@ -325,7 +356,7 @@ export function ScratchOff() {
     strokes.current = []
     setDone(false)
     doneRef.current = false
-    setPicIdx((p) => (p + 1 + Math.floor(Math.random() * (NEON_PICS.length - 1))) % NEON_PICS.length)
+    setPicIdx((p) => (pics.length ? (p + 1 + Math.floor(Math.random() * (pics.length - 1))) % pics.length : 0))
     setSeed(Math.floor(Math.random() * 360))
     setScratched(0)
     clearDraft('scratch')
@@ -347,7 +378,7 @@ export function ScratchOff() {
     g.drawImage(rc, 0, 0)
     g.drawImage(cc, 0, 0)
     clearDraft('scratch')
-    startFinish({ type: 'scratch', title: `Holographic ${pic.name.toLowerCase()}`, img: out.toDataURL('image/png'), tint: `hsl(${seed}, 92%, 58%)` })
+    startFinish({ type: 'scratch', title: `Holographic ${(pic?.name ?? 'picture').toLowerCase()}`, img: out.toDataURL('image/png'), tint: `hsl(${seed}, 92%, 58%)` })
   }
 
   const pickPic = (i: number) => {
@@ -450,7 +481,7 @@ export function ScratchOff() {
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
           <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Picture</span>
-          {NEON_PICS.map((p, i) => (
+          {pics.map((p, i) => (
             <button
               key={p.id}
               onClick={() => pickPic(i)}
