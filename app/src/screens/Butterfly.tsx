@@ -82,6 +82,9 @@ export function Butterfly() {
   const [wet, setWet] = useState<number[]>([])
   const [size, setSize] = useState({ w: 0, h: 0 })
   const [ritual, setRitual] = useState<Ritual>('paint')
+  /** snapshot of the painted sheet, shown ON the flap so the paint itself
+   * travels over as the paper folds (the fold turns it face-out on top) */
+  const [flapImg, setFlapImg] = useState<string | null>(null)
 
   const wrapRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<Konva.Stage>(null)
@@ -171,6 +174,12 @@ export function Butterfly() {
       showToast('paint something first!')
       return
     }
+    // snapshot the painted sheet (guides hidden) so the paint rides on the
+    // flap as it folds over — the child watches their colour travel across
+    const guides = guideRef.current
+    guides?.hide()
+    setFlapImg(stageRef.current?.toDataURL({ pixelRatio: 1.5, mimeType: 'image/png' }) ?? null)
+    guides?.show()
     play('fold')
     setRitual('folding')
     window.setTimeout(() => setRitual('folded'), 700)
@@ -309,7 +318,7 @@ export function Butterfly() {
         >
           <div
             ref={wrapRef}
-            style={{ width: 'min(460px, 88vw)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', touchAction: 'none', position: 'relative', perspective: 1100 }}
+            style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', touchAction: 'none', position: 'relative', perspective: 1100 }}
             onPointerDown={pressDown}
             onPointerUp={pressUp}
             onPointerCancel={pressUp}
@@ -366,12 +375,19 @@ export function Butterfly() {
                   transformStyle: 'preserve-3d',
                   transform: folded ? 'rotateY(-180deg)' : undefined,
                   animation: flapAnim,
-                  background: `linear-gradient(105deg, ${PAPER}, #ebe7d9)`,
+                  // the paint rides on the flap; CSS mirrors it as it turns over
+                  backgroundColor: PAPER,
+                  backgroundImage: flapImg ? `url(${flapImg})` : `linear-gradient(105deg, ${PAPER}, #ebe7d9)`,
+                  backgroundSize: flapImg ? '200% 100%' : undefined,
+                  backgroundPosition: 'left center',
+                  backgroundRepeat: 'no-repeat',
                   borderRight: `2px dashed rgba(22,19,15,.25)`,
                   boxShadow: folded ? '-14px 0 22px rgba(22,19,15,.28)' : '2px 0 8px rgba(22,19,15,.12)',
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-end',
                   justifyContent: 'center',
+                  paddingBottom: 14,
+                  boxSizing: 'border-box',
                   pointerEvents: 'none',
                 }}
               >
@@ -379,11 +395,12 @@ export function Butterfly() {
                   <span
                     style={{
                       fontFamily: fonts.display,
-                      fontSize: 22,
+                      fontSize: 16,
                       textTransform: 'uppercase',
                       color: c.ink,
-                      opacity: 0.65,
+                      opacity: 0.55,
                       transform: 'scaleX(-1)',
+                      textShadow: '0 1px 4px rgba(244,241,231,.95), 0 0 3px rgba(244,241,231,.9)',
                       animation: ritual === 'folded' ? 'ping 1.2s ease-out infinite' : undefined,
                     }}
                   >
