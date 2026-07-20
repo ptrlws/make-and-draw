@@ -3,11 +3,8 @@ import { Card, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { c, fonts } from '../theme'
 
-/** Fun, tappable starter names so pre-readers are never blocked by typing. */
-const IDEAS = ['Pip', 'Sunny', 'Ziggy', 'Bea', 'Nova', 'Mo']
-
 /** First launch only: the one and only place the child types — and even here,
- * typing is optional (tap a name, or skip straight in). */
+ * typing is optional (skip straight in with no name). */
 export function NameEntry() {
   const { confirmName, play, state } = useGame()
   const [value, setValue] = useState(state.name ?? '')
@@ -15,7 +12,7 @@ export function NameEntry() {
 
   const submit = (raw: string) => {
     if (!raw.trim()) {
-      // never a silent dead end: shake, hint, and offer the tap names
+      // never a silent dead end: shake + hint (or use "skip" to start unnamed)
       setNudge(false)
       requestAnimationFrame(() => setNudge(true))
       play('wrong')
@@ -35,7 +32,7 @@ export function NameEntry() {
           <br />&amp; Draw
         </div>
         <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 16, color: nudge ? c.pink : c.hint, margin: '14px 0 14px' }} aria-live="polite">
-          {nudge ? 'type a name — or just tap one!' : 'Hello! What should we call you?'}
+          {nudge ? 'type a name to start!' : 'Hello! What should we call you?'}
         </div>
         <input
           type="text"
@@ -64,33 +61,6 @@ export function NameEntry() {
             animation: nudge ? 'shakeX .45s ease' : undefined,
           }}
         />
-        {/* tap-a-name row — no typing required, ever */}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 14 }}>
-          {IDEAS.map((n) => (
-            <button
-              key={n}
-              onClick={() => {
-                setValue(n)
-                play('select')
-                confirmName(n)
-              }}
-              style={{
-                fontFamily: fonts.body,
-                fontWeight: 800,
-                fontSize: 13,
-                color: c.ink,
-                background: c.paper,
-                border: `2px solid ${c.ink}`,
-                borderRadius: 999,
-                padding: '7px 13px',
-                boxShadow: '0 2px 0 #16130f',
-                cursor: 'pointer',
-              }}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
         <div style={{ marginTop: 18 }}>
           <RisoButton onClick={() => submit(value)} style={{ fontSize: 18, padding: '13px 28px' }}>
             That's me →
