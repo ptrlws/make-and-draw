@@ -28,7 +28,18 @@ function createInitialState(config: Config): GameState {
     /* corrupt / unavailable storage — fall back to defaults */
   }
   const name = active.name
-  const screen: Screen = name ? 'home' : config.skipNameEntry ? 'home' : 'name'
+  // With more than one maker on the device, a fresh launch asks "who's making?"
+  // first. A switch/add sets a one-shot flag so its reload lands on the chosen
+  // maker instead of bouncing back to the picker.
+  let forcePicker = reg.list.length > 1
+  try {
+    // read-only here: the reducer initializer can run twice (StrictMode), so
+    // the one-shot flag is cleared in an effect, never consumed during init
+    if (sessionStorage.getItem('emd_skip_picker')) forcePicker = false
+  } catch {
+    /* sessionStorage unavailable — still gate on multiple makers */
+  }
+  const screen: Screen = forcePicker ? 'profiles' : name ? 'home' : config.skipNameEntry ? 'home' : 'name'
   return {
     ready: true,
     name,
@@ -98,6 +109,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
     })()
     return () => {
       cancelled = true
+    }
+  }, [])
+
+  // ---- clear the one-shot "skip launch picker" flag once we're mounted, so
+  // the next genuine launch asks "who's making?" again ----
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem('emd_skip_picker')
+    } catch {
+      /* ignore */
     }
   }, [])
 
@@ -313,17 +334,29 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // ---- makers: switching / adding / deleting reloads into a clean studio, so
   // each maker's screen state, drafts and audio start from a known-good base ----
+  // the reload after picking/adding a maker should land on THAT maker, not the
+  // launch picker — this one-shot flag tells the next init to skip the gate
+  const skipPickerOnce = () => {
+    try {
+      sessionStorage.setItem('emd_skip_picker', '1')
+    } catch {
+      /* private mode — worst case the picker shows once more */
+    }
+  }
+
   const switchProfile = useCallback((id: string) => {
     if (id === stateRef.current.profileId) {
       go('home')
       return
     }
     setActiveProfile(id)
+    skipPickerOnce()
     location.reload()
   }, [go])
 
   const addProfile = useCallback(() => {
     createProfile() // unnamed + active → the reload lands on name entry
+    skipPickerOnce()
     location.reload()
   }, [])
 
