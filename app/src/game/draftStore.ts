@@ -6,7 +6,9 @@
  * localStorage; every call degrades to a no-op if storage is missing.
  * ------------------------------------------------------------------ */
 
-const key = (kit: string) => `emd_draft_${kit}`
+import { activeProfileId } from './profiles'
+
+const key = (kit: string) => `emd_p_${activeProfileId()}_draft_${kit}`
 
 export function loadDraft<T>(kit: string): T | null {
   try {

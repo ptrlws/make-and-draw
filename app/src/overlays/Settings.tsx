@@ -130,6 +130,27 @@ export function Settings() {
             </span>
           </button>
 
+          {/* switch between the makers who share this device */}
+          <button
+            onClick={() => {
+              closeSettings()
+              go('profiles')
+            }}
+            style={{ ...row, marginTop: 12 }}
+          >
+            <span style={{ textAlign: 'left' }}>
+              <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 16, display: 'block' }}>Makers</span>
+              <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 12, color: c.sub }}>
+                {state.profiles.length > 1 ? `${state.profiles.length} on this device · switch or add` : 'add another maker'}
+              </span>
+            </span>
+            <span style={{ display: 'flex' }}>
+              {state.profiles.slice(0, 4).map((p, i) => (
+                <span key={p.id} style={{ width: 22, height: 22, borderRadius: '50%', background: p.color, border: `2px solid ${c.ink}`, marginLeft: i ? -6 : 0 }} />
+              ))}
+            </span>
+          </button>
+
           {/* the collection can leave the device — and come back */}
           <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
             {state.gallery.length > 0 && (

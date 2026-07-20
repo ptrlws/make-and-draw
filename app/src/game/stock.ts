@@ -4,9 +4,11 @@
  * Shop stock. Stored small (512px JPEG) in localStorage.
  * ------------------------------------------------------------------ */
 
+import { activeProfileId } from './profiles'
+
 export type StockKey = 'pattern' | 'marble'
 
-const key = (k: StockKey) => `emd_stock_${k}`
+const key = (k: StockKey) => `emd_p_${activeProfileId()}_stock_${k}`
 
 export function loadStock(k: StockKey): string | null {
   try {

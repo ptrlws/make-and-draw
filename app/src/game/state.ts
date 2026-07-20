@@ -4,6 +4,7 @@ import type {
   GalleryItem,
   Screen,
 } from '../types'
+import type { Profile } from './profiles'
 
 /**
  * Global, cross-screen state. Per-activity state (marble ink/phase, CBN
@@ -23,6 +24,9 @@ export interface GameState {
   /** true for the single render after a creation is committed, so the Book
    * opens straight onto the new piece instead of the cover. */
   justAdded: boolean
+  /** every maker on this device, and which one is active right now */
+  profiles: Profile[]
+  profileId: string
 }
 
 export const initialState: GameState = {
@@ -36,6 +40,8 @@ export const initialState: GameState = {
   toast: null,
   finishing: null,
   justAdded: false,
+  profiles: [],
+  profileId: '',
 }
 
 export type Action =
@@ -67,7 +73,13 @@ export function reducer(s: GameState, a: Action): GameState {
     case 'SET_SCREEN':
       return { ...s, screen: a.screen, settingsOpen: false, justAdded: false }
     case 'CONFIRM_NAME':
-      return { ...s, name: a.name, screen: 'home', settingsOpen: false }
+      return {
+        ...s,
+        name: a.name,
+        screen: 'home',
+        settingsOpen: false,
+        profiles: s.profiles.map((p) => (p.id === s.profileId ? { ...p, name: a.name } : p)),
+      }
     case 'TOGGLE_MUTED':
       return { ...s, muted: !s.muted }
     case 'TOGGLE_CALM':

@@ -50,6 +50,26 @@ export function Home() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => go('profiles')}
+                aria-label="switch maker"
+                style={{
+                  width: 44,
+                  height: 44,
+                  flex: 'none',
+                  borderRadius: '50%',
+                  background: state.profiles.find((p) => p.id === state.profileId)?.color ?? c.pink,
+                  border: `2.5px solid ${c.ink}`,
+                  color: c.paper,
+                  fontFamily: fonts.display,
+                  fontSize: 20,
+                  lineHeight: 1,
+                  boxShadow: '0 3px 0 #16130f',
+                  cursor: 'pointer',
+                }}
+              >
+                {(name && name.trim()[0]?.toUpperCase()) || '?'}
+              </button>
               <IconButton onClick={toggleMute} ariaLabel={state.muted ? 'unmute sound' : 'mute sound'} style={{ position: 'relative' }}>
                 <span style={{ display: 'flex', alignItems: 'center' }}>
                   <span style={{ width: 6, height: 9, background: c.ink }} />

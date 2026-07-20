@@ -13,19 +13,21 @@ import type { GalleryItem, KitId, Screen, Sound } from '../types'
 import { buildParticles, poss } from '../utils'
 import { GameContext, type FinishInput, type GameApi } from './context'
 import { clearImages, deleteImage, getImages, putImage } from './imageStore'
+import { createProfile, ensureProfiles, removeProfile, setActiveProfile, stateKey, writeRegistry } from './profiles'
 import { reducer, type GameState } from './state'
 
-const STORAGE_KEY = 'emd_v1'
-
-/** Seed state from localStorage (+ dev config) synchronously — no first-paint flash. */
+/** Seed state from the active maker's localStorage (+ dev config) synchronously
+ * — no first-paint flash. Migrates legacy single-user data on first run. */
 function createInitialState(config: Config): GameState {
+  const reg = ensureProfiles()
+  const active = reg.list.find((p) => p.id === reg.activeId) ?? reg.list[0]
   let saved: Partial<GameState> = {}
   try {
-    saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}
+    saved = JSON.parse(localStorage.getItem(stateKey(active.id)) || '{}') || {}
   } catch {
     /* corrupt / unavailable storage — fall back to defaults */
   }
-  const name = saved.name ?? null
+  const name = active.name
   const screen: Screen = name ? 'home' : config.skipNameEntry ? 'home' : 'name'
   return {
     ready: true,
@@ -38,6 +40,8 @@ function createInitialState(config: Config): GameState {
     toast: null,
     finishing: null,
     justAdded: false,
+    profiles: reg.list,
+    profileId: active.id,
   }
 }
 
@@ -64,9 +68,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (!state.ready) return
     try {
       localStorage.setItem(
-        STORAGE_KEY,
+        stateKey(state.profileId),
         JSON.stringify({
-          name: state.name,
           muted: state.muted,
           calm: state.calm,
           gallery: state.gallery.map((g) => ({ id: g.id, type: g.type, title: g.title, tint: g.tint, fills: g.fills })),
@@ -75,7 +78,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore quota / private-mode errors */
     }
-  }, [state.ready, state.name, state.muted, state.calm, state.gallery])
+    // keep the maker registry's name/colour in sync (e.g. after a rename)
+    writeRegistry(state.profileId, state.profiles)
+  }, [state.ready, state.muted, state.calm, state.gallery, state.profileId, state.profiles])
 
   // ---- migrate any inline images to IndexedDB, then hydrate the rest ----
   useEffect(() => {
@@ -306,6 +311,30 @@ export function GameProvider({ children }: { children: ReactNode }) {
     void clearImages()
   }, [])
 
+  // ---- makers: switching / adding / deleting reloads into a clean studio, so
+  // each maker's screen state, drafts and audio start from a known-good base ----
+  const switchProfile = useCallback((id: string) => {
+    if (id === stateRef.current.profileId) {
+      go('home')
+      return
+    }
+    setActiveProfile(id)
+    location.reload()
+  }, [go])
+
+  const addProfile = useCallback(() => {
+    createProfile() // unnamed + active → the reload lands on name entry
+    location.reload()
+  }, [])
+
+  const deleteProfile = useCallback((id: string) => {
+    const dropImages = (ids: string[]) => {
+      for (const gid of ids) void deleteImage(gid)
+    }
+    removeProfile(id, dropImages)
+    location.reload()
+  }, [])
+
   const api = useMemo<GameApi>(
     () => ({
       state,
@@ -326,6 +355,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
       restoreCreation,
       importCollection,
       clearCollection,
+      switchProfile,
+      addProfile,
+      deleteProfile,
     }),
     [
       state,
@@ -346,6 +378,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
       restoreCreation,
       importCollection,
       clearCollection,
+      switchProfile,
+      addProfile,
+      deleteProfile,
     ],
   )
 

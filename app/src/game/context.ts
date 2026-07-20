@@ -32,6 +32,12 @@ export interface GameApi {
   restoreCreation: (item: GalleryItem, index: number) => void
   importCollection: (items: GalleryItem[]) => Promise<number>
   clearCollection: () => void
+  /** switch to another maker (reloads into their studio) */
+  switchProfile: (id: string) => void
+  /** create a fresh maker and drop straight into naming them */
+  addProfile: () => void
+  /** delete a maker and all their work */
+  deleteProfile: (id: string) => void
 }
 
 export const GameContext = createContext<GameApi | null>(null)

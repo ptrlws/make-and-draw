@@ -1,4 +1,4 @@
-export type Screen = 'name' | 'home' | 'marble' | 'cbn' | 'pattern' | 'print' | 'sticker' | 'dot' | 'butterfly' | 'scratch' | 'book' | 'grownups'
+export type Screen = 'name' | 'home' | 'marble' | 'cbn' | 'pattern' | 'print' | 'sticker' | 'dot' | 'butterfly' | 'scratch' | 'book' | 'grownups' | 'profiles'
 
 /** Every kit tile on the shelf — all playable. */
 export type KitId = 'marble' | 'cbn' | 'pattern' | 'print' | 'dot' | 'sticker' | 'butterfly' | 'scratch'

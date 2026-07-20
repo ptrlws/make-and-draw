@@ -5,6 +5,7 @@ import { Book } from './screens/Book'
 import { GrownUps } from './screens/GrownUps'
 import { Home } from './screens/Home'
 import { NameEntry } from './screens/NameEntry'
+import { Profiles } from './screens/Profiles'
 import { FinishingRitual } from './overlays/FinishingRitual'
 import { Settings } from './overlays/Settings'
 import { Toast } from './overlays/Toast'
@@ -69,6 +70,8 @@ function CurrentScreen() {
       return <Book />
     case 'grownups':
       return <GrownUps />
+    case 'profiles':
+      return <Profiles />
     default:
       return null
   }
