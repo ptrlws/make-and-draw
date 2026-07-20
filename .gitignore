@@ -14,8 +14,8 @@ npm-debug.log*
 .vscode/
 *.swp
 
-# local-only tool settings (commit .claude/launch.json, not this)
-.claude/settings.local.json
+# Claude Code local tooling (dev-server launch config, local settings)
+.claude/
 
 # raw Printables downloads (source material — NOT redistributed; see CREDITS.md).
 # The two freely-usable models are bundled under app/public/models/ instead;

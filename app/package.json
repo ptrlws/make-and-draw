@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Esther's Make & Draw — a touch-first craft-play studio for children (React recreation of the EMakeDraw design handoff).",
+  "description": "Make & Draw — a calm, ad-free, on-device craft-play studio for kids. Esther's idea.",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
