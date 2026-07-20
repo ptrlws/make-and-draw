@@ -27,6 +27,13 @@ const POINTS: Point[] = [
     spot: c.pink,
   },
   {
+    icon: '👋',
+    title: 'A space for each maker.',
+    body:
+      "If more than one child shares this device, each can have their own maker — their own name, collection and works-in-progress, kept apart. It isn't an account: there's no sign-up, email or password, and it never leaves the device.",
+    spot: '#8f3ac0',
+  },
+  {
     icon: '🚫',
     title: 'No advertising. Ever.',
     body: "No ads, no promoted content, no “watch a video to unlock.” Nothing is trying to sell to your child while they make things.",
