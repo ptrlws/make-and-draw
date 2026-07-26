@@ -106,7 +106,7 @@ export const text = {
   /** hero that must survive a narrow phone — same rungs, fluid between them */
   heroFluid: { fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 1.08, letterSpacing: '-.022em' },
   /** activity-header title: long kit names must shrink rather than truncate */
-  titleFluid: { fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(17px, 4.6vw, 20px)', lineHeight: 1.2, letterSpacing: '-.012em' },
+  titleFluid: { fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(15px, 4.4vw, 20px)', lineHeight: 1.2, letterSpacing: '-.012em' },
   /** the ONLY uppercase in the app — tiny group labels */
   eyebrow: {
     fontFamily: fonts.body,

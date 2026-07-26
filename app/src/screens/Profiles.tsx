@@ -21,7 +21,7 @@ export function Profiles() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'auto' }}>
       <div style={{ maxWidth: 620, margin: '0 auto', minHeight: '100%', padding: '0 18px 40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 0 8px' }}>
-          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
+          <IconButton onClick={() => go('home')} ariaLabel="back" size={44} style={{ ...text.display }}>
             ‹
           </IconButton>
           <div>

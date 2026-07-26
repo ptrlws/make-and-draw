@@ -255,17 +255,17 @@ export function PrintShop() {
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 14px' }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={44} style={{ ...text.display }}>
           ‹
         </IconButton>
         <div style={{ ...text.title, color: c.ink, flex: 1 }}>Print shop</div>
-        <RisoButton onClick={undo} variant="plain" style={headerBtn}>
-          Undo
-        </RisoButton>
-        <RisoButton onClick={clear} variant="plain" style={headerBtn}>
-          Clear
-        </RisoButton>
+        <IconButton onClick={undo} ariaLabel="undo" size={44} style={{ ...text.title }}>
+          ↶
+        </IconButton>
+        <IconButton onClick={clear} ariaLabel="start again" size={44} style={{ ...text.title }}>
+          ↻
+        </IconButton>
         <RisoButton onClick={keep} variant="confirm" style={headerBtn}>
           Print it ✓
         </RisoButton>

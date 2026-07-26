@@ -94,7 +94,7 @@ export function Book() {
 
   return (
     <div style={root}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 14px' }}>
         <IconButton onClick={() => go('home')} ariaLabel="back" style={{ ...text.display }}>
           ‹
         </IconButton>

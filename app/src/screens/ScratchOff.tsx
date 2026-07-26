@@ -520,19 +520,19 @@ export function ScratchOff() {
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 14px' }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={44} style={{ ...text.display }}>
           ‹
         </IconButton>
         <div style={{ ...text.titleFluid, color: c.ink, flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           Scratch art
         </div>
-        <button onClick={undo} style={{ ...chip, padding: '9px 11px' }}>
-          Undo
-        </button>
-        <button onClick={recover} style={{ ...chip, padding: '9px 11px' }}>
-          New
-        </button>
+        <IconButton onClick={undo} ariaLabel="undo" size={44} style={{ ...text.title }}>
+          ↶
+        </IconButton>
+        <IconButton onClick={recover} ariaLabel="new picture" size={44} style={{ ...text.title }}>
+          ↻
+        </IconButton>
         <button
           onClick={keep}
           style={{

@@ -231,17 +231,17 @@ export function PatternLab() {
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 14px' }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={44} style={{ ...text.display }}>
           ‹
         </IconButton>
         <div style={{ ...text.display, color: c.ink, flex: 1 }}>Pattern lab</div>
-        <button onClick={undo} style={chip}>
-          Undo
-        </button>
-        <button onClick={clear} style={chip}>
-          Clear
-        </button>
+        <IconButton onClick={undo} ariaLabel="undo" size={44} style={{ ...text.title }}>
+          ↶
+        </IconButton>
+        <IconButton onClick={clear} ariaLabel="start again" size={44} style={{ ...text.title }}>
+          ↻
+        </IconButton>
         <button onClick={keep} style={{ ...chip, background: c.ink, color: c.card, boxShadow: shadows.drop }}>
           Keep ✓
         </button>

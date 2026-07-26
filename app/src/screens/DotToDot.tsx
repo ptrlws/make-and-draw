@@ -569,8 +569,8 @@ export function DotToDot() {
   if (view === 'pick') {
     return (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 14px' }}>
+          <IconButton onClick={() => go('home')} ariaLabel="back" size={44} style={{ ...text.display }}>
             ‹
           </IconButton>
           <div>
@@ -608,7 +608,7 @@ export function DotToDot() {
   const joined = puz.dots.slice(0, n)
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 14px' }}>
         <button onClick={() => setView('pick')} style={chip} aria-label="back to shapes">
           <span style={{ ...text.title, marginRight: 2 }}>‹</span> Shapes
         </button>

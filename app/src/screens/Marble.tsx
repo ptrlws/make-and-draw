@@ -129,7 +129,7 @@ export function Marble() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       {/* header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 14px' }}>
         <IconButton
           onClick={() => go('home')}
           ariaLabel="back"
@@ -143,12 +143,12 @@ export function Marble() {
         </div>
         {phase === 'tray' && !noGl && (
           <>
-            <button onClick={() => studioRef.current?.undo()} style={{ ...chip, padding: '9px 12px' }}>
-              Undo
-            </button>
-            <button onClick={() => studioRef.current?.reset()} style={{ ...chip, padding: '9px 12px' }}>
-              Reset
-            </button>
+            <IconButton onClick={() => studioRef.current?.undo()} ariaLabel="undo" size={44} style={{ ...text.title }}>
+              ↶
+            </IconButton>
+            <IconButton onClick={() => studioRef.current?.reset()} ariaLabel="start again" size={44} style={{ ...text.title }}>
+              ↻
+            </IconButton>
             <button onClick={keepPaper} style={{ ...chip, padding: '9px 12px', background: c.teal, color: c.card }}>
               Keep ✓
             </button>
