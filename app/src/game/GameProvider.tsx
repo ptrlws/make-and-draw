@@ -28,6 +28,7 @@ function createInitialState(config: Config): GameState {
     /* corrupt / unavailable storage — fall back to defaults */
   }
   const name = active.name
+  const blotName = saved.blotName ?? null
   // With more than one maker on the device, a fresh launch asks "who's making?"
   // first. A switch/add sets a one-shot flag so its reload lands on the chosen
   // maker instead of bouncing back to the picker.
@@ -43,6 +44,7 @@ function createInitialState(config: Config): GameState {
   return {
     ready: true,
     name,
+    blotName,
     screen,
     muted: saved.muted != null ? saved.muted : config.sound === false,
     calm: saved.calm != null ? saved.calm : config.calmMode,
@@ -81,6 +83,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(
         stateKey(state.profileId),
         JSON.stringify({
+          blotName: state.blotName,
           muted: state.muted,
           calm: state.calm,
           gallery: state.gallery.map((g) => ({ id: g.id, type: g.type, title: g.title, tint: g.tint, fills: g.fills })),
@@ -91,7 +94,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
     // keep the maker registry's name/colour in sync (e.g. after a rename)
     writeRegistry(state.profileId, state.profiles)
-  }, [state.ready, state.muted, state.calm, state.gallery, state.profileId, state.profiles])
+  }, [state.ready, state.blotName, state.muted, state.calm, state.gallery, state.profileId, state.profiles])
 
   // ---- migrate any inline images to IndexedDB, then hydrate the rest ----
   useEffect(() => {
@@ -205,6 +208,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
       pushNav('home')
       dispatch({ t: 'CONFIRM_NAME', name })
       play('pop')
+    },
+    [ensureAudio, play, pushNav],
+  )
+
+  const nameBlot = useCallback(
+    (raw: string) => {
+      ensureAudio()
+      // blank keeps the default — naming is a gift, never a gate
+      const name = raw.trim().slice(0, 12) || null
+      pushNav('home')
+      dispatch({ t: 'NAME_BLOT', name })
+      play('chime')
     },
     [ensureAudio, play, pushNav],
   )
@@ -378,6 +393,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       go,
       openKit,
       confirmName,
+      nameBlot,
       openBook,
       openSettings,
       closeSettings,
@@ -401,6 +417,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       go,
       openKit,
       confirmName,
+      nameBlot,
       openBook,
       openSettings,
       closeSettings,

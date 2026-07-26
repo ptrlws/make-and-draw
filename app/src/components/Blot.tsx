@@ -21,6 +21,7 @@ export function Blot({
   color,
   mood = 'idle',
   still = false,
+  name,
 }: {
   size?: number
   /** usually the tint of the child's latest piece — Blot wears their colour */
@@ -28,6 +29,8 @@ export function Blot({
   mood?: Mood
   /** calm mode / reduced motion: hold still, keep the eye contact */
   still?: boolean
+  /** what this maker chose to call them; falls back to Blot */
+  name?: string | null
 }) {
   const ref = useRef<SVGSVGElement>(null)
   const [look, setLook] = useState({ x: 0, y: 0 })
@@ -76,7 +79,7 @@ export function Blot({
       height={size}
       viewBox="0 0 100 100"
       role="img"
-      aria-label="Blot, the studio's ink drop"
+      aria-label={`${name || 'Blot'}, the studio's ink drop`}
       style={{
         display: 'block',
         overflow: 'visible',

@@ -22,6 +22,8 @@ export interface GameApi {
   go: (screen: Screen) => void
   openKit: (kit: KitId) => void
   confirmName: (name: string) => void
+  /** name the studio's ink drop — '' keeps the default */
+  nameBlot: (name: string) => void
   openBook: () => void
   openSettings: () => void
   closeSettings: () => void

@@ -60,7 +60,7 @@ export function Home() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
               {/* Blot wears the colour of the last thing made here */}
-              <Blot size={44} color={state.gallery[0]?.tint} still={reducedMotion || state.calm} />
+              <Blot size={44} color={state.gallery[0]?.tint} still={reducedMotion || state.calm} name={state.blotName} />
               <div style={{ minWidth: 0 }}>
                 {/* Blot is the hero here, so the greeting sits a rung below it */}
                 <div style={{ ...text.titleFluid, color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

@@ -14,6 +14,8 @@ import type { Profile } from './profiles'
 export interface GameState {
   ready: boolean
   name: string | null
+  /** what this maker calls the studio's ink drop (null until they choose) */
+  blotName: string | null
   screen: Screen
   muted: boolean
   calm: boolean
@@ -32,6 +34,7 @@ export interface GameState {
 export const initialState: GameState = {
   ready: false,
   name: null,
+  blotName: null,
   screen: 'name',
   muted: false,
   calm: false,
@@ -48,6 +51,7 @@ export type Action =
   | { t: 'HYDRATE'; patch: Partial<GameState> }
   | { t: 'SET_SCREEN'; screen: Screen }
   | { t: 'CONFIRM_NAME'; name: string | null }
+  | { t: 'NAME_BLOT'; name: string | null }
   | { t: 'TOGGLE_MUTED' }
   | { t: 'TOGGLE_CALM' }
   | { t: 'OPEN_SETTINGS' }
@@ -80,6 +84,8 @@ export function reducer(s: GameState, a: Action): GameState {
         settingsOpen: false,
         profiles: s.profiles.map((p) => (p.id === s.profileId ? { ...p, name: a.name } : p)),
       }
+    case 'NAME_BLOT':
+      return { ...s, blotName: a.name, screen: 'home', settingsOpen: false }
     case 'TOGGLE_MUTED':
       return { ...s, muted: !s.muted }
     case 'TOGGLE_CALM':

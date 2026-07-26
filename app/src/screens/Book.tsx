@@ -124,10 +124,11 @@ export function Book() {
       {pages.length === 0 ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 28, textAlign: 'center' }}>
           {/* nobody likes an empty room — Blot waits here, dozing */}
-          <Blot size={72} mood="sleepy" still={reducedMotion || state.calm} />
+          <Blot size={72} mood="sleepy" still={reducedMotion || state.calm} name={state.blotName} />
           <div style={{ ...text.hero, color: c.ink }}>Nothing here yet</div>
           <div style={{ ...text.meta, color: c.hint, maxWidth: 300 }}>
-            Your collection fills up as you make things — go dip a marble or colour a print.
+            {state.blotName || 'Blot'} is dozing until there's something to look at — go dip a marble or
+            colour a print.
           </div>
           {trash && (
             <button
