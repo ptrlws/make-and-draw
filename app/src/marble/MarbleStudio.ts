@@ -454,35 +454,64 @@ export class MarbleStudio {
       this.render()
       return
     }
-    const p = this.toField(e)
-    const dx = p[0] - this.last[0]
-    const dy = p[1] - this.last[1]
-    const d = Math.hypot(dx, dy)
-    if (d < 1.5) return
-    this.moved = true
-    const t2 = this.toolParams()
-    const op: Op = {
-      k: 'stroke',
-      x: p[0],
-      y: p[1],
-      dx: dx / d,
-      dy: dy / d,
-      amp: Math.min(d, this.MAXSTEP),
-      sigma: t2.sigma,
-      comb: t2.comb,
-      tines: t2.tines,
-      space: t2.space,
-    }
-    this.current!.push(op)
-    this.applyOp(op)
+    // A quick flick delivers only a handful of pointermove events with big
+    // gaps between them. Take the browser's own coalesced samples where they
+    // exist, then interpolate whatever distance is left, so the ink is dragged
+    // by how far the finger actually travelled rather than by how many events
+    // the device happened to deliver. Without this, a fast swipe barely
+    // marbled at all — every bit of travel past one MAXSTEP was discarded.
+    const coalesced = (e as PointerEvent & { getCoalescedEvents?: () => PointerEvent[] }).getCoalescedEvents
+    const samples = typeof coalesced === 'function' ? coalesced.call(e) : []
+    const pts = (samples.length ? samples : [e]).map((s) => this.toField(s))
+
+    let travelled = 0
+    for (const p of pts) travelled += this.smearTo(p)
+    if (travelled === 0) return
     this.render()
-    this.last = p
+
     // throttled swirl foley, pitch tracking finger speed
     const t = performance.now()
     if (t - this.lastSwirlAt > 80) {
       this.lastSwirlAt = t
-      this.onSound?.('swirl', 0.85 + Math.min(0.6, d / this.MAXSTEP) * 0.7)
+      this.onSound?.('swirl', 0.85 + Math.min(0.6, travelled / this.MAXSTEP) * 0.7)
     }
+  }
+
+  /** Drag the fluid from `this.last` to `p` in steps no longer than MAXSTEP,
+   * so total displacement equals the distance travelled at any event rate.
+   * Returns the distance consumed (0 if the move was too small to count). */
+  private smearTo(p: [number, number]): number {
+    const dx = p[0] - this.last[0]
+    const dy = p[1] - this.last[1]
+    const d = Math.hypot(dx, dy)
+    if (d < 1.5) return 0
+    const t2 = this.toolParams()
+    // one op per MAXSTEP of travel, capped so a wild swipe can't flood the
+    // gesture list (it is replayed on undo/resize and saved into the draft)
+    const steps = Math.min(32, Math.max(1, Math.ceil(d / this.MAXSTEP)))
+    const ux = dx / d
+    const uy = dy / d
+    const amp = d / steps
+    for (let i = 1; i <= steps; i++) {
+      const f = i / steps
+      const op: Op = {
+        k: 'stroke',
+        x: this.last[0] + dx * f,
+        y: this.last[1] + dy * f,
+        dx: ux,
+        dy: uy,
+        amp,
+        sigma: t2.sigma,
+        comb: t2.comb,
+        tines: t2.tines,
+        space: t2.space,
+      }
+      this.current!.push(op)
+      this.applyOp(op)
+    }
+    this.moved = true
+    this.last = p
+    return d
   }
   private onUp = () => {
     if (this.downId === null) {
