@@ -1,6 +1,6 @@
 import { Card, IconButton, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
-import { c, fonts, shadows } from '../theme'
+import { c, shadows, text } from '../theme'
 
 /** A promise, in plain words, of what the app does and does not do — every
  * point here is verified against the actual code, not aspirational. */
@@ -55,14 +55,14 @@ export function GrownUps() {
       <div style={{ maxWidth: 620, margin: '0 auto', minHeight: '100%', padding: '0 18px 40px' }}>
         {/* header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 0 8px' }}>
-          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
+          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
             ‹
           </IconButton>
           <div>
-            <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: c.faint }}>
+            <div style={{ ...text.eyebrow, color: c.faint }}>
               A promise to
             </div>
-            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 1.05, letterSpacing: '-.015em', color: c.ink }}>
+            <div style={{ ...text.heroFluid, color: c.ink }}>
               Grown-ups
             </div>
           </div>
@@ -82,16 +82,16 @@ export function GrownUps() {
             margin: '4px 0 18px',
           }}
         >
-          <span aria-hidden style={{ fontSize: 25, lineHeight: 1 }}>💡</span>
-          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, lineHeight: 1.45, color: c.sub }}>
+          <span aria-hidden style={{ ...text.display }}>💡</span>
+          <div style={{ ...text.meta, color: c.sub }}>
             Make &amp; Draw was{' '}
-            <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 20, color: c.ink }}>Esther&rsquo;s</span> idea.
+            <span style={{ ...text.title, color: c.ink }}>Esther&rsquo;s</span> idea.
             <br />
             The whole studio began with her.
           </div>
         </div>
 
-        <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 15, lineHeight: 1.5, color: c.sub, margin: '4px 0 20px' }}>
+        <div style={{ ...text.body, color: c.sub, margin: '4px 0 20px' }}>
           Make &amp; Draw is a quiet, ad-free corner for one child and their imagination. Here is exactly how it treats your family — and every word of it is built into the app, not just a promise.
         </div>
 
@@ -101,6 +101,7 @@ export function GrownUps() {
               <div
                 aria-hidden
                 style={{
+                  ...text.title,
                   flex: 'none',
                   width: 44,
                   height: 44,
@@ -110,14 +111,13 @@ export function GrownUps() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 20,
                 }}
               >
                 {p.icon}
               </div>
               <div>
-                <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 17, lineHeight: 1.2, letterSpacing: '-.01em', color: c.ink }}>{p.title}</div>
-                <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, lineHeight: 1.55, color: c.sub, marginTop: 6 }}>{p.body}</div>
+                <div style={{ ...text.title, color: c.ink }}>{p.title}</div>
+                <div style={{ ...text.meta, color: c.sub, marginTop: 6 }}>{p.body}</div>
               </div>
             </Card>
           ))}
@@ -126,10 +126,7 @@ export function GrownUps() {
         {/* the one nuance worth stating plainly */}
         <div
           style={{
-            fontFamily: fonts.body,
-            fontWeight: 700,
-            fontSize: 13,
-            lineHeight: 1.5,
+            ...text.meta,
             color: c.sub,
             textAlign: 'center',
             margin: '20px 0 6px',
@@ -142,7 +139,7 @@ export function GrownUps() {
           Art leaves this device only when <em>you</em> choose to — when you print it, or use Share. You can also back the whole collection up to a file you keep, in Settings.
         </div>
 
-        <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 11, lineHeight: 1.4, color: c.faint, textAlign: 'center', margin: '10px 0 18px' }}>
+        <div style={{ ...text.micro, color: c.faint, textAlign: 'center', margin: '10px 0 18px' }}>
           Because it saves to this browser, clearing the browser's data (or using private browsing) will remove saved pictures — so back up anything precious. Imported 3D models © their authors; personal use — see CREDITS.
         </div>
 

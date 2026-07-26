@@ -3,7 +3,7 @@ import { IconButton, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { loadStock } from '../game/stock'
-import { INKS, c, fonts, shadows } from '../theme'
+import { INKS, c, shadows, text } from '../theme'
 
 const STAMPS = ['Circle', 'Square', 'Triangle', 'Diamond', 'Bar'] as const
 const PAPER = '#f4f1e7'
@@ -39,10 +39,7 @@ function drawStampOn(ctx: CanvasRenderingContext2D, W: number, H: number, nx: nu
 
 /** Tool chip: paper-white, borderless, lifted by a soft contact shadow. */
 const chip: CSSProperties = {
-  fontFamily: fonts.display,
-  fontWeight: 600,
-  fontSize: 13,
-  letterSpacing: '-.005em',
+  ...text.labelSm,
   color: c.ink,
   background: c.card,
   border: 'none',
@@ -53,7 +50,7 @@ const chip: CSSProperties = {
 }
 
 /** Header actions run at chip scale rather than full RisoButton size. */
-const headerBtn: CSSProperties = { fontSize: 13, padding: '10px 16px', borderRadius: 12 }
+const headerBtn: CSSProperties = { ...text.meta, padding: '10px 16px', borderRadius: 12 }
 
 export function PrintShop() {
   const { go, play, startFinish } = useGame()
@@ -259,10 +256,10 @@ export function PrintShop() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 20, fontWeight: 600, letterSpacing: '-.015em', color: c.ink, flex: 1 }}>Print shop</div>
+        <div style={{ ...text.title, color: c.ink, flex: 1 }}>Print shop</div>
         <RisoButton onClick={undo} variant="plain" style={headerBtn}>
           Undo
         </RisoButton>
@@ -312,7 +309,7 @@ export function PrintShop() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', padding: '4px 16px 22px' }}>
-        <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>stamp shapes — overlaps overprint into new colours</div>
+        <div style={{ ...text.meta, color: c.hint }}>stamp shapes — overlaps overprint into new colours</div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
           {INKS.map((k, i) => (
             <button
@@ -339,7 +336,7 @@ export function PrintShop() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: fonts.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.1em', fontSize: 11, color: c.faint }}>Stamp</span>
+          <span style={{ ...text.eyebrow, color: c.faint }}>Stamp</span>
           {STAMPS.map((label, i) => (
             <button key={label} onClick={() => { setStamp(i); play('select') }} aria-pressed={i === stamp} style={{ ...chip, background: i === stamp ? c.ink : c.card, color: i === stamp ? c.card : c.ink }}>
               {label}

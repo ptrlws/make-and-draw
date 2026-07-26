@@ -3,7 +3,7 @@ import { Card, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { downloadBlob } from '../game/exporter'
 import { getImages } from '../game/imageStore'
-import { c, fonts, shadows } from '../theme'
+import { c, shadows, text } from '../theme'
 import type { GalleryItem } from '../types'
 import { plural } from '../utils'
 
@@ -112,21 +112,21 @@ export function Settings() {
         style={{ width: 'min(380px, 92vw)', outline: 'none' }}
       >
         <Card radius={18} style={{ padding: 24, color: c.ink, boxShadow: shadows.dropLg }}>
-          <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 32, letterSpacing: '-.02em', lineHeight: 1.05, color: c.ink }}>Settings</div>
-          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: c.faint, margin: '5px 0 18px' }}>
+          <div style={{ ...text.hero, color: c.ink }}>Settings</div>
+          <div style={{ ...text.eyebrow, color: c.faint, margin: '5px 0 18px' }}>
             for grown-ups
           </div>
 
           <button onClick={toggleMute} role="switch" aria-checked={soundOn} aria-label="Sound" style={{ ...row, marginBottom: 12 }}>
-            <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 15, letterSpacing: '-.005em' }}>Sound</span>
+            <span style={{ ...text.label }}>Sound</span>
             <span style={pill(soundOn)}>
               <span style={knob(soundOn)} />
             </span>
           </button>
           <button onClick={toggleCalm} role="switch" aria-checked={state.calm} aria-label="Calm mode" style={row}>
             <span style={{ textAlign: 'left' }}>
-              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 15, letterSpacing: '-.005em', display: 'block' }}>Calm mode</span>
-              <span style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.hint }}>gentle confetti, less motion</span>
+              <span style={{ ...text.label, display: 'block' }}>Calm mode</span>
+              <span style={{ ...text.micro, color: c.hint }}>gentle confetti, less motion</span>
             </span>
             <span style={pill(state.calm)}>
               <span style={knob(state.calm)} />
@@ -142,8 +142,8 @@ export function Settings() {
             style={{ ...row, marginTop: 12 }}
           >
             <span style={{ textAlign: 'left' }}>
-              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 15, letterSpacing: '-.005em', display: 'block' }}>Makers</span>
-              <span style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.hint }}>
+              <span style={{ ...text.label, display: 'block' }}>Makers</span>
+              <span style={{ ...text.micro, color: c.hint }}>
                 {state.profiles.length > 1 ? `${state.profiles.length} on this device · switch or add` : 'add another maker'}
               </span>
             </span>
@@ -161,11 +161,11 @@ export function Settings() {
           <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
             {state.gallery.length > 0 && (
               <button onClick={() => void backup()} style={{ ...row, flex: 1, justifyContent: 'center' }}>
-                <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, letterSpacing: '-.005em' }}>⬇ Back up</span>
+                <span style={{ ...text.labelSm }}>⬇ Back up</span>
               </button>
             )}
             <button onClick={() => fileRef.current?.click()} style={{ ...row, flex: 1, justifyContent: 'center' }}>
-              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, letterSpacing: '-.005em' }}>⬆ Restore</span>
+              <span style={{ ...text.labelSm }}>⬆ Restore</span>
             </button>
             <input
               ref={fileRef}
@@ -200,13 +200,13 @@ export function Settings() {
                 boxShadow: confirmClear ? shadows.drop : row.boxShadow,
               }}
             >
-              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 15, letterSpacing: '-.005em' }}>
+              <span style={{ ...text.label }}>
                 {confirmClear ? `tap again to clear ${plural(state.gallery.length, 'piece')}` : `Clear collection (${state.gallery.length})`}
               </span>
             </button>
           )}
 
-          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.faint, textAlign: 'center', margin: '16px 0 4px' }}>
+          <div style={{ ...text.micro, color: c.faint, textAlign: 'center', margin: '16px 0 4px' }}>
             {state.name ? `Playing as ${state.name}` : 'No name on the cover yet'} · saved on this device ·{' '}
             <button
               onClick={() => {
@@ -214,9 +214,7 @@ export function Settings() {
                 go('name')
               }}
               style={{
-                fontFamily: fonts.body,
-                fontWeight: 600,
-                fontSize: 11,
+                ...text.micro,
                 color: c.hint,
                 background: 'none',
                 border: 'none',
@@ -234,12 +232,9 @@ export function Settings() {
               go('grownups')
             }}
             style={{
+              ...text.micro,
               display: 'block',
               width: '100%',
-              fontFamily: fonts.body,
-              fontWeight: 500,
-              fontSize: 11,
-              lineHeight: 1.45,
               color: c.sub,
               textAlign: 'center',
               margin: '2px 0 8px',
@@ -255,7 +250,7 @@ export function Settings() {
             <br />
             Art stays on this device unless <em>you</em> share it. <span style={{ textDecoration: 'underline' }}>Read more →</span>
           </button>
-          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, lineHeight: 1.4, color: c.faint, textAlign: 'center', marginBottom: 6 }}>
+          <div style={{ ...text.micro, color: c.faint, textAlign: 'center', marginBottom: 6 }}>
             Imported 3D models © their authors — low-poly cat &amp; dog by Matthias L, Balloon Dog by TheCraftyMaker (Printables). Personal use; see CREDITS.
           </div>
           <RisoButton onClick={closeSettings} variant="primary" style={{ width: '100%', marginTop: 6 }}>

@@ -3,7 +3,7 @@ import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { SCRATCH_SVGS } from '../scratch/scratchSvgs'
-import { c, fonts, shadows } from '../theme'
+import { c, shadows, text } from '../theme'
 
 const COAT = '#151310'
 
@@ -66,10 +66,7 @@ function pointNormals(P: [number, number][]): [number, number][] {
 }
 
 const chip: CSSProperties = {
-  fontFamily: fonts.display,
-  fontWeight: 600,
-  fontSize: 13,
-  letterSpacing: '-.005em',
+  ...text.labelSm,
   color: c.ink,
   background: c.card,
   border: 'none',
@@ -82,11 +79,7 @@ const chip: CSSProperties = {
 
 /** tiny eyebrow above a group of chips — meta, so it stays uppercase and faint */
 const eyebrow: CSSProperties = {
-  fontFamily: fonts.body,
-  fontWeight: 600,
-  fontSize: 11,
-  textTransform: 'uppercase',
-  letterSpacing: '.1em',
+  ...text.eyebrow,
   color: c.faint,
 }
 
@@ -528,10 +521,10 @@ export function ScratchOff() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontWeight: 600, letterSpacing: '-.01em', color: c.ink, fontSize: 'clamp(17px, 4.6vw, 20px)', flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        <div style={{ ...text.titleFluid, color: c.ink, flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           Scratch art
         </div>
         <button onClick={undo} style={{ ...chip, padding: '9px 11px' }}>
@@ -585,7 +578,7 @@ export function ScratchOff() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', padding: '2px 16px 20px' }}>
-        <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>
+        <div style={{ ...text.meta, color: c.hint }}>
           {scratched > 0.02 ? "keep going — press Keep ✓ when you're happy with it" : 'scratch to reveal — it stays inside the lines!'}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>

@@ -3,14 +3,12 @@ import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { saveStock } from '../game/stock'
-import { INKS, c, fonts, shadows } from '../theme'
+import { INKS, c, shadows, text } from '../theme'
 
 const STAMPS = ['Dot', 'Petal', 'Ring', 'Plus'] as const
 
 const chip: CSSProperties = {
-  fontFamily: fonts.display,
-  fontWeight: 600,
-  fontSize: 13,
+  ...text.labelSm,
   color: c.ink,
   background: c.card,
   border: 'none',
@@ -234,10 +232,10 @@ export function PatternLab() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 25, fontWeight: 600, color: c.ink, flex: 1 }}>Pattern lab</div>
+        <div style={{ ...text.display, color: c.ink, flex: 1 }}>Pattern lab</div>
         <button onClick={undo} style={chip}>
           Undo
         </button>
@@ -267,7 +265,7 @@ export function PatternLab() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', padding: '4px 16px 22px' }}>
-        <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>tap &amp; drag — it mirrors and repeats</div>
+        <div style={{ ...text.meta, color: c.hint }}>tap &amp; drag — it mirrors and repeats</div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
           {INKS.map((k, i) => (
             <button
@@ -294,7 +292,7 @@ export function PatternLab() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: fonts.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.1em', fontSize: 11, color: c.faint }}>Stamp</span>
+          <span style={{ ...text.eyebrow, color: c.faint }}>Stamp</span>
           {STAMPS.map((label, i) => (
             <button
               key={label}

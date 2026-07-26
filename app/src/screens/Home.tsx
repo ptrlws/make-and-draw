@@ -4,7 +4,7 @@ import { KitSurface } from '../components/KitSurface'
 import { KITS } from '../data/kits'
 import { useGame } from '../game/context'
 import { loadDraft } from '../game/draftStore'
-import { c, fonts, shadows } from '../theme'
+import { c, shadows, text } from '../theme'
 import type { KitId } from '../types'
 import { plural, poss } from '../utils'
 
@@ -58,10 +58,10 @@ export function Home() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontFamily: fonts.display, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 1.1, fontWeight: 600, letterSpacing: '-.015em', color: c.ink }}>
+              <div style={{ ...text.heroFluid, color: c.ink }}>
                 {name ? `hello, ${name}` : 'hello'}
               </div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint, marginTop: 2 }}>
+              <div style={{ ...text.meta, color: c.hint, marginTop: 2 }}>
                 what shall we make?
               </div>
             </div>
@@ -70,16 +70,13 @@ export function Home() {
                 onClick={() => go('profiles')}
                 aria-label="switch maker"
                 style={{
+                  ...text.title,
                   width: 40,
                   height: 40,
                   borderRadius: '50%',
                   background: maker?.color ?? c.pink,
                   border: 'none',
                   color: '#fff',
-                  fontFamily: fonts.display,
-                  fontSize: 17,
-                  fontWeight: 600,
-                  lineHeight: 1,
                   boxShadow: shadows.dropSm,
                   cursor: 'pointer',
                 }}
@@ -115,7 +112,7 @@ export function Home() {
         {/* still on the bench — half-finished work */}
         {resume.length > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', padding: '4px 20px 0' }}>
-            <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: c.faint }}>
+            <span style={{ ...text.eyebrow, color: c.faint }}>
               still out
             </span>
             {resume.map((k) => {
@@ -126,9 +123,7 @@ export function Home() {
                   key={k}
                   onClick={() => openKit(k)}
                   style={{
-                    fontFamily: fonts.body,
-                    fontWeight: 600,
-                    fontSize: 13,
+                    ...text.meta,
                     color: c.ink,
                     background: c.card,
                     border: 'none',
@@ -187,10 +182,10 @@ export function Home() {
                   )}
                 </div>
                 <div style={{ padding: '9px 5px 4px' }}>
-                  <div style={{ fontFamily: fonts.display, fontSize: 15, fontWeight: 600, letterSpacing: '-.005em', color: c.ink, lineHeight: 1.2 }}>
+                  <div style={{ ...text.label, color: c.ink }}>
                     {kit.label}
                   </div>
-                  <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.faint, marginTop: 1 }}>
+                  <div style={{ ...text.micro, color: c.faint, marginTop: 1 }}>
                     {mine ? 'your latest' : kit.blurb}
                   </div>
                 </div>
@@ -235,10 +230,10 @@ export function Home() {
               <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 7, background: 'rgba(64,56,47,.10)' }} />
             </div>
             <div>
-              <div style={{ fontFamily: fonts.display, fontSize: 20, fontWeight: 600, color: c.ink, lineHeight: 1.15 }}>
+              <div style={{ ...text.title, color: c.ink }}>
                 {poss(name)} collection
               </div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint, marginTop: 2 }}>
+              <div style={{ ...text.meta, color: c.hint, marginTop: 2 }}>
                 {state.gallery.length ? `${plural(state.gallery.length, 'piece')} kept` : 'nothing kept yet'}
               </div>
             </div>
@@ -250,10 +245,7 @@ export function Home() {
           <button
             onClick={() => go('grownups')}
             style={{
-              fontFamily: fonts.body,
-              fontWeight: 600,
-              fontSize: 11,
-              letterSpacing: '.04em',
+              ...text.micro,
               color: c.hint,
               background: 'none',
               border: 'none',
@@ -267,7 +259,7 @@ export function Home() {
           >
             for grown-ups
           </button>
-          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.faint, marginTop: 8 }}>
+          <div style={{ ...text.micro, color: c.faint, marginTop: 8 }}>
             an idea by Esther
           </div>
         </div>

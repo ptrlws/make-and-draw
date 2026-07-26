@@ -5,13 +5,10 @@ import { loadDraft, saveDraft } from '../game/draftStore'
 import { saveStock } from '../game/stock'
 import { MarbleStudio, type Op } from '../marble/MarbleStudio'
 import { STL_MODELS } from '../marble/models'
-import { INKS, c, fonts, shadows } from '../theme'
+import { INKS, c, shadows, text } from '../theme'
 
 const chip: CSSProperties = {
-  fontFamily: fonts.display,
-  fontWeight: 600,
-  fontSize: 13,
-  letterSpacing: '-.005em',
+  ...text.labelSm,
   color: c.ink,
   background: c.card,
   border: 'none',
@@ -137,11 +134,11 @@ export function Marble() {
           onClick={() => go('home')}
           ariaLabel="back"
           size={46}
-          style={{ fontFamily: fonts.display, fontSize: 20, fontWeight: 600, lineHeight: 1 }}
+          style={{ ...text.title }}
         >
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 'clamp(17px, 4.6vw, 20px)', fontWeight: 600, letterSpacing: '-.015em', color: c.ink, flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        <div style={{ ...text.titleFluid, color: c.ink, flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           Marbling
         </div>
         {phase === 'tray' && !noGl && (
@@ -202,10 +199,10 @@ export function Marble() {
                 padding: 20,
               }}
             >
-              <div style={{ fontFamily: fonts.display, fontSize: 25, fontWeight: 600, letterSpacing: '-.015em', color: c.ink }}>
+              <div style={{ ...text.display, color: c.ink }}>
                 No ink today
               </div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>
+              <div style={{ ...text.meta, color: c.hint }}>
                 this device can't run the marbling tray — the other kits all still work!
               </div>
             </div>
@@ -213,14 +210,12 @@ export function Marble() {
           {phase === 'tray' && !noGl && (
             <div
               style={{
+                ...text.meta,
                 position: 'absolute',
                 left: 0,
                 right: 0,
                 bottom: 14,
                 textAlign: 'center',
-                fontFamily: fonts.body,
-                fontWeight: 500,
-                fontSize: 13,
                 color: c.faint,
                 pointerEvents: 'none',
               }}
@@ -271,11 +266,7 @@ export function Marble() {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
             <span
               style={{
-                fontFamily: fonts.body,
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '.1em',
-                fontSize: 11,
+                ...text.eyebrow,
                 color: c.faint,
               }}
             >
@@ -290,10 +281,10 @@ export function Marble() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', padding: '4px 16px 26px' }}>
-          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 15, color: c.ink }}>
+          <div style={{ ...text.body, color: c.ink }}>
             a marbled {dipLabel.toLowerCase()} — one of a kind
           </div>
-          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.hint, marginTop: -4 }}>
+          <div style={{ ...text.micro, color: c.hint, marginTop: -4 }}>
             drag to turn it around
           </div>
           <div style={{ display: 'flex', gap: 10 }}>

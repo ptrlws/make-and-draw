@@ -1,5 +1,5 @@
 import { useGame } from '../game/context'
-import { c, fonts } from '../theme'
+import { c, shadows, text } from '../theme'
 
 /** Bottom-centre pill, auto-dismissed by the provider (~1.9s).
  *  The live region is always mounted so assistive tech announces changes. */
@@ -15,16 +15,12 @@ export function Toast() {
             bottom: 30,
             transform: 'translateX(-50%)',
             zIndex: 80,
+            ...text.label,
             background: c.ink,
-            color: c.paper,
-            fontFamily: fonts.body,
-            fontWeight: 700,
-            fontSize: 13,
-            textTransform: 'uppercase',
-            letterSpacing: '.04em',
+            color: '#FCFBF7',
             padding: '12px 20px',
-            borderRadius: 6,
-            boxShadow: `4px 4px 0 ${c.pink}`,
+            borderRadius: 999,
+            boxShadow: shadows.dropLg,
             whiteSpace: 'nowrap',
           }}
         >

@@ -93,12 +93,16 @@ export const text = {
   title: { fontFamily: fonts.display, fontWeight: 600, fontSize: 20, lineHeight: 1.2, letterSpacing: '-.012em' },
   /** the one-line question or intro under a title */
   lede: { fontFamily: fonts.body, fontWeight: 500, fontSize: 17, lineHeight: 1.45 },
-  /** buttons, chips, anything you tap */
+  /** buttons and primary controls — anything you tap */
   label: { fontFamily: fonts.display, fontWeight: 600, fontSize: 15, lineHeight: 1.2, letterSpacing: '-.005em' },
+  /** compact controls: chips, tool pills, toolbar buttons */
+  labelSm: { fontFamily: fonts.display, fontWeight: 600, fontSize: 13, lineHeight: 1.2, letterSpacing: '-.005em' },
   /** running prose */
   body: { fontFamily: fonts.body, fontWeight: 500, fontSize: 15, lineHeight: 1.55 },
   /** secondary text: blurbs, counts, hints */
   meta: { fontFamily: fonts.body, fontWeight: 500, fontSize: 13, lineHeight: 1.4 },
+  /** the smallest text in the app: badge counts, footnotes */
+  micro: { fontFamily: fonts.body, fontWeight: 500, fontSize: 11, lineHeight: 1.35 },
   /** hero that must survive a narrow phone — same rungs, fluid between them */
   heroFluid: { fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 1.08, letterSpacing: '-.022em' },
   /** activity-header title: long kit names must shrink rather than truncate */

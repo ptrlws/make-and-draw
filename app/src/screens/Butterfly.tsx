@@ -5,7 +5,7 @@ import getStroke from 'perfect-freehand'
 import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
-import { INKS, c, fonts, shadows } from '../theme'
+import { INKS, c, shadows, text } from '../theme'
 
 const PAPER = '#f4f1e7'
 
@@ -45,9 +45,7 @@ function mirrorY(pts: number[], cy: number): number[] {
 }
 
 const chip: CSSProperties = {
-  fontFamily: fonts.display,
-  fontWeight: 600,
-  fontSize: 13,
+  ...text.labelSm,
   color: c.ink,
   background: c.card,
   border: 'none',
@@ -286,10 +284,10 @@ export function Butterfly() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 25, fontWeight: 600, color: c.ink, flex: 1 }}>{quad ? 'Mandala' : 'Butterfly'}</div>
+        <div style={{ ...text.display, color: c.ink, flex: 1 }}>{quad ? 'Mandala' : 'Butterfly'}</div>
         <button onClick={undo} style={chip}>
           Undo
         </button>
@@ -408,9 +406,7 @@ export function Butterfly() {
                 {folded && (
                   <span
                     style={{
-                      fontFamily: fonts.display,
-                      fontSize: 15,
-                      fontWeight: 600,
+                      ...text.label,
                       color: c.ink,
                       opacity: 0.55,
                       transform: 'scaleX(-1)',
@@ -428,7 +424,7 @@ export function Butterfly() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', padding: '4px 16px 22px' }}>
-        <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: ritual === 'folded' ? c.ink : c.hint }} aria-live="polite">
+        <div style={{ ...text.meta, color: ritual === 'folded' ? c.ink : c.hint }} aria-live="polite">
           {hint}
         </div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -463,8 +459,8 @@ export function Butterfly() {
             onClick={fold}
             disabled={ritual !== 'paint'}
             style={{
+              ...text.body,
               ...chip,
-              fontSize: 15,
               padding: '12px 22px',
               borderRadius: 16,
               background: fresh.length > 0 ? c.ink : c.card,

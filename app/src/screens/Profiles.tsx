@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
-import { c, fonts, shadows } from '../theme'
+import { c, shadows, text } from '../theme'
 
 /** "Who's making today?" — pick a maker, add one, or (for grown-ups) remove one.
  * Each maker keeps their own name, collection, drafts and settings. */
@@ -21,14 +21,14 @@ export function Profiles() {
     <div style={{ position: 'absolute', inset: 0, overflow: 'auto' }}>
       <div style={{ maxWidth: 620, margin: '0 auto', minHeight: '100%', padding: '0 18px 40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 0 8px' }}>
-          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
+          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ ...text.display }}>
             ‹
           </IconButton>
           <div>
-            <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: c.faint }}>
+            <div style={{ ...text.eyebrow, color: c.faint }}>
               Make &amp; Draw
             </div>
-            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 1.05, letterSpacing: '-.015em', color: c.ink }}>
+            <div style={{ ...text.heroFluid, color: c.ink }}>
               Who&rsquo;s making?
             </div>
           </div>
@@ -60,16 +60,16 @@ export function Profiles() {
                   }}
                 >
                   <div style={{ position: 'relative', height: 96, background: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontFamily: fonts.display, fontSize: 32, color: c.paper, lineHeight: 1 }}>{initial(p.name)}</span>
+                    <span style={{ ...text.hero, color: c.paper }}>{initial(p.name)}</span>
                     {active && (
-                      <span style={{ position: 'absolute', top: 7, left: 7, width: 22, height: 22, borderRadius: '50%', background: c.card, border: 'none', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 700, fontSize: 11, lineHeight: '22px', textAlign: 'center', color: c.ink }}>✓</span>
+                      <span style={{ ...text.micro, position: 'absolute', top: 7, left: 7, width: 22, height: 22, borderRadius: '50%', background: c.card, border: 'none', boxShadow: shadows.dropSm, textAlign: 'center', color: c.ink }}>✓</span>
                     )}
                   </div>
                   <div style={{ padding: '9px 12px' }}>
-                    <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 17, color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ ...text.title, color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {p.name || 'Tap to name'}
                     </div>
-                    <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.faint, marginTop: 1 }}>{active ? 'making now' : 'tap to switch'}</div>
+                    <div style={{ ...text.micro, color: c.faint, marginTop: 1 }}>{active ? 'making now' : 'tap to switch'}</div>
                   </div>
                 </button>
                 <button
@@ -95,10 +95,9 @@ export function Profiles() {
                     color: arming ? '#FCFBF7' : c.hint,
                     border: 'none',
                     boxShadow: shadows.dropSm,
-                    fontFamily: fonts.body,
-                    fontWeight: 700,
-                    fontSize: arming ? 10 : 13,
-                    letterSpacing: arming ? '.03em' : 0,
+                    ...text.micro,
+                    // the armed label is longer, so it drops a rung to fit
+                    fontSize: arming ? 11 : 13,
                     cursor: 'pointer',
                     lineHeight: 1,
                   }}
@@ -128,12 +127,12 @@ export function Profiles() {
               cursor: 'pointer',
             }}
           >
-            <span style={{ fontFamily: fonts.display, fontSize: 32, color: c.hint, lineHeight: 1 }}>＋</span>
-            <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.hint }}>New maker</span>
+            <span style={{ ...text.hero, color: c.hint }}>＋</span>
+            <span style={{ ...text.labelSm, color: c.hint }}>New maker</span>
           </button>
         </div>
 
-        <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 11, lineHeight: 1.45, color: c.faint, textAlign: 'center', margin: '20px 0 0' }}>
+        <div style={{ ...text.micro, color: c.faint, textAlign: 'center', margin: '20px 0 0' }}>
           Each maker keeps their own collection and works-in-progress, saved on this device.
         </div>
       </div>

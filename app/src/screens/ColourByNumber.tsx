@@ -7,7 +7,7 @@ import { preprocess } from '../cbn/pbnSources'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { printHtml } from '../game/exporter'
-import { c, fonts, shadows } from '../theme'
+import { c, fonts, shadows, text } from '../theme'
 import { buildParticles } from '../utils'
 
 const WK = { w: 150, h: 188 } // working raster resolution → viewBox
@@ -73,10 +73,7 @@ function outline(points: number[][], size: number): number[] {
 }
 
 const chip: CSSProperties = {
-  fontFamily: fonts.display,
-  fontWeight: 600,
-  fontSize: 13,
-  letterSpacing: '-.005em',
+  ...text.labelSm,
   color: c.ink,
   background: c.card,
   border: 'none',
@@ -453,10 +450,10 @@ export function ColourByNumber() {
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       {/* header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={48} style={{ fontFamily: fonts.display, fontSize: 25 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={48} style={{ ...text.display }}>
           ‹
         </IconButton>
-        <div style={{ flex: 1, minWidth: 0, fontFamily: fonts.display, fontSize: 20, fontWeight: 600, letterSpacing: '-.015em', color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Paint by number</div>
+        <div style={{ ...text.title, flex: 1, minWidth: 0, color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Paint by number</div>
         <button onClick={() => guard(() => setDetail((d) => (d + 1) % DETAILS.length))} style={{ ...chip }} aria-label="detail level">
           {DETAILS[detail].k}
         </button>
@@ -565,18 +562,16 @@ export function ColourByNumber() {
                   })}
               </svg>
             ) : (
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>printing…</div>
+              <div style={{ ...text.meta, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: c.hint }}>printing…</div>
             )}
             {view.s > 1.04 && (
               <button
                 onClick={() => setView({ s: 1, tx: 0, ty: 0 })}
                 style={{
+                  ...text.micro,
                   position: 'absolute',
                   top: 8,
                   right: 8,
-                  fontFamily: fonts.display,
-                  fontWeight: 600,
-                  fontSize: 11,
                   color: c.ink,
                   background: c.card,
                   border: 'none',
@@ -626,12 +621,12 @@ export function ColourByNumber() {
                * colour — green means "getting there", not decoration */}
               <div style={{ width: `${(filledCount / total) * 100}%`, height: '100%', background: c.teal, transition: 'width .2s' }} />
             </div>
-            <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 11, color: c.hint, minWidth: 52, textAlign: 'right' }}>
+            <span style={{ ...text.micro, color: c.hint, minWidth: 52, textAlign: 'right' }}>
               {filledCount}/{total}
             </span>
           </div>
         )}
-        <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>
+        <div style={{ ...text.meta, color: c.hint }}>
           {!pbn ? 'printing…' : done ? 'finished! press keep →' : mode === 'paint' ? 'free paint — scribble anywhere' : pot == null ? 'pick a colour to begin' : 'tap the glowing shapes · pinch to zoom'}
         </div>
         {/* palette rail */}
@@ -665,9 +660,8 @@ export function ColourByNumber() {
                       ? `0 0 0 2.5px ${c.card}, 0 0 0 4.5px ${c.ink}, ${shadows.drop}`
                       : `inset 0 0 0 1px rgba(64,56,47,.14), ${shadows.dropSm}`,
                   transform: pot === n ? 'translateY(-2px)' : undefined,
-                  fontFamily: fonts.display,
-                  fontSize: 17,
-                  fontWeight: 600,
+                  ...text.title,
+                  fontSize: 17, // pot numerals sit a rung below a card title
                   color: isDark(rgb) ? '#fff' : c.ink,
                   cursor: 'pointer',
                   transition: 'transform .12s',
@@ -675,12 +669,12 @@ export function ColourByNumber() {
               >
                 {n}
                 {mode === 'number' && (
-                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 17, height: 17, padding: '0 3px', borderRadius: 999, background: potDone ? c.teal : c.card, color: potDone ? '#FCFBF7' : c.hint, border: 'none', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 700, fontSize: 11, lineHeight: '17px', textAlign: 'center' }}>{potDone ? '✓' : rem}</span>
+                  <span style={{ ...text.micro, position: 'absolute', top: -6, right: -6, minWidth: 17, height: 17, padding: '0 3px', borderRadius: 999, background: potDone ? c.teal : c.card, color: potDone ? '#FCFBF7' : c.hint, border: 'none', boxShadow: shadows.dropSm, textAlign: 'center' }}>{potDone ? '✓' : rem}</span>
                 )}
               </button>
             )
           })}
-          {potCount === 0 && <span style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>…</span>}
+          {potCount === 0 && <span style={{ ...text.meta, color: c.hint }}>…</span>}
         </div>
         {(hist.length > 0 || strokes.length > 0) && (
           <div style={{ display: 'flex', gap: 8 }}>
@@ -705,7 +699,7 @@ export function ColourByNumber() {
         {/* photo tune (only for uploaded photos) */}
         {srcIdx < 0 && (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-            <span style={{ fontFamily: fonts.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.1em', fontSize: 11, color: c.faint }}>Tune</span>
+            <span style={{ ...text.eyebrow, color: c.faint }}>Tune</span>
             <button onClick={() => guard(() => setTune((t) => ({ ...t, b: (t.b + 1) % 3 })))} style={{ ...chip, minHeight: 34 }}>
               ☀ {T_BRIGHT[tune.b]}
             </button>
@@ -719,7 +713,7 @@ export function ColourByNumber() {
         )}
         {/* source picker */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontFamily: fonts.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.1em', fontSize: 11, color: c.faint }}>Print</span>
+          <span style={{ ...text.eyebrow, color: c.faint }}>Print</span>
           {assets.map((s, i) => (
             <button
               key={s.id}

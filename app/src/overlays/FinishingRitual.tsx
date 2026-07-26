@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import { Motif } from '../components/Motif'
 import { useGame } from '../game/context'
-import { fonts } from '../theme'
+import { text } from '../theme'
 import type { GalleryItem } from '../types'
 
 const artBase: CSSProperties = {
@@ -102,13 +102,12 @@ export function FinishingRitual() {
       {f.text && (
         <div
           style={{
+            ...text.display,
             position: 'absolute',
             left: 0,
             right: 0,
             bottom: '16%',
             textAlign: 'center',
-            fontFamily: fonts.hand,
-            fontSize: 25,
             color: '#fff',
             textShadow: '0 2px 6px rgba(0,0,0,.4)',
             animation: 'rise .4s ease',
