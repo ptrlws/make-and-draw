@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Motif } from '../components/Motif'
 import { IconButton, RisoButton } from '../components/riso'
+import { Blot } from '../components/Blot'
 import { useGame } from '../game/context'
 import { sharePiece } from '../game/exporter'
 import { useLandscape } from '../hooks/useLandscape'
@@ -44,7 +45,7 @@ const TYPE_TO_KIT: Partial<Record<GalleryType, KitId>> = {
 }
 
 export function Book() {
-  const { state, go, play, showToast, removeCreation, restoreCreation, openKit } = useGame()
+  const { state, go, play, showToast, removeCreation, restoreCreation, openKit, reducedMotion } = useGame()
   const landscape = useLandscape()
   const pages = state.gallery
   // Arriving straight from the finishing ritual: skip the cover and land on
@@ -122,6 +123,8 @@ export function Book() {
 
       {pages.length === 0 ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 28, textAlign: 'center' }}>
+          {/* nobody likes an empty room — Blot waits here, dozing */}
+          <Blot size={72} mood="sleepy" still={reducedMotion || state.calm} />
           <div style={{ ...text.hero, color: c.ink }}>Nothing here yet</div>
           <div style={{ ...text.meta, color: c.hint, maxWidth: 300 }}>
             Your collection fills up as you make things — go dip a marble or colour a print.

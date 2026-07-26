@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import { Motif } from '../components/Motif'
+import { Blot } from '../components/Blot'
 import { useGame } from '../game/context'
 import { text } from '../theme'
 import type { GalleryItem } from '../types'
@@ -113,6 +114,10 @@ export function FinishingRitual() {
             animation: 'rise .4s ease',
           }}
         >
+          {/* Blot cheers the piece into the book — the payoff moment */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+            <Blot size={56} mood="happy" color={f.tint} still={f.calm} />
+          </div>
           {f.text}
         </div>
       )}

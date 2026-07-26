@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Blot } from '../components/Blot'
 import { Card, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { c, shadows, text } from '../theme'
@@ -24,6 +25,9 @@ export function NameEntry() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <Card spot={c.blue} offset={8} radius={10} style={{ width: 'min(440px, 92vw)', padding: '30px 28px 24px', textAlign: 'center', position: 'relative' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+          <Blot size={64} />
+        </div>
         <div style={{ ...text.eyebrow, color: c.faint }}>A print studio of your own</div>
         <div style={{ ...text.hero, margin: '10px 0 0', color: c.ink }}>Make &amp; Draw</div>
         <div style={{ ...text.lede, color: nudge ? c.pink : c.hint, margin: '10px 0 16px' }} aria-live="polite">

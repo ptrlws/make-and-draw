@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Blot } from '../components/Blot'
 import { IconButton } from '../components/riso'
 import { KitSurface } from '../components/KitSurface'
 import { KITS } from '../data/kits'
@@ -31,7 +32,7 @@ function resumableKits(): KitId[] {
 }
 
 export function Home() {
-  const { state, openKit, openBook, openSettings, toggleMute, go } = useGame()
+  const { state, openKit, openBook, openSettings, toggleMute, go, reducedMotion } = useGame()
   const name = state.name
   const [resume] = useState(resumableKits)
 
@@ -57,12 +58,17 @@ export function Home() {
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ ...text.heroFluid, color: c.ink }}>
-                {name ? `hello, ${name}` : 'hello'}
-              </div>
-              <div style={{ ...text.meta, color: c.hint, marginTop: 2 }}>
-                what shall we make?
+            <div style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+              {/* Blot wears the colour of the last thing made here */}
+              <Blot size={44} color={state.gallery[0]?.tint} still={reducedMotion || state.calm} />
+              <div style={{ minWidth: 0 }}>
+                {/* Blot is the hero here, so the greeting sits a rung below it */}
+                <div style={{ ...text.titleFluid, color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {name ? `hello, ${name}` : 'hello'}
+                </div>
+                <div style={{ ...text.meta, color: c.hint, marginTop: 2 }}>
+                  what shall we make?
+                </div>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, flex: 'none' }}>
