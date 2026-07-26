@@ -7,9 +7,20 @@ import { c, shadows, text } from '../theme'
 import type { GalleryItem } from '../types'
 import { plural } from '../utils'
 
+/* ------------------------------------------------------------------ *
+ * Grown-ups' settings.
+ *
+ * One sheet of paper, ruled into rows — not a stack of floating cards
+ * inside another card. The hierarchy is the point: switches read as
+ * switches, the collection tools are grouped under their own heading,
+ * and the one destructive action is deliberately the quietest thing on
+ * the panel until it is armed.
+ * ------------------------------------------------------------------ */
+
 const pill = (on: boolean): CSSProperties => ({
-  width: 52,
+  width: 50,
   height: 30,
+  flex: 'none',
   borderRadius: 15,
   border: 'none',
   background: on ? c.green : c.toggleOff,
@@ -24,26 +35,27 @@ const knob = (on: boolean): CSSProperties => ({
   height: 24,
   borderRadius: '50%',
   background: c.card,
-  border: 'none',
   boxShadow: shadows.dropSm,
-  transform: `translateX(${on ? 22 : 0}px)`,
+  transform: `translateX(${on ? 20 : 0}px)`,
   transition: 'transform .15s',
 })
-const row: CSSProperties = {
+
+/** a ruled row on the sheet — no card, no shadow, just a hairline above it */
+const row = (first = false): CSSProperties => ({
   width: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  background: c.card,
-  color: c.ink,
+  gap: 14,
+  background: 'none',
   border: 'none',
-  borderRadius: 14,
-  padding: '14px 16px',
-  boxShadow: `inset 0 0 0 1px ${c.line}, ${shadows.dropSm}`,
+  borderTop: first ? 'none' : `1px solid ${c.line}`,
+  padding: '14px 0',
+  textAlign: 'left',
+  color: c.ink,
   cursor: 'pointer',
-}
+})
 
-/** Grown-ups' settings: sound + calm mode. */
 export function Settings() {
   const { state, closeSettings, toggleMute, toggleCalm, clearCollection, go, importCollection, showToast } = useGame()
   const panelRef = useRef<HTMLDivElement>(null)
@@ -97,6 +109,18 @@ export function Settings() {
   if (!state.settingsOpen) return null
   const soundOn = !state.muted
 
+  /** a plain text action — used for anything that isn't a switch */
+  const link: CSSProperties = {
+    ...text.meta,
+    color: c.hint,
+    background: 'none',
+    border: 'none',
+    padding: 0,
+    textDecoration: 'underline',
+    textUnderlineOffset: 3,
+    cursor: 'pointer',
+  }
+
   return (
     <div
       onClick={closeSettings}
@@ -109,64 +133,74 @@ export function Settings() {
         aria-label="Settings"
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        style={{ width: 'min(380px, 92vw)', outline: 'none' }}
+        style={{ width: 'min(380px, 92vw)', maxHeight: '92dvh', overflowY: 'auto', outline: 'none' }}
       >
-        <Card radius={18} style={{ padding: 24, color: c.ink, boxShadow: shadows.dropLg }}>
-          <div style={{ ...text.hero, color: c.ink }}>Settings</div>
-          <div style={{ ...text.eyebrow, color: c.faint, margin: '5px 0 18px' }}>
-            for grown-ups
-          </div>
+        <Card radius={18} style={{ padding: '22px 22px 20px', color: c.ink, boxShadow: shadows.dropLg }}>
+          <div style={{ ...text.eyebrow, color: c.faint }}>For grown-ups</div>
+          <div style={{ ...text.hero, color: c.ink, margin: '4px 0 14px' }}>Settings</div>
 
-          <button onClick={toggleMute} role="switch" aria-checked={soundOn} aria-label="Sound" style={{ ...row, marginBottom: 12 }}>
+          <button onClick={toggleMute} role="switch" aria-checked={soundOn} aria-label="Sound" style={row(true)}>
             <span style={{ ...text.label }}>Sound</span>
             <span style={pill(soundOn)}>
               <span style={knob(soundOn)} />
             </span>
           </button>
-          <button onClick={toggleCalm} role="switch" aria-checked={state.calm} aria-label="Calm mode" style={row}>
-            <span style={{ textAlign: 'left' }}>
+
+          <button onClick={toggleCalm} role="switch" aria-checked={state.calm} aria-label="Calm mode" style={row()}>
+            <span>
               <span style={{ ...text.label, display: 'block' }}>Calm mode</span>
-              <span style={{ ...text.micro, color: c.hint }}>gentle confetti, less motion</span>
+              <span style={{ ...text.meta, color: c.hint }}>gentle confetti, less motion</span>
             </span>
             <span style={pill(state.calm)}>
               <span style={knob(state.calm)} />
             </span>
           </button>
 
-          {/* switch between the makers who share this device */}
           <button
             onClick={() => {
               closeSettings()
               go('profiles')
             }}
-            style={{ ...row, marginTop: 12 }}
+            style={row()}
           >
-            <span style={{ textAlign: 'left' }}>
+            <span>
               <span style={{ ...text.label, display: 'block' }}>Makers</span>
-              <span style={{ ...text.micro, color: c.hint }}>
-                {state.profiles.length > 1 ? `${state.profiles.length} on this device · switch or add` : 'add another maker'}
+              <span style={{ ...text.meta, color: c.hint }}>
+                {state.profiles.length > 1 ? `${state.profiles.length} on this device` : 'add another child'}
               </span>
             </span>
-            <span style={{ display: 'flex' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {state.profiles.slice(0, 4).map((p, i) => (
                 <span
                   key={p.id}
-                  style={{ width: 22, height: 22, borderRadius: '50%', background: p.color, border: 'none', boxShadow: `0 0 0 2px ${c.card}`, marginLeft: i ? -6 : 0 }}
+                  style={{ width: 18, height: 18, borderRadius: '50%', background: p.color, boxShadow: `0 0 0 2px ${c.card}`, marginLeft: i ? -9 : 0 }}
                 />
               ))}
+              <span style={{ ...text.title, color: c.faint, lineHeight: 1 }}>›</span>
             </span>
           </button>
 
-          {/* the collection can leave the device — and come back */}
-          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-            {state.gallery.length > 0 && (
-              <button onClick={() => void backup()} style={{ ...row, flex: 1, justifyContent: 'center' }}>
-                <span style={{ ...text.labelSm }}>⬇ Back up</span>
+          {/* the collection: file operations grouped, destructive one set apart */}
+          <div style={{ borderTop: `1px solid ${c.line}`, padding: '14px 0 0' }}>
+            <div style={{ ...text.eyebrow, color: c.faint, marginBottom: 8 }}>The collection</div>
+            <div style={{ display: 'flex', gap: 18, alignItems: 'baseline', flexWrap: 'wrap' }}>
+              {state.gallery.length > 0 && (
+                <button onClick={() => void backup()} style={link}>
+                  Back up to a file
+                </button>
+              )}
+              <button onClick={() => fileRef.current?.click()} style={link}>
+                Restore from a file
               </button>
-            )}
-            <button onClick={() => fileRef.current?.click()} style={{ ...row, flex: 1, justifyContent: 'center' }}>
-              <span style={{ ...text.labelSm }}>⬆ Restore</span>
-            </button>
+              {state.gallery.length > 0 && (
+                <button
+                  onClick={() => (confirmClear ? (clearCollection(), setConfirmClear(false)) : setConfirmClear(true))}
+                  style={{ ...link, color: confirmClear ? c.pink : c.faint, fontWeight: confirmClear ? 700 : 500 }}
+                >
+                  {confirmClear ? `tap again to delete ${plural(state.gallery.length, 'piece')}` : 'Clear it'}
+                </button>
+              )}
+            </div>
             <input
               ref={fileRef}
               type="file"
@@ -180,80 +214,34 @@ export function Settings() {
             />
           </div>
 
-          {state.gallery.length > 0 && (
-            <button
-              onClick={() => {
-                if (confirmClear) {
-                  clearCollection()
-                  setConfirmClear(false)
-                } else {
-                  setConfirmClear(true)
-                }
-              }}
-              style={{
-                ...row,
-                marginTop: 12,
-                justifyContent: 'center',
-                // armed state is a filled ink chip, not an outline or a pigment
-                background: confirmClear ? c.ink : c.card,
-                color: confirmClear ? c.card : c.ink,
-                boxShadow: confirmClear ? shadows.drop : row.boxShadow,
-              }}
-            >
-              <span style={{ ...text.label }}>
-                {confirmClear ? `tap again to clear ${plural(state.gallery.length, 'piece')}` : `Clear collection (${state.gallery.length})`}
-              </span>
-            </button>
-          )}
+          <div style={{ borderTop: `1px solid ${c.line}`, margin: '16px 0 0', padding: '14px 0 0' }}>
+            <div style={{ ...text.meta, color: c.faint }}>
+              {state.name ? `Playing as ${state.name}` : 'No name on the cover yet'} ·{' '}
+              <button
+                onClick={() => {
+                  closeSettings()
+                  go('name')
+                }}
+                style={{ ...link, ...text.meta, color: c.hint }}
+              >
+                {state.name ? 'change name' : 'add a name'}
+              </button>
+            </div>
+            <div style={{ ...text.meta, color: c.faint, marginTop: 6 }}>
+              Nothing here is tracked, sold or uploaded ·{' '}
+              <button
+                onClick={() => {
+                  closeSettings()
+                  go('grownups')
+                }}
+                style={{ ...link, ...text.meta, color: c.hint }}
+              >
+                the full promise
+              </button>
+            </div>
+          </div>
 
-          <div style={{ ...text.micro, color: c.faint, textAlign: 'center', margin: '16px 0 4px' }}>
-            {state.name ? `Playing as ${state.name}` : 'No name on the cover yet'} · saved on this device ·{' '}
-            <button
-              onClick={() => {
-                closeSettings()
-                go('name')
-              }}
-              style={{
-                ...text.micro,
-                color: c.hint,
-                background: 'none',
-                border: 'none',
-                textDecoration: 'underline',
-                cursor: 'pointer',
-                padding: 0,
-              }}
-            >
-              {state.name ? 'change name' : 'add a name'}
-            </button>
-          </div>
-          <button
-            onClick={() => {
-              closeSettings()
-              go('grownups')
-            }}
-            style={{
-              ...text.micro,
-              display: 'block',
-              width: '100%',
-              color: c.sub,
-              textAlign: 'center',
-              margin: '2px 0 8px',
-              padding: '10px 12px',
-              background: c.paper,
-              border: 'none',
-              boxShadow: `inset 0 0 0 1px ${c.line}`,
-              borderRadius: 12,
-              cursor: 'pointer',
-            }}
-          >
-            No ads · no accounts · no tracking.
-            <br />
-            Art stays on this device unless <em>you</em> share it. <span style={{ textDecoration: 'underline' }}>Read more →</span>
-          </button>
-          <div style={{ ...text.micro, color: c.faint, textAlign: 'center', marginBottom: 6 }}>
-            Imported 3D models © their authors — low-poly cat &amp; dog by Matthias L, Balloon Dog by TheCraftyMaker (Printables). Personal use; see CREDITS.
-          </div>
-          <RisoButton onClick={closeSettings} variant="primary" style={{ width: '100%', marginTop: 6 }}>
+          <RisoButton onClick={closeSettings} variant="primary" style={{ width: '100%', marginTop: 18 }}>
             All done
           </RisoButton>
         </Card>
