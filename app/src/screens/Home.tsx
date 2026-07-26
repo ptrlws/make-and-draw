@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Halftone, IconButton } from '../components/riso'
-import { KitEmblem } from '../components/KitEmblem'
+import { IconButton } from '../components/riso'
+import { KitSurface } from '../components/KitSurface'
 import { KITS } from '../data/kits'
 import { useGame } from '../game/context'
 import { loadDraft } from '../game/draftStore'
-import { SPOT, c, fonts } from '../theme'
+import { c, fonts, shadows } from '../theme'
 import type { KitId } from '../types'
 import { plural, poss } from '../utils'
 
@@ -25,8 +25,8 @@ function resumableKits(): KitId[] {
   if ((bf?.committed?.length ?? 0) + (bf?.fresh?.length ?? 0) + (bf?.strokes?.length ?? 0) > 0) out.push('butterfly')
   const st = loadDraft<{ stickers?: unknown[] }>('sticker')
   if (st?.stickers?.length) out.push('sticker')
-  const scr = loadDraft<{ strokes?: unknown[]; done?: boolean }>('scratch')
-  if (scr?.strokes?.length || scr?.done) out.push('scratch')
+  const scr = loadDraft<{ strokes?: unknown[] }>('scratch')
+  if (scr?.strokes?.length) out.push('scratch')
   return out
 }
 
@@ -35,65 +35,88 @@ export function Home() {
   const name = state.name
   const [resume] = useState(resumableKits)
 
+  /** the child's most recent piece from each kit — the tile IS their work */
+  const latest = new Map<string, string>()
+  for (const g of state.gallery) if (g.img && !latest.has(g.type)) latest.set(g.type, g.img)
+
+  const maker = state.profiles.find((p) => p.id === state.profileId)
+
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'auto' }}>
       <div style={{ maxWidth: 680, margin: '0 auto', minHeight: '100%' }}>
-        {/* header */}
-        <div style={{ position: 'sticky', top: 0, zIndex: 6, background: c.headerWash, backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)', padding: '18px 18px 12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: c.pink }}>
-                {poss(name)} print studio
+        {/* header — quiet, lowercase, nothing shouting */}
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 6,
+            background: c.headerWash,
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            padding: '20px 20px 14px',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontFamily: fonts.display, fontSize: 'clamp(23px, 6vw, 30px)', lineHeight: 1.1, fontWeight: 550, letterSpacing: '-.015em', color: c.ink }}>
+                {name ? `hello, ${name}` : 'hello'}
               </div>
-              <div style={{ fontFamily: fonts.display, fontSize: 'clamp(30px, 8vw, 42px)', lineHeight: 0.92, textTransform: 'uppercase', marginTop: 2 }}>
-                Make &amp; Draw
+              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 14, color: c.hint, marginTop: 2 }}>
+                what shall we make?
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ display: 'flex', gap: 8, flex: 'none' }}>
               <button
                 onClick={() => go('profiles')}
                 aria-label="switch maker"
                 style={{
-                  width: 44,
-                  height: 44,
-                  flex: 'none',
+                  width: 40,
+                  height: 40,
                   borderRadius: '50%',
-                  background: state.profiles.find((p) => p.id === state.profileId)?.color ?? c.pink,
-                  border: `2.5px solid ${c.ink}`,
-                  color: c.paper,
+                  background: maker?.color ?? c.pink,
+                  border: 'none',
+                  color: '#fff',
                   fontFamily: fonts.display,
-                  fontSize: 20,
+                  fontSize: 17,
+                  fontWeight: 600,
                   lineHeight: 1,
-                  boxShadow: '0 3px 0 #16130f',
+                  boxShadow: shadows.dropSm,
                   cursor: 'pointer',
                 }}
               >
                 {(name && name.trim()[0]?.toUpperCase()) || '?'}
               </button>
-              <IconButton onClick={toggleMute} ariaLabel={state.muted ? 'unmute sound' : 'mute sound'} style={{ position: 'relative' }}>
+              <IconButton
+                onClick={toggleMute}
+                ariaLabel={state.muted ? 'unmute sound' : 'mute sound'}
+                size={40}
+                style={{ position: 'relative', background: c.card, border: 'none', boxShadow: shadows.dropSm }}
+              >
                 <span style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ width: 6, height: 9, background: c.ink }} />
-                  <span style={{ width: 0, height: 0, borderTop: '8px solid transparent', borderBottom: '8px solid transparent', borderLeft: `10px solid ${c.ink}`, marginLeft: -1 }} />
+                  <span style={{ width: 5, height: 8, background: c.ink }} />
+                  <span style={{ width: 0, height: 0, borderTop: '7px solid transparent', borderBottom: '7px solid transparent', borderLeft: `9px solid ${c.ink}`, marginLeft: -1 }} />
                 </span>
-                {state.muted && <span style={{ position: 'absolute', width: 32, height: 3, background: c.pink, transform: 'rotate(-32deg)', borderRadius: 2 }} />}
+                {state.muted && <span style={{ position: 'absolute', width: 26, height: 2.5, background: c.pink, transform: 'rotate(-32deg)', borderRadius: 2 }} />}
               </IconButton>
-              <IconButton onClick={openSettings} ariaLabel="settings" style={{ gap: 4 }}>
+              <IconButton
+                onClick={openSettings}
+                ariaLabel="settings"
+                size={40}
+                style={{ gap: 3.5, background: c.card, border: 'none', boxShadow: shadows.dropSm }}
+              >
                 {[0, 1, 2].map((i) => (
-                  <span key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: c.ink }} />
+                  <span key={i} style={{ width: 4, height: 4, borderRadius: '50%', background: c.ink }} />
                 ))}
               </IconButton>
             </div>
           </div>
-          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 15, color: c.hint, marginTop: 8 }}>
-            {name ? `Hi ${name} — what are we making?` : 'What are we making today?'}
-          </div>
         </div>
 
-        {/* jump back in — kits holding half-finished work */}
+        {/* still on the bench — half-finished work */}
         {resume.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', padding: '10px 18px 0' }}>
-            <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 11, letterSpacing: '.18em', textTransform: 'uppercase', color: c.pink }}>
-              Jump back in
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', padding: '4px 20px 0' }}>
+            <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: c.faint }}>
+              still out
             </span>
             {resume.map((k) => {
               const kit = KITS.find((x) => x.id === k)
@@ -104,31 +127,28 @@ export function Home() {
                   onClick={() => openKit(k)}
                   style={{
                     fontFamily: fonts.body,
-                    fontWeight: 800,
-                    fontSize: 12,
-                    textTransform: 'uppercase',
-                    letterSpacing: '.03em',
+                    fontWeight: 600,
+                    fontSize: 12.5,
                     color: c.ink,
-                    background: c.yellow,
-                    border: `2px solid ${c.ink}`,
+                    background: c.card,
+                    border: 'none',
                     borderRadius: 999,
-                    padding: '6px 12px',
-                    boxShadow: '0 2px 0 #16130f',
+                    padding: '6px 13px',
+                    boxShadow: shadows.dropSm,
                     cursor: 'pointer',
                   }}
                 >
-                  {kit.label} →
+                  {kit.label}
                 </button>
               )
             })}
           </div>
         )}
 
-        {/* the shelf — every tile is playable */}
-        <div style={{ padding: '10px 15px 6px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        {/* the shelf — every tile is a real surface, not a swatch */}
+        <div style={{ padding: '16px 16px 8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           {KITS.map((kit, i) => {
-            const spot = SPOT[i % SPOT.length]
-            const spot2 = SPOT[(i + 2) % SPOT.length]
+            const mine = latest.get(kit.id)
             return (
               <button
                 key={kit.id}
@@ -137,84 +157,121 @@ export function Home() {
                   position: 'relative',
                   textAlign: 'left',
                   background: c.card,
-                  border: `3px solid ${c.ink}`,
-                  borderRadius: 8,
-                  boxShadow: `5px 5px 0 ${spot}`,
-                  padding: 10,
+                  border: 'none',
+                  borderRadius: 18,
+                  boxShadow: shadows.card,
+                  padding: 7,
                   cursor: 'pointer',
-                  animation: 'popin .4s cubic-bezier(.3,1.3,.5,1) both',
-                  animationDelay: `${i * 45}ms`,
+                  animation: 'popin .42s cubic-bezier(.3,1.2,.5,1) both',
+                  animationDelay: `${i * 40}ms`,
                 }}
               >
-                <div style={{ position: 'relative', height: 96, borderRadius: 4, background: spot, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span aria-hidden style={{ position: 'absolute', width: 130, height: 130, borderRadius: '50%', background: spot2, mixBlendMode: 'multiply', top: -34, right: -30 }} />
-                  <Halftone opacity={0.16} />
-                  <div style={{ position: 'relative', width: '78%', height: '74%' }}>
-                    <KitEmblem id={kit.id} ink={c.paper} accent={c.ink} />
+                <div
+                  style={{
+                    position: 'relative',
+                    aspectRatio: '1 / 1',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                    background: c.paperBody,
+                    boxShadow: 'inset 0 0 0 1px rgba(64,56,47,.06)',
+                  }}
+                >
+                  {mine ? (
+                    <img
+                      src={mine}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  ) : (
+                    <KitSurface id={kit.id} />
+                  )}
+                </div>
+                <div style={{ padding: '9px 5px 4px' }}>
+                  <div style={{ fontFamily: fonts.display, fontSize: 15, fontWeight: 550, letterSpacing: '-.005em', color: c.ink, lineHeight: 1.2 }}>
+                    {kit.label}
+                  </div>
+                  <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11.5, color: c.faint, marginTop: 1 }}>
+                    {mine ? 'your latest' : kit.blurb}
                   </div>
                 </div>
-                <div style={{ fontFamily: fonts.display, fontSize: 18, textTransform: 'uppercase', marginTop: 8, color: c.ink }}>{kit.label}</div>
-                <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 11.5, color: c.sub, marginTop: 1 }}>{kit.blurb}</div>
               </button>
             )
           })}
         </div>
 
-        {/* collection card */}
-        <div style={{ padding: '4px 15px 26px' }}>
+        {/* the collection */}
+        <div style={{ padding: '8px 16px 8px' }}>
           <button
             onClick={openBook}
             style={{
               width: '100%',
               display: 'flex',
               alignItems: 'center',
-              gap: 16,
+              gap: 14,
               textAlign: 'left',
               background: c.card,
-              border: `3px solid ${c.ink}`,
-              borderRadius: 8,
-              boxShadow: `5px 5px 0 ${c.yellow}`,
-              padding: 14,
+              border: 'none',
+              borderRadius: 18,
+              boxShadow: shadows.cardSoft,
+              padding: 13,
               cursor: 'pointer',
             }}
           >
-            <div style={{ width: 66, height: 80, flex: 'none', background: c.pink, border: `2.5px solid ${c.ink}`, borderRadius: '3px 7px 7px 3px', position: 'relative', overflow: 'hidden' }}>
-              <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 11, background: 'rgba(22,19,15,.28)' }} />
-              <Halftone opacity={0.2} />
+            <div
+              style={{
+                width: 54,
+                height: 66,
+                flex: 'none',
+                borderRadius: '3px 8px 8px 3px',
+                position: 'relative',
+                overflow: 'hidden',
+                background: c.paperBody,
+                boxShadow: 'inset 0 0 0 1px rgba(64,56,47,.08)',
+              }}
+            >
+              {state.gallery[0]?.img ? (
+                <img src={state.gallery[0].img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              ) : null}
+              <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 7, background: 'rgba(64,56,47,.10)' }} />
             </div>
             <div>
-              <div style={{ fontFamily: fonts.display, fontSize: 24, textTransform: 'uppercase', lineHeight: 1 }}>{poss(name)} collection</div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.sub, marginTop: 4 }}>{plural(state.gallery.length, 'thing')} you've made →</div>
+              <div style={{ fontFamily: fonts.display, fontSize: 19, fontWeight: 550, color: c.ink, lineHeight: 1.15 }}>
+                {poss(name)} collection
+              </div>
+              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 12.5, color: c.hint, marginTop: 2 }}>
+                {state.gallery.length ? `${plural(state.gallery.length, 'piece')} kept` : 'nothing kept yet'}
+              </div>
             </div>
           </button>
         </div>
 
-        {/* a quiet doorway for parents — no ads, no tracking, nothing to buy */}
-        <div style={{ padding: '0 15px 30px', textAlign: 'center' }}>
+        {/* a quiet doorway for parents */}
+        <div style={{ padding: '4px 16px 30px', textAlign: 'center' }}>
           <button
             onClick={() => go('grownups')}
             style={{
               fontFamily: fonts.body,
-              fontWeight: 800,
+              fontWeight: 600,
               fontSize: 12,
-              letterSpacing: '.08em',
-              textTransform: 'uppercase',
+              letterSpacing: '.04em',
               color: c.hint,
               background: 'none',
-              border: '2px solid rgba(22,19,15,.18)',
+              border: 'none',
               borderRadius: 999,
-              padding: '9px 18px',
+              padding: '9px 14px',
               cursor: 'pointer',
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+              textDecorationColor: c.line,
             }}
           >
-            For grown-ups →
+            for grown-ups
           </button>
-          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.04em', color: c.faint, marginTop: 12 }}>
-            An idea by Esther 💡
+          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.faint, marginTop: 8 }}>
+            an idea by Esther
           </div>
         </div>
       </div>
     </div>
   )
 }
-

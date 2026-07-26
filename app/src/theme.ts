@@ -1,71 +1,96 @@
 /* ------------------------------------------------------------------ *
- * Design tokens — "Print-shop / Riso" direction (C).
- * Limited fluoro spot inks, hard ink outlines, offset registration
- * shadows, paper + halftone grain, bold poster type.
+ * Design tokens — "quiet shell, loud work".
+ *
+ * The studio owns almost no colour. Chrome is warm paper, soft graphite
+ * and hairline rules; there is no pure black and no brand accent. Every
+ * saturated colour on screen is something the child actually made — a
+ * marbled sheet, a scratched panel, a filled-in page. That is a
+ * structural guarantee, not a discipline: if the shell has no palette to
+ * shout with, the work is always the loudest thing in the room.
+ *
+ * Token NAMES are unchanged from the old print-shop direction so every
+ * screen re-skins from this one file.
  * ------------------------------------------------------------------ */
 
 import type { CSSProperties } from 'react'
 
 export const c = {
-  ink: '#16130f', // text + all outlines
-  inkSoft: '#3a352c',
+  /** warm soft charcoal — never #000; outlines and body text share it */
+  ink: '#40382F',
+  inkSoft: '#6A6053',
 
-  // spot inks (overprint via multiply)
-  pink: '#ff2e7e',
-  blue: '#0a5af5',
-  yellow: '#ffb800',
-  teal: '#00a58a',
+  /* Spot inks. These are no longer chrome — they are the pigments the
+   * activities themselves paint with (marble inks, CBN pots, stamps), so
+   * they only ever appear inside the child's own work. */
+  pink: '#D8447A',
+  blue: '#3C6BC4',
+  yellow: '#E0A33A',
+  teal: '#3E9481',
 
-  // primary accent = pink (legacy name `coral` kept so older screens still compile)
-  coral: '#ff2e7e',
-  coralDark: '#d81b60',
-  sunshine: '#ffb800',
+  // legacy aliases kept so older screens still compile
+  coral: '#D8447A',
+  coralDark: '#B23561',
+  sunshine: '#E0A33A',
 
-  // paper grounds
-  paper: '#f4f1e7',
-  paperBody: '#ebe7d9',
-  paperBook: '#efe9da',
-  card: '#faf8f0',
-  cardAlt: '#ffffff',
-  headerWash: 'rgba(244,241,231,.92)',
+  /* paper grounds — cartridge paper, faintly warm, never cream-yellow.
+   * The ground sits a clear step below the cards so work reads as sheets
+   * laid ON a surface, without needing an outline to separate them. */
+  paper: '#E9E5DA',
+  paperBody: '#E2DED1',
+  paperBook: '#EFECE3',
+  card: '#FCFBF7',
+  cardAlt: '#FFFFFF',
+  headerWash: 'rgba(233,229,218,.88)',
 
-  disabled: '#c7c1b2',
+  /** hairline separations — replaces the old 3px black outline everywhere */
+  line: 'rgba(64,56,47,.13)',
+  lineStrong: 'rgba(64,56,47,.26)',
 
-  hint: '#6f675a',
-  prompt: '#4a4335',
-  sub: '#6f675a',
-  faint: '#9a9078',
+  disabled: '#D5D0C4',
 
-  green: '#00a58a', // success / toggle-on (teal ink)
-  toggleOff: '#d9d3c4',
+  hint: '#6A6053',
+  prompt: '#4A4235',
+  sub: '#6A6053',
+  faint: '#948B7C',
+
+  green: '#3E9481', // success / toggle-on
+  toggleOff: '#DCD7CB',
 } as const
 
 /** Spot inks in rotation order, for cycling tile accents. */
 export const SPOT = [c.pink, c.blue, c.yellow, c.teal] as const
 
 export const fonts = {
-  display: "'Anton', 'Arial Narrow', 'Haettenschweiler', sans-serif", // heavy condensed poster
+  /* A rounded humanist face: SF Rounded on Apple devices, a graceful
+   * system fallback elsewhere. Warm and lowercase-friendly — the opposite
+   * of the old condensed uppercase poster face, and it needs no webfont
+   * (the CSP forbids font CDNs and we ship no extra bytes). */
+  display: 'ui-rounded, "SF Pro Rounded", "Varela Round", "Hiragino Maru Gothic ProN", system-ui, sans-serif',
   body: "'Inter Variable', Inter, system-ui, sans-serif",
-  // legacy alias (there is no more hand-lettering in the Riso direction)
-  hand: "'Inter Variable', Inter, system-ui, sans-serif",
+  hand: 'ui-rounded, "SF Pro Rounded", "Varela Round", system-ui, sans-serif',
 } as const
 
+/* Depth now comes from light and contact, not from a hard offset plate. */
 export const shadows = {
-  card: '5px 5px 0 #16130f', // hard registration-offset
-  cardSoft: '4px 4px 0 rgba(22,19,15,.85)',
-  drop: '0 4px 0 #16130f',
-  dropSm: '0 3px 0 #16130f',
-  dropLg: '0 5px 0 #16130f',
+  card: '0 1px 2px rgba(64,56,47,.07), 0 10px 22px -12px rgba(64,56,47,.30)',
+  cardSoft: '0 1px 2px rgba(64,56,47,.06), 0 6px 16px -10px rgba(64,56,47,.24)',
+  drop: '0 1px 2px rgba(64,56,47,.10), 0 4px 10px -4px rgba(64,56,47,.22)',
+  dropSm: '0 1px 2px rgba(64,56,47,.10), 0 3px 8px -4px rgba(64,56,47,.20)',
+  dropLg: '0 2px 4px rgba(64,56,47,.10), 0 14px 28px -14px rgba(64,56,47,.34)',
 } as const
 
-/** Warm paper with a faint halftone grain. */
+/** Warm paper with the faintest tooth — no halftone dots. */
 export const paperTexture: CSSProperties = {
-  background: c.paper,
-  backgroundImage: 'radial-gradient(rgba(22,19,15,.05) 0.5px, transparent 0.6px)',
-  backgroundSize: '3px 3px',
+  // longhand only — mixing `background` with backgroundImage/Size/Position
+  // makes React warn about shorthand/longhand conflicts on re-render
+  backgroundColor: c.paper,
+  backgroundImage:
+    'radial-gradient(rgba(64,56,47,.028) 0.5px, transparent 0.6px), radial-gradient(rgba(64,56,47,.02) 0.5px, transparent 0.6px)',
+  backgroundSize: '7px 7px, 11px 11px',
+  backgroundPosition: '0 0, 3px 5px',
 }
 
-/** A tileable halftone dot overlay in a given ink, for print texture. */
+/** A tileable halftone dot overlay in a given ink (legacy; used sparingly). */
 export function halftone(color: string, size = 5): CSSProperties {
   return {
     backgroundImage: `radial-gradient(${color} 22%, transparent 23%)`,
@@ -80,12 +105,12 @@ export interface Ink {
   d: string
 }
 
-/** Marble inks — the riso spot set. */
+/** Marble inks — pigments, mixed a touch off-primary so they overlap well. */
 export const INKS: Ink[] = [
-  { c: '#ff2e7e', d: '#d81b60' },
-  { c: '#0a5af5', d: '#0842b0' },
-  { c: '#ffb800', d: '#d99500' },
-  { c: '#00a58a', d: '#007a66' },
+  { c: '#D8447A', d: '#B23561' },
+  { c: '#3C6BC4', d: '#2C4F94' },
+  { c: '#E0A33A', d: '#B8822A' },
+  { c: '#3E9481', d: '#2E7060' },
 ]
 
 export interface Pot {
@@ -96,10 +121,10 @@ export interface Pot {
 
 /** Colour-by-number pots, keyed by numeral. */
 export const POTS: Pot[] = [
-  { c: '#ffb800', d: '#d99500', n: 1 },
-  { c: '#ff2e7e', d: '#d81b60', n: 2 },
-  { c: '#00a58a', d: '#007a66', n: 3 },
-  { c: '#0a5af5', d: '#0842b0', n: 4 },
+  { c: '#E0A33A', d: '#B8822A', n: 1 },
+  { c: '#D8447A', d: '#B23561', n: 2 },
+  { c: '#3E9481', d: '#2E7060', n: 3 },
+  { c: '#3C6BC4', d: '#2C4F94', n: 4 },
 ]
 
 export function regionColor(n: number): string {
