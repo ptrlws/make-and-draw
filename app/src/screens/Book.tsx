@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Motif } from '../components/Motif'
-import { Halftone, IconButton, RisoButton } from '../components/riso'
+import { IconButton, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { sharePiece } from '../game/exporter'
 import { useLandscape } from '../hooks/useLandscape'
-import { c, fonts } from '../theme'
+import { c, fonts, shadows } from '../theme'
 import type { GalleryItem, GalleryType, KitId } from '../types'
 import { plural, poss } from '../utils'
 
@@ -75,14 +75,14 @@ export function Book() {
     inset: 0,
     display: 'flex',
     flexDirection: 'column',
-    background: c.paperBook,
-    backgroundImage: 'radial-gradient(rgba(22,19,15,.05) 0.5px, transparent 0.6px)',
+    backgroundColor: c.paperBook,
+    backgroundImage: 'radial-gradient(rgba(64,56,47,.035) 0.5px, transparent 0.6px)',
     backgroundSize: '3px 3px',
   }
   const pane: CSSProperties = {
     flex: 1,
-    background: '#fff',
-    border: `2.5px solid ${c.ink}`,
+    background: c.card,
+    border: 'none',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -98,7 +98,7 @@ export function Book() {
         <IconButton onClick={() => go('home')} ariaLabel="back" style={{ fontFamily: fonts.display, fontSize: 24 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 24, textTransform: 'uppercase', flex: 1 }}>{poss(state.name)} collection</div>
+        <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 24, letterSpacing: '-.01em', color: c.ink, flex: 1 }}>{poss(state.name)} collection</div>
         <IconButton
           onClick={() => {
             // real sharing: OS share sheet where available, PNG download otherwise
@@ -114,15 +114,15 @@ export function Book() {
           }}
           ariaLabel="share or save this piece"
         >
-          <span style={{ width: 13, height: 13, border: `2.5px solid ${c.ink}`, borderBottom: 'none', borderRadius: '3px 3px 0 0', position: 'relative' }}>
-            <span style={{ position: 'absolute', left: '50%', top: -7, transform: 'translateX(-50%)', width: 2.5, height: 9, background: c.ink }} />
+          <span style={{ width: 13, height: 13, border: `2px solid ${c.ink}`, borderBottom: 'none', borderRadius: '4px 4px 0 0', position: 'relative' }}>
+            <span style={{ position: 'absolute', left: '50%', top: -7, transform: 'translateX(-50%)', width: 2, height: 9, borderRadius: 1, background: c.ink }} />
           </span>
         </IconButton>
       </div>
 
       {pages.length === 0 ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 28, textAlign: 'center' }}>
-          <div style={{ fontFamily: fonts.display, fontSize: 30, textTransform: 'uppercase' }}>Nothing here yet</div>
+          <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 30, letterSpacing: '-.01em', color: c.ink }}>Nothing here yet</div>
           <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 14, color: c.hint, maxWidth: 300 }}>
             Your collection fills up as you make things — go dip a marble or colour a print.
           </div>
@@ -136,7 +136,7 @@ export function Book() {
                 play('pop')
                 showToast('back in the book!')
               }}
-              style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: '.04em', color: c.ink, background: c.yellow, border: `2.5px solid ${c.ink}`, borderRadius: 6, padding: '10px 16px', boxShadow: '0 3px 0 #16130f', cursor: 'pointer' }}
+              style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 14, color: c.ink, background: c.card, border: 'none', borderRadius: 14, padding: '11px 18px', boxShadow: shadows.dropSm, cursor: 'pointer' }}
             >
               ↶ undo remove
             </button>
@@ -154,10 +154,10 @@ export function Book() {
               position: 'relative',
               width: 'min(340px, 82vw)',
               aspectRatio: '3 / 3.7',
-              background: c.pink,
-              border: `4px solid ${c.ink}`,
-              borderRadius: '4px 10px 10px 4px',
-              boxShadow: `10px 10px 0 ${c.ink}`,
+              background: c.card,
+              border: 'none',
+              borderRadius: '6px 18px 18px 6px',
+              boxShadow: shadows.dropLg,
               overflow: 'hidden',
               cursor: 'pointer',
               display: 'flex',
@@ -165,16 +165,32 @@ export function Book() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 12,
-              color: c.paper,
+              color: c.ink,
             }}
           >
-            <Halftone opacity={0.14} />
-            <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 20, background: 'rgba(22,19,15,.28)', borderRight: `3px solid ${c.ink}` }} />
-            <div style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 12, letterSpacing: '.2em', textTransform: 'uppercase' }}>{poss(state.name)}</div>
-            <div style={{ fontFamily: fonts.display, fontSize: 'clamp(38px, 12vw, 56px)', lineHeight: 0.9, textTransform: 'uppercase', textAlign: 'center' }}>
+            <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 20, background: c.paperBody, boxShadow: `inset -1px 0 0 ${c.line}` }} />
+            {/* the newest piece is mounted on the cover — the book is only ever
+             * as colourful as the work inside it */}
+            {pages[0]?.img && (
+              <div
+                style={{
+                  width: '54%',
+                  aspectRatio: '1 / 1',
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                  background: c.paperBody,
+                  boxShadow: `0 0 0 1px ${c.line}, ${shadows.cardSoft}`,
+                  marginBottom: 4,
+                }}
+              >
+                <img src={pages[0].img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+            )}
+            <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 12, letterSpacing: '.18em', textTransform: 'uppercase', color: c.faint }}>{poss(state.name)}</div>
+            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(38px, 12vw, 56px)', lineHeight: 0.95, letterSpacing: '-.015em', textAlign: 'center' }}>
               Collection
             </div>
-            <div style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: '.1em', marginTop: 6 }}>{plural(pages.length, 'piece')} · tap to open</div>
+            <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: c.hint, marginTop: 6 }}>{plural(pages.length, 'piece')} · tap to open</div>
             {/* milestone ink stamps collect on the cover as the book fills */}
             {pages.length >= 1 && (
               <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
@@ -188,13 +204,14 @@ export function Book() {
                         width: 30,
                         height: 30,
                         borderRadius: '50%',
-                        border: `2.5px dashed ${c.paper}`,
+                        border: `1.5px dashed ${c.lineStrong}`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontFamily: fonts.display,
+                        fontWeight: 600,
                         fontSize: 12,
-                        color: c.paper,
+                        color: c.hint,
                         opacity: 0.9,
                         transform: `rotate(${(i % 2 ? -1 : 1) * (8 + i * 3)}deg)`,
                       }}
@@ -212,23 +229,24 @@ export function Book() {
             <div
               style={{
                 display: 'flex',
-                boxShadow: '8px 8px 0 rgba(22,19,15,.25)',
+                borderRadius: 16,
+                boxShadow: shadows.dropLg,
                 width: landscape ? 'min(720px, 94vw)' : 'min(96vw, 520px)',
                 height: landscape ? 'min(76vh, 520px)' : 'min(64vh, 440px)',
               }}
             >
               {/* left caption page */}
-              <div style={{ ...pane, borderRight: 'none', borderRadius: '8px 0 0 8px', background: c.card, gap: 12, boxShadow: 'inset -12px 0 22px -16px rgba(22,19,15,.35)' }}>
-                <div style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 12, letterSpacing: '.16em', textTransform: 'uppercase', color: c.pink }}>{KICKER[cur.type]}</div>
-                <div style={{ fontFamily: fonts.display, fontSize: 'clamp(24px, 5vw, 32px)', textTransform: 'uppercase', textAlign: 'center', lineHeight: 1 }}>{cur.title}</div>
+              <div style={{ ...pane, borderRadius: '16px 0 0 16px', gap: 12, boxShadow: 'inset -12px 0 22px -18px rgba(64,56,47,.30)' }}>
+                <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 12, letterSpacing: '.16em', textTransform: 'uppercase', color: c.faint }}>{KICKER[cur.type]}</div>
+                <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(24px, 5vw, 32px)', letterSpacing: '-.01em', textAlign: 'center', lineHeight: 1.05, color: c.ink }}>{cur.title}</div>
                 <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: c.hint }}>{note}</div>
               </div>
               {/* right art page — flips in on each turn */}
               <div
                 key={clamped}
-                style={{ ...pane, borderRadius: '0 8px 8px 0', transformOrigin: 'left center', animation: 'pageturn .55s cubic-bezier(.3,.1,.2,1)', boxShadow: 'inset 12px 0 22px -16px rgba(22,19,15,.35)' }}
+                style={{ ...pane, borderRadius: '0 16px 16px 0', transformOrigin: 'left center', animation: 'pageturn .55s cubic-bezier(.3,.1,.2,1)', boxShadow: 'inset 12px 0 22px -18px rgba(64,56,47,.30)' }}
               >
-                <div style={{ width: 'min(100%, 78%)', aspectRatio: '1 / 1', border: `2.5px solid ${c.ink}`, borderRadius: 4, overflow: 'hidden', background: c.paper }}>
+                <div style={{ width: 'min(100%, 78%)', aspectRatio: '1 / 1', border: 'none', borderRadius: 12, overflow: 'hidden', background: c.paper, boxShadow: `0 0 0 1px ${c.line}, ${shadows.cardSoft}` }}>
                   <Motif item={cur} />
                 </div>
                 {justMade && clamped === 0 && (
@@ -237,24 +255,22 @@ export function Book() {
                       position: 'absolute',
                       top: 12,
                       right: 12,
-                      fontFamily: fonts.body,
-                      fontWeight: 800,
-                      fontSize: 11,
-                      letterSpacing: '.08em',
-                      textTransform: 'uppercase',
-                      color: c.ink,
-                      background: c.yellow,
-                      border: `2px solid ${c.ink}`,
-                      borderRadius: 5,
-                      padding: '4px 8px',
+                      fontFamily: fonts.display,
+                      fontWeight: 600,
+                      fontSize: 11.5,
+                      color: c.card,
+                      background: c.ink,
+                      border: 'none',
+                      borderRadius: 999,
+                      padding: '5px 11px',
                       transform: 'rotate(6deg)',
-                      boxShadow: '0 2px 0 #16130f',
+                      boxShadow: shadows.dropSm,
                     }}
                   >
                     just made ✓
                   </div>
                 )}
-                <div style={{ position: 'absolute', bottom: 8, right: 12, fontFamily: fonts.body, fontWeight: 800, fontSize: 11, color: c.faint }}>no. {clamped + 1}</div>
+                <div style={{ position: 'absolute', bottom: 8, right: 12, fontFamily: fonts.body, fontWeight: 600, fontSize: 11, color: c.faint }}>no. {clamped + 1}</div>
               </div>
             </div>
           </div>
@@ -263,7 +279,7 @@ export function Book() {
             <IconButton onClick={() => turn(-1)} ariaLabel="previous" size={54} style={{ fontFamily: fonts.display, fontSize: 26 }}>
               ‹
             </IconButton>
-            <div style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: '.06em', color: c.hint, minWidth: 90, textAlign: 'center' }}>
+            <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: c.hint, minWidth: 90, textAlign: 'center' }}>
               {clamped + 1} of {pages.length}
             </div>
             <IconButton onClick={() => turn(1)} ariaLabel="next" size={54} style={{ fontFamily: fonts.display, fontSize: 26 }}>
@@ -272,10 +288,10 @@ export function Book() {
           </div>
           {confirmDel ? (
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', paddingBottom: 18, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.ink }}>Remove this piece?</span>
+              <span style={{ fontFamily: fonts.display, fontWeight: 550, fontSize: 14, color: c.ink }}>Remove this piece?</span>
               <button
                 onClick={() => setConfirmDel(false)}
-                style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: c.ink, background: '#fff', border: `2.5px solid ${c.ink}`, borderRadius: 6, padding: '9px 14px', minHeight: 40, boxShadow: '0 3px 0 #16130f', cursor: 'pointer' }}
+                style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.ink, background: c.card, border: 'none', borderRadius: 13, padding: '9px 16px', minHeight: 40, boxShadow: shadows.dropSm, cursor: 'pointer' }}
               >
                 Keep it
               </button>
@@ -290,14 +306,14 @@ export function Book() {
                   setConfirmDel(false)
                   if (clamped >= pages.length - 1) setIdx(Math.max(0, clamped - 1))
                 }}
-                style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: c.paper, background: c.pink, border: `2.5px solid ${c.ink}`, borderRadius: 6, padding: '9px 14px', minHeight: 40, boxShadow: '0 3px 0 #16130f', cursor: 'pointer' }}
+                style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.card, background: c.ink, border: 'none', borderRadius: 13, padding: '9px 16px', minHeight: 40, boxShadow: shadows.drop, cursor: 'pointer' }}
               >
                 Remove
               </button>
             </div>
           ) : trash ? (
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', paddingBottom: 18, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>removed “{trash.item.title}”</span>
+              <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: c.hint }}>removed “{trash.item.title}”</span>
               <button
                 onClick={() => {
                   clearTimeout(trashTimer.current)
@@ -307,7 +323,7 @@ export function Book() {
                   play('pop')
                   showToast('back in the book!')
                 }}
-                style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: c.ink, background: c.yellow, border: `2.5px solid ${c.ink}`, borderRadius: 6, padding: '9px 14px', minHeight: 40, boxShadow: '0 3px 0 #16130f', cursor: 'pointer' }}
+                style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.ink, background: c.card, border: 'none', borderRadius: 13, padding: '9px 16px', minHeight: 40, boxShadow: shadows.dropSm, cursor: 'pointer' }}
               >
                 ↶ undo
               </button>
@@ -339,14 +355,14 @@ export function Book() {
                   })
                 }}
                 aria-label="share or save this piece"
-                style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: c.ink, background: 'transparent', border: 'none', padding: '9px 8px', cursor: 'pointer', textDecoration: 'underline' }}
+                style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.ink, background: 'transparent', border: 'none', padding: '9px 10px', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3 }}
               >
                 share ↗
               </button>
               <button
                 onClick={() => setConfirmDel(true)}
                 aria-label="remove this piece"
-                style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.04em', color: c.hint, background: 'transparent', border: 'none', padding: '9px 8px', cursor: 'pointer' }}
+                style={{ fontFamily: fonts.display, fontWeight: 550, fontSize: 13, color: c.hint, background: 'transparent', border: 'none', padding: '9px 10px', cursor: 'pointer' }}
               >
                 remove
               </button>

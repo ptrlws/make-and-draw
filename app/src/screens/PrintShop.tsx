@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { IconButton } from '../components/riso'
+import { IconButton, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { loadStock } from '../game/stock'
-import { INKS, c, fonts } from '../theme'
+import { INKS, c, fonts, shadows } from '../theme'
 
 const STAMPS = ['Circle', 'Square', 'Triangle', 'Diamond', 'Bar'] as const
 const PAPER = '#f4f1e7'
@@ -37,20 +37,23 @@ function drawStampOn(ctx: CanvasRenderingContext2D, W: number, H: number, nx: nu
   ctx.fill()
 }
 
+/** Tool chip: paper-white, borderless, lifted by a soft contact shadow. */
 const chip: CSSProperties = {
-  fontFamily: fonts.body,
-  fontWeight: 800,
-  fontSize: 13,
-  textTransform: 'uppercase',
-  letterSpacing: '.04em',
+  fontFamily: fonts.display,
+  fontWeight: 600,
+  fontSize: 14,
+  letterSpacing: '-.005em',
   color: c.ink,
-  background: '#fff',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 6,
-  padding: '9px 13px',
-  boxShadow: '0 3px 0 #16130f',
+  background: c.card,
+  border: 'none',
+  borderRadius: 12,
+  padding: '10px 15px',
+  boxShadow: shadows.dropSm,
   cursor: 'pointer',
 }
+
+/** Header actions run at chip scale rather than full RisoButton size. */
+const headerBtn: CSSProperties = { fontSize: 14, padding: '10px 16px', borderRadius: 12 }
 
 export function PrintShop() {
   const { go, play, startFinish } = useGame()
@@ -259,33 +262,35 @@ export function PrintShop() {
         <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 24, textTransform: 'uppercase', flex: 1 }}>Print shop</div>
-        <button onClick={undo} style={chip}>
+        <div style={{ fontFamily: fonts.display, fontSize: 22, fontWeight: 550, letterSpacing: '-.015em', color: c.ink, flex: 1 }}>Print shop</div>
+        <RisoButton onClick={undo} variant="plain" style={headerBtn}>
           Undo
-        </button>
-        <button onClick={clear} style={chip}>
+        </RisoButton>
+        <RisoButton onClick={clear} variant="plain" style={headerBtn}>
           Clear
-        </button>
-        <button onClick={keep} style={{ ...chip, background: c.teal, color: c.ink }}>
+        </RisoButton>
+        <RisoButton onClick={keep} variant="confirm" style={headerBtn}>
           Print it ✓
-        </button>
+        </RisoButton>
       </div>
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
         <div
           style={{
             position: 'relative',
-            background: '#fff',
-            border: `3px solid ${c.ink}`,
-            borderRadius: 6,
-            boxShadow: `6px 6px 0 ${c.yellow}`,
+            background: c.card,
+            border: 'none',
+            borderRadius: 20,
+            boxShadow: shadows.dropLg,
             padding: 10,
             transform: pressing ? 'scaleY(.98)' : undefined,
             transition: 'transform .2s ease',
           }}
         >
-          <div ref={wrapRef} style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', position: 'relative' }}>
+          <div ref={wrapRef} style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 12, overflow: 'hidden', position: 'relative' }}>
             <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none', cursor: 'crosshair' }} />
+            {/* hairline seat for the sheet — the only boundary in the chrome */}
+            <div aria-hidden style={{ position: 'absolute', inset: 0, borderRadius: 12, boxShadow: `inset 0 0 0 1px ${c.line}`, pointerEvents: 'none' }} />
             {pressing && (
               <div
                 aria-hidden
@@ -295,9 +300,9 @@ export function PrintShop() {
                   right: -6,
                   top: 0,
                   height: 44,
-                  background: `linear-gradient(180deg, ${c.ink}, #3a352c)`,
+                  background: `linear-gradient(180deg, ${c.inkSoft}, ${c.ink})`,
                   borderRadius: 22,
-                  boxShadow: '0 8px 16px rgba(22,19,15,.45)',
+                  boxShadow: shadows.dropLg,
                   animation: 'pressSweep .74s cubic-bezier(.5,.05,.5,1) both',
                 }}
               />
@@ -307,7 +312,7 @@ export function PrintShop() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', padding: '4px 16px 22px' }}>
-        <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>stamp shapes — overlaps overprint into new colours</div>
+        <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>stamp shapes — overlaps overprint into new colours</div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
           {INKS.map((k, i) => (
             <button
@@ -323,8 +328,9 @@ export function PrintShop() {
                 height: 44,
                 borderRadius: '50%',
                 background: k.c,
-                border: ink === i ? `4px solid ${c.ink}` : '3px solid rgba(22,19,15,.3)',
-                boxShadow: `0 4px 0 ${k.d}`,
+                border: 'none',
+                // the pot itself is pigment; selection is a soft paper-gapped ring
+                boxShadow: ink === i ? `0 0 0 3px ${c.paper}, 0 0 0 5px ${c.ink}, ${shadows.dropSm}` : shadows.dropSm,
                 transform: ink === i ? 'scale(1.12)' : undefined,
                 transition: 'transform .12s',
                 cursor: 'pointer',
@@ -333,9 +339,9 @@ export function PrintShop() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Stamp</span>
+          <span style={{ fontFamily: fonts.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.1em', fontSize: 11, color: c.faint }}>Stamp</span>
           {STAMPS.map((label, i) => (
-            <button key={label} onClick={() => { setStamp(i); play('select') }} aria-pressed={i === stamp} style={{ ...chip, background: i === stamp ? c.ink : '#fff', color: i === stamp ? c.paper : c.ink }}>
+            <button key={label} onClick={() => { setStamp(i); play('select') }} aria-pressed={i === stamp} style={{ ...chip, background: i === stamp ? c.ink : c.card, color: i === stamp ? c.card : c.ink }}>
               {label}
             </button>
           ))}
@@ -349,7 +355,7 @@ export function PrintShop() {
                 play('page')
               }}
               aria-pressed={onMarble}
-              style={{ ...chip, background: onMarble ? c.ink : '#fff', color: onMarble ? c.paper : c.ink }}
+              style={{ ...chip, background: onMarble ? c.ink : c.card, color: onMarble ? c.card : c.ink }}
             >
               ❖ marbled paper
             </button>

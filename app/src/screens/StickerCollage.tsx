@@ -5,7 +5,7 @@ import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { loadStock } from '../game/stock'
-import { INKS, c, fonts } from '../theme'
+import { INKS, c, fonts, shadows } from '../theme'
 
 const MOTIFS = ['Star', 'Heart', 'Flower', 'Cloud', 'Blob', 'Bolt', 'Ring'] as const
 type Motif = (typeof MOTIFS)[number]
@@ -23,18 +23,16 @@ interface Sticker {
 }
 
 const chip: CSSProperties = {
-  fontFamily: fonts.body,
-  fontWeight: 800,
-  fontSize: 13,
-  textTransform: 'uppercase',
-  letterSpacing: '.04em',
+  fontFamily: fonts.display,
+  fontWeight: 600,
+  fontSize: 14,
   color: c.ink,
-  background: '#fff',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 6,
-  padding: '11px 13px',
+  background: c.card,
+  border: 'none',
+  borderRadius: 14,
+  padding: '11px 15px',
   minHeight: 44,
-  boxShadow: '0 3px 0 #16130f',
+  boxShadow: shadows.dropSm,
   cursor: 'pointer',
 }
 
@@ -44,7 +42,7 @@ function Shape({ motif, S, ink }: { motif: Motif; S: number; ink: string }) {
     stroke: '#ffffff',
     strokeWidth: 5,
     strokeScaleEnabled: false,
-    shadowColor: '#16130f',
+    shadowColor: c.ink,
     shadowBlur: 8,
     shadowOpacity: 0.25,
     shadowOffsetY: 3,
@@ -386,21 +384,31 @@ export function StickerCollage() {
         <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 24, textTransform: 'uppercase', flex: 1 }}>Sticker collage</div>
+        <div style={{ fontFamily: fonts.display, fontSize: 24, fontWeight: 600, color: c.ink, flex: 1 }}>Sticker collage</div>
         <button onClick={undo} style={chip}>
           Undo
         </button>
         <button onClick={clear} style={chip}>
           Clear
         </button>
-        <button onClick={keep} style={{ ...chip, background: c.teal, color: c.ink }}>
+        <button onClick={keep} style={{ ...chip, background: c.ink, color: c.card, boxShadow: shadows.drop }}>
           Keep ✓
         </button>
       </div>
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-        <div style={{ position: 'relative', background: '#fff', border: `3px solid ${c.ink}`, borderRadius: 6, boxShadow: `6px 6px 0 ${c.blue}`, padding: 10 }}>
-          <div ref={wrapRef} style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', touchAction: 'none' }}>
+        <div style={{ position: 'relative', background: c.card, border: 'none', borderRadius: 18, boxShadow: shadows.dropLg, padding: 10 }}>
+          <div
+            ref={wrapRef}
+            style={{
+              width: 'min(560px, 88vw, 74vh)',
+              aspectRatio: '1 / 1',
+              borderRadius: 10,
+              overflow: 'hidden',
+              touchAction: 'none',
+              boxShadow: `0 0 0 1px ${c.line}`,
+            }}
+          >
             {size.w > 0 && (
               <Stage
                 ref={stageRef}
@@ -460,15 +468,22 @@ export function StickerCollage() {
                 height: 44,
                 borderRadius: '50%',
                 background: k.c,
-                border: ink === i ? `4px solid ${c.ink}` : '3px solid rgba(22,19,15,.3)',
-                boxShadow: `0 4px 0 ${k.d}`,
+                border: 'none',
+                boxShadow:
+                  ink === i
+                    ? `0 0 0 3px ${c.card}, 0 0 0 4.5px ${c.ink}, ${shadows.drop}`
+                    : `inset 0 0 0 1px rgba(64,56,47,.10), ${shadows.dropSm}`,
                 transform: ink === i ? 'scale(1.12)' : undefined,
                 transition: 'transform .12s',
                 cursor: 'pointer',
               }}
             />
           ))}
-          <button onClick={() => (tumble ? disableTumble() : enableTumble())} aria-pressed={tumble} style={{ ...chip, marginLeft: 6, background: tumble ? c.ink : '#fff', color: tumble ? c.paper : c.ink }}>
+          <button
+            onClick={() => (tumble ? disableTumble() : enableTumble())}
+            aria-pressed={tumble}
+            style={{ ...chip, marginLeft: 6, background: tumble ? c.ink : c.card, color: tumble ? c.card : c.ink }}
+          >
             {tumble ? '✦ tumble' : '↯ tumble'}
           </button>
           {patternPaper && (
@@ -478,16 +493,21 @@ export function StickerCollage() {
                 play('page')
               }}
               aria-pressed={usePaper}
-              style={{ ...chip, background: usePaper ? c.ink : '#fff', color: usePaper ? c.paper : c.ink }}
+              style={{ ...chip, background: usePaper ? c.ink : c.card, color: usePaper ? c.card : c.ink }}
             >
               ❖ your paper
             </button>
           )}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Sticker</span>
+          <span style={{ fontFamily: fonts.body, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 11, color: c.faint }}>Sticker</span>
           {MOTIFS.map((label, i) => (
-            <button key={label} onClick={() => setMotif(i)} aria-pressed={i === motif} style={{ ...chip, padding: '9px 13px', background: i === motif ? c.ink : '#fff', color: i === motif ? c.paper : c.ink }}>
+            <button
+              key={label}
+              onClick={() => setMotif(i)}
+              aria-pressed={i === motif}
+              style={{ ...chip, padding: '9px 14px', borderRadius: 12, background: i === motif ? c.ink : c.card, color: i === motif ? c.card : c.ink }}
+            >
               {label}
             </button>
           ))}

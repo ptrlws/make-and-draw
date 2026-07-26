@@ -75,13 +75,13 @@ export function printHtml(bodyHtml: string, title: string): void {
   frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
 <style>
   @page { margin: 12mm; }
-  body { font-family: -apple-system, 'Segoe UI', sans-serif; color: #16130f; margin: 0; }
-  h1 { font-size: 20px; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 2mm; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; color: #40382F; margin: 0; }
+  h1 { font-size: 20px; letter-spacing: -.01em; margin: 0 0 2mm; }
   .sub { font-size: 11px; color: #6f675a; margin: 0 0 5mm; }
   svg { width: 100%; height: auto; }
   .legend { display: flex; flex-wrap: wrap; gap: 4mm; margin-top: 5mm; }
   .swatch { display: flex; align-items: center; gap: 2mm; font-size: 12px; font-weight: 700; }
-  .swatch i { width: 8mm; height: 8mm; border: 1px solid #16130f; border-radius: 2mm; display: inline-block; }
+  .swatch i { width: 8mm; height: 8mm; border: 1px solid rgba(64,56,47,.35); border-radius: 2mm; display: inline-block; }
 </style></head><body>${bodyHtml}</body></html>`
   document.body.appendChild(frame)
   frame.onload = () => {

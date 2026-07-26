@@ -5,7 +5,7 @@ import getStroke from 'perfect-freehand'
 import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
-import { INKS, c, fonts } from '../theme'
+import { INKS, c, fonts, shadows } from '../theme'
 
 const PAPER = '#f4f1e7'
 
@@ -45,18 +45,16 @@ function mirrorY(pts: number[], cy: number): number[] {
 }
 
 const chip: CSSProperties = {
-  fontFamily: fonts.body,
-  fontWeight: 800,
-  fontSize: 13,
-  textTransform: 'uppercase',
-  letterSpacing: '.04em',
+  fontFamily: fonts.display,
+  fontWeight: 600,
+  fontSize: 14,
   color: c.ink,
-  background: '#fff',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 6,
-  padding: '11px 13px',
+  background: c.card,
+  border: 'none',
+  borderRadius: 14,
+  padding: '11px 16px',
   minHeight: 44,
-  boxShadow: '0 3px 0 #16130f',
+  boxShadow: shadows.dropSm,
   cursor: 'pointer',
 }
 
@@ -291,14 +289,21 @@ export function Butterfly() {
         <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 24, textTransform: 'uppercase', flex: 1 }}>{quad ? 'Mandala' : 'Butterfly'}</div>
+        <div style={{ fontFamily: fonts.display, fontSize: 24, fontWeight: 600, color: c.ink, flex: 1 }}>{quad ? 'Mandala' : 'Butterfly'}</div>
         <button onClick={undo} style={chip}>
           Undo
         </button>
         <button onClick={clear} style={chip}>
           Clear
         </button>
-        <button onClick={keep} style={{ ...chip, background: fresh.length === 0 && committed.length > 0 ? c.teal : c.disabled, color: c.ink }}>
+        <button
+          onClick={keep}
+          style={
+            fresh.length === 0 && committed.length > 0
+              ? { ...chip, background: c.ink, color: c.card, boxShadow: shadows.drop }
+              : { ...chip, color: c.faint }
+          }
+        >
           Keep ✓
         </button>
       </div>
@@ -307,18 +312,27 @@ export function Butterfly() {
         <div
           style={{
             position: 'relative',
-            background: '#fff',
-            border: `3px solid ${c.ink}`,
-            borderRadius: 6,
-            boxShadow: `6px 6px 0 ${INKS[ink].c}`,
-            padding: 10,
+            background: c.card,
+            border: 'none',
+            borderRadius: 20,
+            boxShadow: shadows.dropLg,
+            padding: 12,
             transform: ritual === 'pressing' ? 'scale(.965)' : undefined,
             transition: 'transform .25s ease',
           }}
         >
           <div
             ref={wrapRef}
-            style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', touchAction: 'none', position: 'relative', perspective: 1100 }}
+            style={{
+              width: 'min(560px, 88vw, 74vh)',
+              aspectRatio: '1 / 1',
+              borderRadius: 12,
+              overflow: 'hidden',
+              touchAction: 'none',
+              position: 'relative',
+              perspective: 1100,
+              boxShadow: `inset 0 0 0 1px ${c.line}`,
+            }}
             onPointerDown={pressDown}
             onPointerUp={pressUp}
             onPointerCancel={pressUp}
@@ -341,11 +355,11 @@ export function Butterfly() {
                 </Layer>
                 {/* guides live on their own layer so exports can hide them */}
                 <Layer ref={guideRef} listening={false}>
-                  <Line points={[cx, 8, cx, size.h - 8]} stroke="rgba(22,19,15,.14)" strokeWidth={1.5} dash={[5, 6]} />
-                  {quad && <Line points={[8, cy, size.w - 8, cy]} stroke="rgba(22,19,15,.14)" strokeWidth={1.5} dash={[5, 6]} />}
+                  <Line points={[cx, 8, cx, size.h - 8]} stroke="rgba(64,56,47,.16)" strokeWidth={1.5} dash={[5, 6]} />
+                  {quad && <Line points={[8, cy, size.w - 8, cy]} stroke="rgba(64,56,47,.16)" strokeWidth={1.5} dash={[5, 6]} />}
                   {!quad &&
                     [1, -1].map((sx, i) => (
-                      <Path key={i} data={wing} x={cx} y={cy} scaleX={sx * g} scaleY={g} stroke="rgba(22,19,15,.16)" strokeWidth={2} />
+                      <Path key={i} data={wing} x={cx} y={cy} scaleX={sx * g} scaleY={g} stroke="rgba(64,56,47,.18)" strokeWidth={2} />
                     ))}
                 </Layer>
                 <Layer listening={false}>
@@ -381,8 +395,8 @@ export function Butterfly() {
                   backgroundSize: flapImg ? '200% 100%' : undefined,
                   backgroundPosition: 'left center',
                   backgroundRepeat: 'no-repeat',
-                  borderRight: `2px dashed rgba(22,19,15,.25)`,
-                  boxShadow: folded ? '-14px 0 22px rgba(22,19,15,.28)' : '2px 0 8px rgba(22,19,15,.12)',
+                  borderRight: `2px dashed rgba(64,56,47,.25)`,
+                  boxShadow: folded ? '-14px 0 22px rgba(64,56,47,.28)' : '2px 0 8px rgba(64,56,47,.12)',
                   display: 'flex',
                   alignItems: 'flex-end',
                   justifyContent: 'center',
@@ -396,7 +410,7 @@ export function Butterfly() {
                     style={{
                       fontFamily: fonts.display,
                       fontSize: 16,
-                      textTransform: 'uppercase',
+                      fontWeight: 600,
                       color: c.ink,
                       opacity: 0.55,
                       transform: 'scaleX(-1)',
@@ -414,7 +428,7 @@ export function Butterfly() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', padding: '4px 16px 22px' }}>
-        <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: ritual === 'folded' ? c.pink : c.hint }} aria-live="polite">
+        <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: ritual === 'folded' ? c.ink : c.hint }} aria-live="polite">
           {hint}
         </div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -432,8 +446,11 @@ export function Butterfly() {
                 height: 44,
                 borderRadius: '50%',
                 background: k.c,
-                border: ink === i ? `4px solid ${c.ink}` : '3px solid rgba(22,19,15,.3)',
-                boxShadow: `0 4px 0 ${k.d}`,
+                border: 'none',
+                boxShadow:
+                  ink === i
+                    ? `0 0 0 3px ${c.card}, 0 0 0 5px ${c.ink}, ${shadows.drop}`
+                    : `inset 0 0 0 1px rgba(64,56,47,.12), ${shadows.dropSm}`,
                 transform: ink === i ? 'scale(1.12)' : undefined,
                 transition: 'transform .12s',
                 cursor: 'pointer',
@@ -448,9 +465,11 @@ export function Butterfly() {
             style={{
               ...chip,
               fontSize: 15,
-              padding: '12px 20px',
-              background: fresh.length > 0 ? c.pink : '#fff',
-              color: c.ink,
+              padding: '12px 22px',
+              borderRadius: 16,
+              background: fresh.length > 0 ? c.ink : c.card,
+              color: fresh.length > 0 ? c.card : c.ink,
+              boxShadow: fresh.length > 0 ? shadows.drop : shadows.dropSm,
               animation: fresh.length > 0 && ritual === 'paint' ? 'popin .4s ease-out' : undefined,
               opacity: ritual === 'paint' ? 1 : 0.5,
             }}
@@ -464,7 +483,7 @@ export function Butterfly() {
               play('select')
             }}
             aria-pressed={quad}
-            style={{ ...chip, background: quad ? c.ink : '#fff', color: quad ? c.paper : c.ink }}
+            style={{ ...chip, background: quad ? c.ink : c.card, color: quad ? c.card : c.ink, boxShadow: quad ? shadows.drop : shadows.dropSm }}
           >
             {quad ? '✦ 4-way' : '❋ 2-way'}
           </button>

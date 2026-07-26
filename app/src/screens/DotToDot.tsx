@@ -3,7 +3,7 @@ import { IconButton } from '../components/riso'
 import { DOT_SVGS } from '../dots/dotSvgs'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
-import { c, fonts } from '../theme'
+import { c, fonts, shadows } from '../theme'
 import { buildParticles } from '../utils'
 
 const PAPER = '#f4f1e7'
@@ -383,21 +383,20 @@ const centroid = (pts: Pt[]): Pt => {
 }
 
 const chip: CSSProperties = {
-  fontFamily: fonts.body,
-  fontWeight: 800,
-  fontSize: 13,
-  textTransform: 'uppercase',
-  letterSpacing: '.04em',
+  fontFamily: fonts.display,
+  fontWeight: 600,
+  fontSize: 15,
+  letterSpacing: '-.005em',
   color: c.ink,
-  background: '#fff',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 8,
-  padding: '0 14px',
+  background: c.card,
+  border: 'none',
+  borderRadius: 14,
+  padding: '0 16px',
   height: 44,
   display: 'inline-flex',
   alignItems: 'center',
   gap: 4,
-  boxShadow: '0 3px 0 #16130f',
+  boxShadow: shadows.dropSm,
   cursor: 'pointer',
 }
 
@@ -562,7 +561,7 @@ export function DotToDot() {
       showToast('join every dot first!')
       return
     }
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${VW} ${VH}'><rect width='${VW}' height='${VH}' fill='${PAPER}'/><path d='${puz.path}' fill='${puz.color}' stroke='#16130f' stroke-width='4' stroke-linejoin='round'/></svg>`
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${VW} ${VH}'><rect width='${VW}' height='${VH}' fill='${PAPER}'/><path d='${puz.path}' fill='${puz.color}' stroke='${c.ink}' stroke-width='4' stroke-linejoin='round'/></svg>`
     const url = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
     clearDraft('dot')
     setView('pick') // primed for "make another" when the ritual clears
@@ -578,8 +577,8 @@ export function DotToDot() {
             ‹
           </IconButton>
           <div>
-            <div style={{ fontFamily: fonts.display, fontSize: 24, textTransform: 'uppercase', lineHeight: 1 }}>Dot to dot</div>
-            <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint, marginTop: 2 }}>pick something to join</div>
+            <div style={{ fontFamily: fonts.display, fontSize: 24, fontWeight: 550, letterSpacing: '-.015em', lineHeight: 1.1, color: c.ink }}>Dot to dot</div>
+            <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint, marginTop: 3 }}>pick something to join</div>
           </div>
         </div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '4px 16px calc(24px + env(safe-area-inset-bottom))' }}>
@@ -590,15 +589,15 @@ export function DotToDot() {
                 <button
                   key={p.id}
                   onClick={() => open(i)}
-                  style={{ position: 'relative', textAlign: 'left', background: c.card, border: `3px solid ${c.ink}`, borderRadius: 12, boxShadow: `5px 5px 0 ${spot}`, padding: 8, cursor: 'pointer' }}
+                  style={{ position: 'relative', textAlign: 'left', background: c.card, border: 'none', borderRadius: 18, boxShadow: shadows.card, padding: 8, cursor: 'pointer' }}
                 >
-                  <div style={{ position: 'relative', aspectRatio: '4 / 5', background: PAPER, borderRadius: 4, overflow: 'hidden', border: `1.5px solid rgba(22,19,15,.15)` }}>
+                  <div style={{ position: 'relative', aspectRatio: '4 / 5', background: PAPER, borderRadius: 12, overflow: 'hidden', border: 'none', boxShadow: `inset 0 0 0 1px ${c.line}` }}>
                     <Preview p={p} spot={spot} />
-                    <span style={{ position: 'absolute', top: 6, left: 6, background: PAPER, border: `2px solid ${c.ink}`, borderRadius: 8, padding: '1px 6px', fontFamily: fonts.body, fontWeight: 800, fontSize: 10, textTransform: 'uppercase', color: c.ink }}>
+                    <span style={{ position: 'absolute', top: 6, left: 6, background: c.card, border: 'none', borderRadius: 999, padding: '2px 8px', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 600, fontSize: 10, letterSpacing: '.07em', textTransform: 'uppercase', color: c.faint }}>
                       {p.dots.length} dots
                     </span>
                   </div>
-                  <div style={{ fontFamily: fonts.display, fontSize: 15, textTransform: 'uppercase', textAlign: 'center', marginTop: 6, color: c.ink }}>{p.name}</div>
+                  <div style={{ fontFamily: fonts.display, fontSize: 15, fontWeight: 550, letterSpacing: '-.01em', textAlign: 'center', marginTop: 8, color: c.ink }}>{p.name}</div>
                 </button>
               )
             })}
@@ -613,10 +612,10 @@ export function DotToDot() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <button onClick={() => setView('pick')} style={{ ...chip, background: '#fff' }} aria-label="back to shapes">
+        <button onClick={() => setView('pick')} style={chip} aria-label="back to shapes">
           <span style={{ fontFamily: fonts.display, fontSize: 18, marginRight: 2 }}>‹</span> Shapes
         </button>
-        <div style={{ flex: 1, minWidth: 0, textAlign: 'center', fontFamily: fonts.display, fontSize: 'clamp(13px, 4.2vw, 20px)', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{puz.name}</div>
+        <div style={{ flex: 1, minWidth: 0, textAlign: 'center', fontFamily: fonts.display, fontWeight: 550, letterSpacing: '-.01em', color: c.ink, fontSize: 'clamp(13px, 4.2vw, 20px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{puz.name}</div>
         <IconButton onClick={undo} ariaLabel="undo last dot" size={44} style={{ fontFamily: fonts.display, fontSize: 20 }}>
           ↶
         </IconButton>
@@ -626,15 +625,15 @@ export function DotToDot() {
         <button
           onClick={keep}
           aria-disabled={!done}
-          style={{ ...chip, background: done ? c.teal : c.disabled, color: c.ink, boxShadow: done ? '0 4px 0 #16130f' : 'none', animation: done ? 'popin .5s ease-out' : undefined }}
+          style={{ ...chip, background: done ? c.ink : c.disabled, color: done ? c.card : c.hint, boxShadow: done ? shadows.drop : 'none', animation: done ? 'popin .5s ease-out' : undefined }}
         >
           Keep ✓
         </button>
       </div>
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-        <div style={{ position: 'relative', background: '#fff', border: `3px solid ${c.ink}`, borderRadius: 6, boxShadow: `6px 6px 0 ${puz.color}`, padding: 8 }}>
-          <div style={{ width: 'min(420px, 88vw)', aspectRatio: `${VW} / ${VH}`, borderRadius: 3, overflow: 'hidden', background: PAPER, touchAction: 'none', animation: done ? 'wobble .8s ease-in-out 1s' : undefined }}>
+        <div style={{ position: 'relative', background: c.card, border: 'none', borderRadius: 20, boxShadow: shadows.dropLg, padding: 8 }}>
+          <div style={{ width: 'min(420px, 88vw)', aspectRatio: `${VW} / ${VH}`, borderRadius: 13, overflow: 'hidden', background: PAPER, boxShadow: `inset 0 0 0 1px ${c.line}`, touchAction: 'none', animation: done ? 'wobble .8s ease-in-out 1s' : undefined }}>
             <svg
               ref={svgRef}
               viewBox={`0 0 ${VW} ${VH}`}
@@ -699,7 +698,7 @@ export function DotToDot() {
             </svg>
           </div>
           {done && (
-            <div style={{ position: 'absolute', inset: 8, pointerEvents: 'none', overflow: 'hidden', borderRadius: 3 }}>
+            <div style={{ position: 'absolute', inset: 8, pointerEvents: 'none', overflow: 'hidden', borderRadius: 13 }}>
               <div style={{ position: 'absolute', top: 0, bottom: 0, width: 70, background: 'linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent)', animation: 'shim 1.1s ease-out 1s' }} />
               {buildParticles(reducedMotion || state.calm).map((p, i) => (
                 <span
@@ -727,11 +726,11 @@ export function DotToDot() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center', padding: '4px 16px 22px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: 'min(260px, 72vw)' }}>
-          <div style={{ flex: 1, height: 8, background: c.toggleOff, borderRadius: 5, overflow: 'hidden', border: `1.5px solid ${c.ink}` }}>
-            <div style={{ width: `${(n / N) * 100}%`, height: '100%', background: c.teal, transition: 'width .2s' }} />
+          <div style={{ flex: 1, height: 8, background: c.toggleOff, borderRadius: 999, overflow: 'hidden', border: 'none' }}>
+            <div style={{ width: `${(n / N) * 100}%`, height: '100%', background: c.ink, borderRadius: 999, transition: 'width .2s' }} />
           </div>
         </div>
-        <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>
+        <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>
           {done ? 'done — press keep! ✨' : n === 0 ? 'start at dot 1' : `join dot ${n + 1} of ${N}`}
         </div>
       </div>

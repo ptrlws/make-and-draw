@@ -9,7 +9,7 @@ import { Profiles } from './screens/Profiles'
 import { FinishingRitual } from './overlays/FinishingRitual'
 import { Settings } from './overlays/Settings'
 import { Toast } from './overlays/Toast'
-import { c, fonts, paperTexture } from './theme'
+import { c, fonts, paperTexture, shadows } from './theme'
 
 // Heavy engines are loaded only when their activity is opened:
 //   Marble → three.js, ColourByNumber → konva, PatternLab → canvas 2d.
@@ -89,13 +89,13 @@ function CrashCard({ onReset }: { onReset: () => void }) {
           maxWidth: 400,
           textAlign: 'center',
           background: c.card,
-          border: `3px solid ${c.ink}`,
-          borderRadius: 10,
-          boxShadow: `7px 7px 0 ${c.pink}`,
+          border: 'none',
+          borderRadius: 18,
+          boxShadow: shadows.dropLg,
           padding: '30px 26px',
         }}
       >
-        <div style={{ fontFamily: fonts.display, fontSize: 30, textTransform: 'uppercase', lineHeight: 1 }}>Whoops — ink spill!</div>
+        <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 26, letterSpacing: '-.015em', lineHeight: 1.15, color: c.ink }}>Whoops — ink spill!</div>
         <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 15, color: c.sub, margin: '12px 0 20px' }}>
           That bit went wrong, but your collection is safe.
         </div>
@@ -108,14 +108,12 @@ function CrashCard({ onReset }: { onReset: () => void }) {
             fontFamily: fonts.body,
             fontWeight: 800,
             fontSize: 16,
-            textTransform: 'uppercase',
-            letterSpacing: '.04em',
-            color: c.ink,
-            background: c.teal,
-            border: `3px solid ${c.ink}`,
-            borderRadius: 8,
+            color: '#FCFBF7',
+            background: c.ink,
+            border: 'none',
+            borderRadius: 14,
             padding: '13px 24px',
-            boxShadow: '0 4px 0 #16130f',
+            boxShadow: shadows.drop,
             cursor: 'pointer',
           }}
         >

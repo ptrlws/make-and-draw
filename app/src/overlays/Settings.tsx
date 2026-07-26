@@ -3,27 +3,29 @@ import { Card, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { downloadBlob } from '../game/exporter'
 import { getImages } from '../game/imageStore'
-import { c, fonts } from '../theme'
+import { c, fonts, shadows } from '../theme'
 import type { GalleryItem } from '../types'
 import { plural } from '../utils'
 
 const pill = (on: boolean): CSSProperties => ({
   width: 52,
   height: 30,
-  borderRadius: 6,
-  border: `2.5px solid ${c.ink}`,
-  background: on ? c.teal : c.toggleOff,
+  borderRadius: 15,
+  border: 'none',
+  background: on ? c.green : c.toggleOff,
+  boxShadow: on ? 'none' : `inset 0 0 0 1px ${c.line}`,
   display: 'flex',
   alignItems: 'center',
-  padding: 2,
+  padding: 3,
   transition: 'background .15s',
 })
 const knob = (on: boolean): CSSProperties => ({
-  width: 22,
-  height: 22,
-  borderRadius: 4,
-  background: '#fff',
-  border: `2px solid ${c.ink}`,
+  width: 24,
+  height: 24,
+  borderRadius: '50%',
+  background: c.card,
+  border: 'none',
+  boxShadow: shadows.dropSm,
   transform: `translateX(${on ? 22 : 0}px)`,
   transition: 'transform .15s',
 })
@@ -32,11 +34,12 @@ const row: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  background: '#fff',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 6,
+  background: c.card,
+  color: c.ink,
+  border: 'none',
+  borderRadius: 14,
   padding: '14px 16px',
-  boxShadow: '0 3px 0 #16130f',
+  boxShadow: `inset 0 0 0 1px ${c.line}, ${shadows.dropSm}`,
   cursor: 'pointer',
 }
 
@@ -97,7 +100,7 @@ export function Settings() {
   return (
     <div
       onClick={closeSettings}
-      style={{ position: 'absolute', inset: 0, zIndex: 40, background: 'rgba(22,19,15,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 22 }}
+      style={{ position: 'absolute', inset: 0, zIndex: 40, background: 'rgba(64,56,47,.42)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 22 }}
     >
       <div
         ref={panelRef}
@@ -108,22 +111,22 @@ export function Settings() {
         onClick={(e) => e.stopPropagation()}
         style={{ width: 'min(380px, 92vw)', outline: 'none' }}
       >
-        <Card spot={c.pink} offset={7} radius={10} style={{ padding: 24 }}>
-          <div style={{ fontFamily: fonts.display, fontSize: 30, textTransform: 'uppercase', lineHeight: 1 }}>Settings</div>
-          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 12, letterSpacing: '.12em', textTransform: 'uppercase', color: c.sub, margin: '4px 0 18px' }}>
+        <Card radius={18} style={{ padding: 24, color: c.ink, boxShadow: shadows.dropLg }}>
+          <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 30, letterSpacing: '-.02em', lineHeight: 1.05, color: c.ink }}>Settings</div>
+          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11.5, letterSpacing: '.14em', textTransform: 'uppercase', color: c.faint, margin: '5px 0 18px' }}>
             for grown-ups
           </div>
 
           <button onClick={toggleMute} role="switch" aria-checked={soundOn} aria-label="Sound" style={{ ...row, marginBottom: 12 }}>
-            <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 16 }}>Sound</span>
+            <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 16, letterSpacing: '-.005em' }}>Sound</span>
             <span style={pill(soundOn)}>
               <span style={knob(soundOn)} />
             </span>
           </button>
           <button onClick={toggleCalm} role="switch" aria-checked={state.calm} aria-label="Calm mode" style={row}>
             <span style={{ textAlign: 'left' }}>
-              <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 16, display: 'block' }}>Calm mode</span>
-              <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 12, color: c.sub }}>gentle confetti, less motion</span>
+              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 16, letterSpacing: '-.005em', display: 'block' }}>Calm mode</span>
+              <span style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 12, color: c.hint }}>gentle confetti, less motion</span>
             </span>
             <span style={pill(state.calm)}>
               <span style={knob(state.calm)} />
@@ -139,14 +142,17 @@ export function Settings() {
             style={{ ...row, marginTop: 12 }}
           >
             <span style={{ textAlign: 'left' }}>
-              <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 16, display: 'block' }}>Makers</span>
-              <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 12, color: c.sub }}>
+              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 16, letterSpacing: '-.005em', display: 'block' }}>Makers</span>
+              <span style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 12, color: c.hint }}>
                 {state.profiles.length > 1 ? `${state.profiles.length} on this device · switch or add` : 'add another maker'}
               </span>
             </span>
             <span style={{ display: 'flex' }}>
               {state.profiles.slice(0, 4).map((p, i) => (
-                <span key={p.id} style={{ width: 22, height: 22, borderRadius: '50%', background: p.color, border: `2px solid ${c.ink}`, marginLeft: i ? -6 : 0 }} />
+                <span
+                  key={p.id}
+                  style={{ width: 22, height: 22, borderRadius: '50%', background: p.color, border: 'none', boxShadow: `0 0 0 2px ${c.card}`, marginLeft: i ? -6 : 0 }}
+                />
               ))}
             </span>
           </button>
@@ -155,11 +161,11 @@ export function Settings() {
           <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
             {state.gallery.length > 0 && (
               <button onClick={() => void backup()} style={{ ...row, flex: 1, justifyContent: 'center' }}>
-                <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: '.04em' }}>⬇ Back up</span>
+                <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 14, letterSpacing: '-.005em' }}>⬇ Back up</span>
               </button>
             )}
             <button onClick={() => fileRef.current?.click()} style={{ ...row, flex: 1, justifyContent: 'center' }}>
-              <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 13, textTransform: 'uppercase', letterSpacing: '.04em' }}>⬆ Restore</span>
+              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 14, letterSpacing: '-.005em' }}>⬆ Restore</span>
             </button>
             <input
               ref={fileRef}
@@ -188,17 +194,19 @@ export function Settings() {
                 ...row,
                 marginTop: 12,
                 justifyContent: 'center',
-                background: confirmClear ? c.pink : '#fff',
-                color: confirmClear ? c.paper : c.ink,
+                // armed state is a filled ink chip, not an outline or a pigment
+                background: confirmClear ? c.ink : c.card,
+                color: confirmClear ? c.card : c.ink,
+                boxShadow: confirmClear ? shadows.drop : row.boxShadow,
               }}
             >
-              <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 14, textTransform: 'uppercase', letterSpacing: '.04em' }}>
+              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 15, letterSpacing: '-.005em' }}>
                 {confirmClear ? `tap again to clear ${plural(state.gallery.length, 'piece')}` : `Clear collection (${state.gallery.length})`}
               </span>
             </button>
           )}
 
-          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 12, color: c.faint, textAlign: 'center', margin: '16px 0 4px' }}>
+          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 12, color: c.faint, textAlign: 'center', margin: '16px 0 4px' }}>
             {state.name ? `Playing as ${state.name}` : 'No name on the cover yet'} · saved on this device ·{' '}
             <button
               onClick={() => {
@@ -207,7 +215,7 @@ export function Settings() {
               }}
               style={{
                 fontFamily: fonts.body,
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 12,
                 color: c.hint,
                 background: 'none',
@@ -225,13 +233,29 @@ export function Settings() {
               closeSettings()
               go('grownups')
             }}
-            style={{ display: 'block', width: '100%', fontFamily: fonts.body, fontWeight: 700, fontSize: 12, lineHeight: 1.4, color: c.sub, textAlign: 'center', margin: '2px 0 8px', padding: '8px 10px', background: 'rgba(47,184,179,.1)', border: `1.5px solid rgba(47,184,179,.45)`, borderRadius: 8, cursor: 'pointer' }}
+            style={{
+              display: 'block',
+              width: '100%',
+              fontFamily: fonts.body,
+              fontWeight: 500,
+              fontSize: 12,
+              lineHeight: 1.45,
+              color: c.sub,
+              textAlign: 'center',
+              margin: '2px 0 8px',
+              padding: '10px 12px',
+              background: c.paper,
+              border: 'none',
+              boxShadow: `inset 0 0 0 1px ${c.line}`,
+              borderRadius: 12,
+              cursor: 'pointer',
+            }}
           >
             No ads · no accounts · no tracking.
             <br />
             Art stays on this device unless <em>you</em> share it. <span style={{ textDecoration: 'underline' }}>Read more →</span>
           </button>
-          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 10.5, lineHeight: 1.35, color: c.faint, textAlign: 'center', marginBottom: 6 }}>
+          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 10.5, lineHeight: 1.4, color: c.faint, textAlign: 'center', marginBottom: 6 }}>
             Imported 3D models © their authors — low-poly cat &amp; dog by Matthias L, Balloon Dog by TheCraftyMaker (Printables). Personal use; see CREDITS.
           </div>
           <RisoButton onClick={closeSettings} variant="primary" style={{ width: '100%', marginTop: 6 }}>

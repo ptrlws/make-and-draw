@@ -1,6 +1,6 @@
 import { Card, IconButton, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
-import { c, fonts } from '../theme'
+import { c, fonts, shadows } from '../theme'
 
 /** A promise, in plain words, of what the app does and does not do — every
  * point here is verified against the actual code, not aspirational. */
@@ -59,10 +59,10 @@ export function GrownUps() {
             ‹
           </IconButton>
           <div>
-            <div style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: c.pink }}>
+            <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: c.faint }}>
               A promise to
             </div>
-            <div style={{ fontFamily: fonts.display, fontSize: 'clamp(26px, 7vw, 36px)', lineHeight: 0.95, textTransform: 'uppercase' }}>
+            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.6vw, 33px)', lineHeight: 1.05, letterSpacing: '-.015em', color: c.ink }}>
               Grown-ups
             </div>
           </div>
@@ -74,18 +74,18 @@ export function GrownUps() {
             display: 'flex',
             alignItems: 'center',
             gap: 12,
-            padding: '13px 16px',
-            background: 'rgba(255,46,126,.08)',
-            border: `2.5px solid ${c.ink}`,
-            borderRadius: 12,
-            boxShadow: `5px 5px 0 ${c.pink}`,
+            padding: '15px 17px',
+            background: c.card,
+            border: 'none',
+            borderRadius: 16,
+            boxShadow: shadows.card,
             margin: '4px 0 18px',
           }}
         >
           <span aria-hidden style={{ fontSize: 26, lineHeight: 1 }}>💡</span>
-          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 14, lineHeight: 1.4, color: c.sub }}>
+          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 14, lineHeight: 1.45, color: c.sub }}>
             Make &amp; Draw was{' '}
-            <span style={{ fontFamily: fonts.display, fontWeight: 400, fontSize: 20, textTransform: 'uppercase', color: c.ink }}>Esther&rsquo;s</span> idea.
+            <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 19, color: c.ink }}>Esther&rsquo;s</span> idea.
             <br />
             The whole studio began with her.
           </div>
@@ -97,27 +97,27 @@ export function GrownUps() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {POINTS.map((p) => (
-            <Card key={p.title} spot={p.spot} offset={5} radius={10} style={{ padding: 18, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+            <Card key={p.title} radius={16} style={{ padding: 18, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
               <div
                 aria-hidden
                 style={{
                   flex: 'none',
-                  width: 46,
-                  height: 46,
-                  borderRadius: 10,
-                  background: p.spot,
-                  border: `2.5px solid ${c.ink}`,
+                  width: 44,
+                  height: 44,
+                  borderRadius: 13,
+                  background: c.paperBody,
+                  border: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 24,
+                  fontSize: 22,
                 }}
               >
                 {p.icon}
               </div>
               <div>
-                <div style={{ fontFamily: fonts.display, fontSize: 20, textTransform: 'uppercase', lineHeight: 1.05, color: c.ink }}>{p.title}</div>
-                <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 14, lineHeight: 1.5, color: c.sub, marginTop: 6 }}>{p.body}</div>
+                <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 18, lineHeight: 1.2, letterSpacing: '-.01em', color: c.ink }}>{p.title}</div>
+                <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 14, lineHeight: 1.55, color: c.sub, marginTop: 6 }}>{p.body}</div>
               </div>
             </Card>
           ))}

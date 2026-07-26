@@ -3,7 +3,7 @@ import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { SCRATCH_SVGS } from '../scratch/scratchSvgs'
-import { c, fonts } from '../theme'
+import { c, fonts, shadows } from '../theme'
 
 const COAT = '#151310'
 
@@ -66,19 +66,28 @@ function pointNormals(P: [number, number][]): [number, number][] {
 }
 
 const chip: CSSProperties = {
-  fontFamily: fonts.body,
-  fontWeight: 800,
-  fontSize: 13,
-  textTransform: 'uppercase',
-  letterSpacing: '.04em',
+  fontFamily: fonts.display,
+  fontWeight: 600,
+  fontSize: 14,
+  letterSpacing: '-.005em',
   color: c.ink,
-  background: '#fff',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 6,
+  background: c.card,
+  border: 'none',
+  borderRadius: 14,
   padding: '11px 13px',
   minHeight: 44,
-  boxShadow: '0 3px 0 #16130f',
+  boxShadow: shadows.dropSm,
   cursor: 'pointer',
+}
+
+/** tiny eyebrow above a group of chips — meta, so it stays uppercase and faint */
+const eyebrow: CSSProperties = {
+  fontFamily: fonts.body,
+  fontWeight: 600,
+  fontSize: 11,
+  textTransform: 'uppercase',
+  letterSpacing: '.1em',
+  color: c.faint,
 }
 
 interface ScratchDraft {
@@ -522,7 +531,7 @@ export function ScratchOff() {
         <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 'clamp(15px, 4.6vw, 24px)', textTransform: 'uppercase', flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        <div style={{ fontFamily: fonts.display, fontWeight: 600, letterSpacing: '-.01em', color: c.ink, fontSize: 'clamp(15px, 4.6vw, 24px)', flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           Scratch art
         </div>
         <button onClick={undo} style={{ ...chip, padding: '9px 11px' }}>
@@ -531,16 +540,25 @@ export function ScratchOff() {
         <button onClick={recover} style={{ ...chip, padding: '9px 11px' }}>
           New
         </button>
-        <button onClick={keep} style={{ ...chip, padding: '9px 11px', background: scratched > 0.02 ? c.teal : c.disabled, color: c.ink }}>
+        <button
+          onClick={keep}
+          style={{
+            ...chip,
+            padding: '9px 11px',
+            background: scratched > 0.02 ? c.teal : c.disabled,
+            color: scratched > 0.02 ? c.card : c.hint,
+            boxShadow: scratched > 0.02 ? shadows.drop : 'none',
+          }}
+        >
           Keep ✓
         </button>
       </div>
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-        <div style={{ position: 'relative', background: '#fff', border: `3px solid ${c.ink}`, borderRadius: 6, boxShadow: `6px 6px 0 ${c.pink}`, padding: 10 }}>
+        <div style={{ position: 'relative', background: c.card, border: 'none', borderRadius: 22, boxShadow: shadows.card, padding: 10 }}>
           <div
             ref={wrapRef}
-            style={{ position: 'relative', width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden', touchAction: 'none' }}
+            style={{ position: 'relative', width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 13, overflow: 'hidden', touchAction: 'none' }}
           >
             <canvas
               ref={neonRef}
@@ -567,31 +585,31 @@ export function ScratchOff() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', padding: '2px 16px 20px' }}>
-        <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 13, color: c.hint }}>
+        <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>
           {scratched > 0.02 ? "keep going — press Keep ✓ when you're happy with it" : 'scratch to reveal — it stays inside the lines!'}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Reveal</span>
+          <span style={eyebrow}>Reveal</span>
           {STYLES.map((s) => (
             <button
               key={s.id}
               onClick={() => pickStyle(s.id)}
               aria-pressed={s.id === style}
               title={s.name}
-              style={{ ...chip, minHeight: 38, padding: '8px 12px', background: s.id === style ? c.ink : '#fff', color: s.id === style ? c.paper : c.ink }}
+              style={{ ...chip, minHeight: 38, padding: '8px 12px', background: s.id === style ? c.ink : c.card, color: s.id === style ? c.card : c.ink }}
             >
               <span aria-hidden style={{ marginRight: 6 }}>{s.icon}</span>
               {s.name}
             </button>
           ))}
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55, marginLeft: 6 }}>Tool</span>
+          <span style={{ ...eyebrow, marginLeft: 6 }}>Tool</span>
           {TOOLS.map((t, i) => (
             <button
               key={t.id}
               onClick={() => pickTool(i)}
               aria-pressed={i === toolIdx}
               title={t.name}
-              style={{ ...chip, minHeight: 38, padding: '8px 12px', background: i === toolIdx ? c.ink : '#fff', color: i === toolIdx ? c.paper : c.ink }}
+              style={{ ...chip, minHeight: 38, padding: '8px 12px', background: i === toolIdx ? c.ink : c.card, color: i === toolIdx ? c.card : c.ink }}
             >
               <span aria-hidden style={{ marginRight: 6 }}>{t.icon}</span>
               {t.name}
@@ -599,13 +617,13 @@ export function ScratchOff() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', maxWidth: 'min(460px, 94vw)' }}>
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Picture</span>
+          <span style={eyebrow}>Picture</span>
           {pics.map((p, i) => (
             <button
               key={p.id}
               onClick={() => pickPic(i)}
               aria-pressed={i === picIdx}
-              style={{ ...chip, minHeight: 38, padding: '8px 11px', background: i === picIdx ? c.ink : '#fff', color: i === picIdx ? c.paper : c.ink }}
+              style={{ ...chip, minHeight: 38, padding: '8px 11px', background: i === picIdx ? c.ink : c.card, color: i === picIdx ? c.card : c.ink }}
             >
               {p.name}
             </button>

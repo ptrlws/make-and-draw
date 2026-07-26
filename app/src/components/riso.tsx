@@ -1,7 +1,12 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { c, fonts, halftone } from '../theme'
+import { c, fonts, halftone, shadows } from '../theme'
 
-/** Square taped-free control: back / sound / settings / page nav. */
+/* Shared controls for the "quiet shell" direction: no outlines, no hard
+ * offset plates, no chroma. Separation comes from a paper-white fill and a
+ * soft contact shadow, so the only saturated thing on any screen stays the
+ * child's own work. */
+
+/** Round-cornered control: back / sound / settings / page nav. */
 export function IconButton({
   onClick,
   ariaLabel,
@@ -23,10 +28,10 @@ export function IconButton({
         width: size,
         height: size,
         flex: 'none',
-        border: `2.5px solid ${c.ink}`,
-        borderRadius: 8,
-        background: '#fff',
-        boxShadow: '0 3px 0 #16130f',
+        border: 'none',
+        borderRadius: 12,
+        background: c.card,
+        boxShadow: shadows.dropSm,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -42,7 +47,8 @@ export function IconButton({
 
 type Variant = 'primary' | 'confirm' | 'plain'
 
-/** Bold print-shop button: pink primary, teal confirm, white plain. */
+/** Primary actions are carried by weight and contrast rather than by a brand
+ * colour: solid ink on paper. `confirm` keeps the one semantic green. */
 export function RisoButton({
   onClick,
   children,
@@ -54,25 +60,24 @@ export function RisoButton({
   variant?: Variant
   style?: CSSProperties
 }) {
-  const bg = variant === 'primary' ? c.pink : variant === 'confirm' ? c.teal : '#fff'
-  // Ink labels on the fluoro fills: paper/white failed WCAG 1.4.3 on these
-  // (teal 2.75:1, pink 3.1:1); ink is 5.95:1 / 5.24:1 and reads more letterpress.
-  const col = c.ink
+  const primary = variant === 'primary'
+  const confirm = variant === 'confirm'
+  const bg = primary ? c.ink : confirm ? c.teal : c.card
+  const col = primary || confirm ? '#FCFBF7' : c.ink
   return (
     <button
       onClick={onClick}
       style={{
-        fontFamily: fonts.body,
-        fontWeight: 800,
-        textTransform: 'uppercase',
-        letterSpacing: '.05em',
-        fontSize: 15,
+        fontFamily: fonts.display,
+        fontWeight: 600,
+        letterSpacing: '-.005em',
+        fontSize: 16,
         background: bg,
         color: col,
-        border: `2.5px solid ${c.ink}`,
-        borderRadius: 6,
-        padding: '12px 20px',
-        boxShadow: '0 4px 0 #16130f',
+        border: 'none',
+        borderRadius: 14,
+        padding: '13px 22px',
+        boxShadow: shadows.drop,
         cursor: 'pointer',
         ...style,
       }}
@@ -82,12 +87,11 @@ export function RisoButton({
   )
 }
 
-/** Cut-card with a hard registration-offset shadow in a spot ink. */
+/** A sheet of paper laid on the surface. `spot`/`offset` are still accepted
+ * so older callers compile, but the hard registration plate is gone. */
 export function Card({
   children,
-  spot = c.pink,
-  offset = 5,
-  radius = 8,
+  radius = 16,
   style,
 }: {
   children: ReactNode
@@ -100,9 +104,9 @@ export function Card({
     <div
       style={{
         background: c.card,
-        border: `3px solid ${c.ink}`,
+        border: 'none',
         borderRadius: radius,
-        boxShadow: `${offset}px ${offset}px 0 ${spot}`,
+        boxShadow: shadows.card,
         ...style,
       }}
     >

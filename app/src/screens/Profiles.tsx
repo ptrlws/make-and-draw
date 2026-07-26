@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
-import { c, fonts } from '../theme'
+import { c, fonts, shadows } from '../theme'
 
 /** "Who's making today?" — pick a maker, add one, or (for grown-ups) remove one.
  * Each maker keeps their own name, collection, drafts and settings. */
@@ -25,10 +25,10 @@ export function Profiles() {
             ‹
           </IconButton>
           <div>
-            <div style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: c.pink }}>
+            <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: c.faint }}>
               Make &amp; Draw
             </div>
-            <div style={{ fontFamily: fonts.display, fontSize: 'clamp(26px, 7vw, 36px)', lineHeight: 0.95, textTransform: 'uppercase' }}>
+            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.6vw, 33px)', lineHeight: 1.05, letterSpacing: '-.015em', color: c.ink }}>
               Who&rsquo;s making?
             </div>
           </div>
@@ -50,9 +50,10 @@ export function Profiles() {
                     width: '100%',
                     textAlign: 'left',
                     background: c.card,
-                    border: `3px solid ${c.ink}`,
-                    borderRadius: 10,
-                    boxShadow: active ? `5px 5px 0 ${p.color}` : `4px 4px 0 rgba(22,19,15,.18)`,
+                    border: 'none',
+                    borderRadius: 16,
+                    // the active maker is lifted, not outlined
+                    boxShadow: active ? `0 0 0 2px ${p.color}, ${shadows.card}` : shadows.cardSoft,
                     padding: 0,
                     overflow: 'hidden',
                     cursor: 'pointer',
@@ -61,14 +62,14 @@ export function Profiles() {
                   <div style={{ position: 'relative', height: 96, background: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <span style={{ fontFamily: fonts.display, fontSize: 52, color: c.paper, lineHeight: 1 }}>{initial(p.name)}</span>
                     {active && (
-                      <span style={{ position: 'absolute', top: 6, left: 6, width: 22, height: 22, borderRadius: '50%', background: c.card, border: `2px solid ${c.ink}`, fontFamily: fonts.body, fontWeight: 800, fontSize: 12, lineHeight: '19px', textAlign: 'center', color: c.ink }}>✓</span>
+                      <span style={{ position: 'absolute', top: 7, left: 7, width: 22, height: 22, borderRadius: '50%', background: c.card, border: 'none', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 800, fontSize: 12, lineHeight: '22px', textAlign: 'center', color: c.ink }}>✓</span>
                     )}
                   </div>
                   <div style={{ padding: '9px 12px' }}>
-                    <div style={{ fontFamily: fonts.display, fontSize: 18, textTransform: 'uppercase', color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 17, color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {p.name || 'Tap to name'}
                     </div>
-                    <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, color: c.sub, marginTop: 1 }}>{active ? 'making now' : 'tap to switch'}</div>
+                    <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11.5, color: c.faint, marginTop: 1 }}>{active ? 'making now' : 'tap to switch'}</div>
                   </div>
                 </button>
                 <button
@@ -91,13 +92,13 @@ export function Profiles() {
                     width: arming ? 'auto' : 24,
                     borderRadius: 12,
                     background: arming ? c.pink : c.card,
-                    color: arming ? c.paper : c.ink,
-                    border: `2px solid ${c.ink}`,
+                    color: arming ? '#FCFBF7' : c.hint,
+                    border: 'none',
+                    boxShadow: shadows.dropSm,
                     fontFamily: fonts.body,
-                    fontWeight: 800,
+                    fontWeight: 700,
                     fontSize: arming ? 10 : 13,
-                    textTransform: 'uppercase',
-                    letterSpacing: '.04em',
+                    letterSpacing: arming ? '.03em' : 0,
                     cursor: 'pointer',
                     lineHeight: 1,
                   }}
@@ -121,14 +122,14 @@ export function Profiles() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 6,
-              background: c.card,
-              border: `3px dashed ${c.ink}`,
-              borderRadius: 10,
+              background: 'transparent',
+              border: `2px dashed ${c.lineStrong}`,
+              borderRadius: 16,
               cursor: 'pointer',
             }}
           >
-            <span style={{ fontFamily: fonts.display, fontSize: 44, color: c.ink, lineHeight: 1 }}>＋</span>
-            <span style={{ fontFamily: fonts.body, fontWeight: 800, fontSize: 12, textTransform: 'uppercase', letterSpacing: '.06em', color: c.ink }}>New maker</span>
+            <span style={{ fontFamily: fonts.display, fontSize: 40, color: c.hint, lineHeight: 1 }}>＋</span>
+            <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 14, color: c.hint }}>New maker</span>
           </button>
         </div>
 

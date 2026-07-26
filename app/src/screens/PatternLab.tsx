@@ -3,22 +3,21 @@ import { IconButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { clearDraft, loadDraft, saveDraft } from '../game/draftStore'
 import { saveStock } from '../game/stock'
-import { INKS, c, fonts } from '../theme'
+import { INKS, c, fonts, shadows } from '../theme'
 
 const STAMPS = ['Dot', 'Petal', 'Ring', 'Plus'] as const
 
 const chip: CSSProperties = {
-  fontFamily: fonts.body,
-  fontWeight: 800,
-  fontSize: 13,
-  textTransform: 'uppercase',
-  letterSpacing: '.04em',
+  fontFamily: fonts.display,
+  fontWeight: 600,
+  fontSize: 14,
   color: c.ink,
-  background: '#fff',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 6,
-  padding: '9px 13px',
-  boxShadow: '0 3px 0 #16130f',
+  background: c.card,
+  border: 'none',
+  borderRadius: 14,
+  padding: '11px 16px',
+  minHeight: 44,
+  boxShadow: shadows.dropSm,
   cursor: 'pointer',
 }
 
@@ -238,21 +237,30 @@ export function PatternLab() {
         <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 24, textTransform: 'uppercase', flex: 1 }}>Pattern lab</div>
+        <div style={{ fontFamily: fonts.display, fontSize: 24, fontWeight: 600, color: c.ink, flex: 1 }}>Pattern lab</div>
         <button onClick={undo} style={chip}>
           Undo
         </button>
         <button onClick={clear} style={chip}>
           Clear
         </button>
-        <button onClick={keep} style={{ ...chip, background: c.teal, color: c.ink }}>
+        <button onClick={keep} style={{ ...chip, background: c.ink, color: c.card, boxShadow: shadows.drop }}>
           Keep ✓
         </button>
       </div>
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-        <div style={{ position: 'relative', background: '#fff', border: `3px solid ${c.ink}`, borderRadius: 6, boxShadow: `6px 6px 0 ${c.pink}`, padding: 10 }}>
-          <div ref={wrapRef} style={{ width: 'min(560px, 88vw, 74vh)', aspectRatio: '1 / 1', borderRadius: 3, overflow: 'hidden' }}>
+        <div style={{ position: 'relative', background: c.card, border: 'none', borderRadius: 20, boxShadow: shadows.dropLg, padding: 12 }}>
+          <div
+            ref={wrapRef}
+            style={{
+              width: 'min(560px, 88vw, 74vh)',
+              aspectRatio: '1 / 1',
+              borderRadius: 12,
+              overflow: 'hidden',
+              boxShadow: `inset 0 0 0 1px ${c.line}`,
+            }}
+          >
             <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%', touchAction: 'none', cursor: 'crosshair' }} />
           </div>
         </div>
@@ -275,8 +283,9 @@ export function PatternLab() {
                 height: 44,
                 borderRadius: '50%',
                 background: k.c,
-                border: ink === i ? `4px solid ${c.ink}` : '3px solid rgba(22,19,15,.3)',
-                boxShadow: `0 4px 0 ${k.d}`,
+                border: 'none',
+                boxShadow:
+                  ink === i ? `0 0 0 3px ${c.card}, 0 0 0 5px ${c.inkSoft}, ${shadows.dropSm}` : shadows.dropSm,
                 transform: ink === i ? 'scale(1.12)' : undefined,
                 transition: 'transform .12s',
                 cursor: 'pointer',
@@ -285,9 +294,18 @@ export function PatternLab() {
           ))}
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>Stamp</span>
+          <span style={{ fontFamily: fonts.body, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.1em', fontSize: 11, color: c.faint }}>Stamp</span>
           {STAMPS.map((label, i) => (
-            <button key={label} onClick={() => { setStamp(i); play('select') }} aria-pressed={i === stamp} style={{ ...chip, background: i === stamp ? c.ink : '#fff', color: i === stamp ? c.paper : c.ink }}>
+            <button
+              key={label}
+              onClick={() => { setStamp(i); play('select') }}
+              aria-pressed={i === stamp}
+              style={
+                i === stamp
+                  ? { ...chip, background: c.ink, color: c.card, boxShadow: shadows.drop }
+                  : chip
+              }
+            >
               {label}
             </button>
           ))}

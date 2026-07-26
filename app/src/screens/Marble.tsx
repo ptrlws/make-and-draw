@@ -1,37 +1,23 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { IconButton, RisoButton } from '../components/riso'
 import { useGame } from '../game/context'
 import { loadDraft, saveDraft } from '../game/draftStore'
 import { saveStock } from '../game/stock'
 import { MarbleStudio, type Op } from '../marble/MarbleStudio'
 import { STL_MODELS } from '../marble/models'
-import { INKS, c, fonts } from '../theme'
+import { INKS, c, fonts, shadows } from '../theme'
 
 const chip: CSSProperties = {
-  fontFamily: fonts.body,
-  fontWeight: 800,
-  fontSize: 13,
-  textTransform: 'uppercase',
-  letterSpacing: '.04em',
-  color: c.ink,
-  background: '#fff',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 6,
-  padding: '9px 13px',
-  boxShadow: '0 3px 0 #16130f',
-  cursor: 'pointer',
-}
-const squareBtn: CSSProperties = {
-  width: 46,
-  height: 46,
-  flex: 'none',
-  border: `2.5px solid ${c.ink}`,
-  borderRadius: 8,
-  background: '#fff',
-  boxShadow: '0 3px 0 #16130f',
   fontFamily: fonts.display,
-  fontSize: 22,
+  fontWeight: 600,
+  fontSize: 14,
+  letterSpacing: '-.005em',
   color: c.ink,
-  lineHeight: 1,
+  background: c.card,
+  border: 'none',
+  borderRadius: 14,
+  padding: '10px 14px',
+  boxShadow: shadows.dropSm,
   cursor: 'pointer',
 }
 
@@ -147,21 +133,26 @@ export function Marble() {
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       {/* header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <button onClick={() => go('home')} aria-label="back" style={{ ...squareBtn, fontWeight: 800 }}>
+        <IconButton
+          onClick={() => go('home')}
+          ariaLabel="back"
+          size={46}
+          style={{ fontFamily: fonts.display, fontSize: 22, fontWeight: 600, lineHeight: 1 }}
+        >
           ‹
-        </button>
-        <div style={{ fontFamily: fonts.display, fontSize: 'clamp(15px, 4.6vw, 26px)', textTransform: 'uppercase', letterSpacing: '.01em', flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        </IconButton>
+        <div style={{ fontFamily: fonts.display, fontSize: 'clamp(15px, 4.6vw, 26px)', fontWeight: 550, letterSpacing: '-.015em', color: c.ink, flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           Marbling
         </div>
         {phase === 'tray' && !noGl && (
           <>
-            <button onClick={() => studioRef.current?.undo()} style={{ ...chip, padding: '9px 10px' }}>
+            <button onClick={() => studioRef.current?.undo()} style={{ ...chip, padding: '9px 12px' }}>
               Undo
             </button>
-            <button onClick={() => studioRef.current?.reset()} style={{ ...chip, padding: '9px 10px' }}>
+            <button onClick={() => studioRef.current?.reset()} style={{ ...chip, padding: '9px 12px' }}>
               Reset
             </button>
-            <button onClick={keepPaper} style={{ ...chip, padding: '9px 10px', background: c.teal }}>
+            <button onClick={keepPaper} style={{ ...chip, padding: '9px 12px', background: c.teal, color: c.card }}>
               Keep ✓
             </button>
           </>
@@ -176,16 +167,24 @@ export function Marble() {
             width: 'min(560px, 92vw, 74vh)',
             aspectRatio: '1 / 1',
             maxHeight: '100%',
-            background: '#fff',
-            border: `3px solid ${c.ink}`,
-            borderRadius: 6,
-            boxShadow: `7px 7px 0 ${c.pink}, 14px 14px 0 rgba(10,90,245,.25)`,
+            background: c.card,
+            border: 'none',
+            borderRadius: 18,
+            boxShadow: shadows.dropLg,
             padding: 10,
           }}
         >
           <canvas
             ref={canvasRef}
-            style={{ display: 'block', width: '100%', height: '100%', borderRadius: 3, touchAction: 'none', cursor: 'crosshair' }}
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              borderRadius: 10,
+              boxShadow: `inset 0 0 0 1px ${c.line}`,
+              touchAction: 'none',
+              cursor: 'crosshair',
+            }}
           />
           {noGl && (
             <div
@@ -199,12 +198,14 @@ export function Marble() {
                 gap: 8,
                 textAlign: 'center',
                 background: c.paper,
-                borderRadius: 3,
+                borderRadius: 10,
                 padding: 20,
               }}
             >
-              <div style={{ fontFamily: fonts.display, fontSize: 24, textTransform: 'uppercase' }}>No ink today</div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 14, color: c.hint }}>
+              <div style={{ fontFamily: fonts.display, fontSize: 24, fontWeight: 550, letterSpacing: '-.015em', color: c.ink }}>
+                No ink today
+              </div>
+              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 14, color: c.hint }}>
                 this device can't run the marbling tray — the other kits all still work!
               </div>
             </div>
@@ -218,9 +219,9 @@ export function Marble() {
                 bottom: 14,
                 textAlign: 'center',
                 fontFamily: fonts.body,
-                fontWeight: 700,
+                fontWeight: 500,
                 fontSize: 13,
-                color: 'rgba(22,19,15,.5)',
+                color: c.faint,
                 pointerEvents: 'none',
               }}
             >
@@ -245,8 +246,11 @@ export function Marble() {
                   height: 44,
                   borderRadius: '50%',
                   background: k.c,
-                  border: ink === i ? `4px solid ${c.ink}` : '3px solid rgba(22,19,15,.3)',
-                  boxShadow: `0 4px 0 ${k.d}`,
+                  border: 'none',
+                  boxShadow:
+                    ink === i
+                      ? `0 0 0 3px ${c.paper}, 0 0 0 5px ${c.ink}, ${shadows.dropSm}`
+                      : shadows.dropSm,
                   transform: ink === i ? 'scale(1.12)' : undefined,
                   transition: 'transform .12s',
                   cursor: 'pointer',
@@ -258,22 +262,27 @@ export function Marble() {
                 key={label}
                 onClick={() => pickTool(i)}
                 aria-pressed={tool === i}
-                style={{ ...chip, background: tool === i ? c.ink : '#fff', color: tool === i ? c.paper : c.ink }}
+                style={{ ...chip, background: tool === i ? c.ink : c.card, color: tool === i ? c.card : c.ink }}
               >
                 {label}
               </button>
             ))}
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-            <span style={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.12em', fontSize: 12, opacity: 0.55 }}>
+            <span
+              style={{
+                fontFamily: fonts.body,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '.1em',
+                fontSize: 11,
+                color: c.faint,
+              }}
+            >
               Dip
             </span>
             {STL_MODELS.map((m) => (
-              <button
-                key={m.id}
-                onClick={() => dip(m.id)}
-                style={{ ...chip, background: c.pink, color: c.ink, borderColor: c.ink }}
-              >
+              <button key={m.id} onClick={() => dip(m.id)} style={chip}>
                 {m.emoji} {m.name}
               </button>
             ))}
@@ -281,22 +290,19 @@ export function Marble() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', padding: '4px 16px 26px' }}>
-          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 15, color: c.ink }}>
+          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 15, color: c.ink }}>
             a marbled {dipLabel.toLowerCase()} — one of a kind
           </div>
-          <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 12, color: c.hint, marginTop: -4 }}>
+          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 12, color: c.hint, marginTop: -4 }}>
             drag to turn it around
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={backToTray} style={chip}>
+            <RisoButton onClick={backToTray} variant="plain">
               ‹ Tray
-            </button>
-            <button
-              onClick={addToCollection}
-              style={{ ...chip, fontSize: 15, padding: '11px 18px', background: c.teal, color: c.ink, borderColor: c.ink }}
-            >
+            </RisoButton>
+            <RisoButton onClick={addToCollection} variant="confirm">
               Add to collection ✓
-            </button>
+            </RisoButton>
           </div>
         </div>
       )}
