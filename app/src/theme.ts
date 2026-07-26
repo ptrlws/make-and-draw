@@ -70,6 +70,50 @@ export const fonts = {
   hand: 'ui-rounded, "SF Pro Rounded", "Varela Round", system-ui, sans-serif',
 } as const
 
+/* ------------------------------------------------------------------ *
+ * The type scale. ONE ladder, seven rungs, no in-between values:
+ *
+ *     11 · 13 · 15 · 17 · 20 · 25 · 32
+ *
+ * Three rules, and they are what make it cohere:
+ *   1. Anything a person SAYS or TAPS is the rounded display face at 600
+ *      (headings, control labels, names). Anything the app REPORTS is the
+ *      body face at 500/600 (prose, counts, meta).
+ *   2. Sentence case everywhere. `eyebrow` is the single exception and the
+ *      only tracked uppercase in the app.
+ *   3. Never write a raw fontSize in a screen — spread a role and override
+ *      only fontSize, and only to another rung.
+ * ------------------------------------------------------------------ */
+export const text = {
+  /** the one-per-screen hero (wordmark, "who's making?") */
+  hero: { fontFamily: fonts.display, fontWeight: 600, fontSize: 32, lineHeight: 1.08, letterSpacing: '-.022em' },
+  /** screen titles, book cover, big numbers */
+  display: { fontFamily: fonts.display, fontWeight: 600, fontSize: 25, lineHeight: 1.12, letterSpacing: '-.018em' },
+  /** card + section titles, kit names */
+  title: { fontFamily: fonts.display, fontWeight: 600, fontSize: 20, lineHeight: 1.2, letterSpacing: '-.012em' },
+  /** the one-line question or intro under a title */
+  lede: { fontFamily: fonts.body, fontWeight: 500, fontSize: 17, lineHeight: 1.45 },
+  /** buttons, chips, anything you tap */
+  label: { fontFamily: fonts.display, fontWeight: 600, fontSize: 15, lineHeight: 1.2, letterSpacing: '-.005em' },
+  /** running prose */
+  body: { fontFamily: fonts.body, fontWeight: 500, fontSize: 15, lineHeight: 1.55 },
+  /** secondary text: blurbs, counts, hints */
+  meta: { fontFamily: fonts.body, fontWeight: 500, fontSize: 13, lineHeight: 1.4 },
+  /** hero that must survive a narrow phone — same rungs, fluid between them */
+  heroFluid: { fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 1.08, letterSpacing: '-.022em' },
+  /** activity-header title: long kit names must shrink rather than truncate */
+  titleFluid: { fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(17px, 4.6vw, 20px)', lineHeight: 1.2, letterSpacing: '-.012em' },
+  /** the ONLY uppercase in the app — tiny group labels */
+  eyebrow: {
+    fontFamily: fonts.body,
+    fontWeight: 600,
+    fontSize: 11,
+    lineHeight: 1.3,
+    letterSpacing: '.14em',
+    textTransform: 'uppercase',
+  },
+} as const satisfies Record<string, CSSProperties>
+
 /* Depth now comes from light and contact, not from a hard offset plate. */
 export const shadows = {
   card: '0 1px 2px rgba(64,56,47,.07), 0 10px 22px -12px rgba(64,56,47,.30)',

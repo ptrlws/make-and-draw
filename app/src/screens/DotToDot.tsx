@@ -573,11 +573,11 @@ export function DotToDot() {
     return (
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
+          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
             ‹
           </IconButton>
           <div>
-            <div style={{ fontFamily: fonts.display, fontSize: 24, fontWeight: 550, letterSpacing: '-.015em', lineHeight: 1.1, color: c.ink }}>Dot to dot</div>
+            <div style={{ fontFamily: fonts.display, fontSize: 25, fontWeight: 600, letterSpacing: '-.015em', lineHeight: 1.1, color: c.ink }}>Dot to dot</div>
             <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint, marginTop: 3 }}>pick something to join</div>
           </div>
         </div>
@@ -593,11 +593,11 @@ export function DotToDot() {
                 >
                   <div style={{ position: 'relative', aspectRatio: '4 / 5', background: PAPER, borderRadius: 12, overflow: 'hidden', border: 'none', boxShadow: `inset 0 0 0 1px ${c.line}` }}>
                     <Preview p={p} spot={spot} />
-                    <span style={{ position: 'absolute', top: 6, left: 6, background: c.card, border: 'none', borderRadius: 999, padding: '2px 8px', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 600, fontSize: 10, letterSpacing: '.07em', textTransform: 'uppercase', color: c.faint }}>
+                    <span style={{ position: 'absolute', top: 6, left: 6, background: c.card, border: 'none', borderRadius: 999, padding: '2px 8px', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 600, fontSize: 11, letterSpacing: '.07em', textTransform: 'uppercase', color: c.faint }}>
                       {p.dots.length} dots
                     </span>
                   </div>
-                  <div style={{ fontFamily: fonts.display, fontSize: 15, fontWeight: 550, letterSpacing: '-.01em', textAlign: 'center', marginTop: 8, color: c.ink }}>{p.name}</div>
+                  <div style={{ fontFamily: fonts.display, fontSize: 15, fontWeight: 600, letterSpacing: '-.01em', textAlign: 'center', marginTop: 8, color: c.ink }}>{p.name}</div>
                 </button>
               )
             })}
@@ -613,9 +613,9 @@ export function DotToDot() {
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
         <button onClick={() => setView('pick')} style={chip} aria-label="back to shapes">
-          <span style={{ fontFamily: fonts.display, fontSize: 18, marginRight: 2 }}>‹</span> Shapes
+          <span style={{ fontFamily: fonts.display, fontSize: 17, marginRight: 2 }}>‹</span> Shapes
         </button>
-        <div style={{ flex: 1, minWidth: 0, textAlign: 'center', fontFamily: fonts.display, fontWeight: 550, letterSpacing: '-.01em', color: c.ink, fontSize: 'clamp(13px, 4.2vw, 20px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{puz.name}</div>
+        <div style={{ flex: 1, minWidth: 0, textAlign: 'center', fontFamily: fonts.display, fontWeight: 600, letterSpacing: '-.01em', color: c.ink, fontSize: 'clamp(17px, 4.6vw, 20px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{puz.name}</div>
         <IconButton onClick={undo} ariaLabel="undo last dot" size={44} style={{ fontFamily: fonts.display, fontSize: 20 }}>
           ↶
         </IconButton>

@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { c, fonts, halftone, shadows } from '../theme'
+import { c, halftone, shadows, text } from '../theme'
 
 /* Shared controls for the "quiet shell" direction: no outlines, no hard
  * offset plates, no chroma. Separation comes from a paper-white fill and a
@@ -68,10 +68,7 @@ export function RisoButton({
     <button
       onClick={onClick}
       style={{
-        fontFamily: fonts.display,
-        fontWeight: 600,
-        letterSpacing: '-.005em',
-        fontSize: 16,
+        ...text.label,
         background: bg,
         color: col,
         border: 'none',

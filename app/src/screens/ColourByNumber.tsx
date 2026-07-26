@@ -75,7 +75,7 @@ function outline(points: number[][], size: number): number[] {
 const chip: CSSProperties = {
   fontFamily: fonts.display,
   fontWeight: 600,
-  fontSize: 13.5,
+  fontSize: 13,
   letterSpacing: '-.005em',
   color: c.ink,
   background: c.card,
@@ -453,10 +453,10 @@ export function ColourByNumber() {
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       {/* header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={48} style={{ fontFamily: fonts.display, fontSize: 24 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={48} style={{ fontFamily: fonts.display, fontSize: 25 }}>
           ‹
         </IconButton>
-        <div style={{ flex: 1, minWidth: 0, fontFamily: fonts.display, fontSize: 20, fontWeight: 550, letterSpacing: '-.015em', color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Paint by number</div>
+        <div style={{ flex: 1, minWidth: 0, fontFamily: fonts.display, fontSize: 20, fontWeight: 600, letterSpacing: '-.015em', color: c.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Paint by number</div>
         <button onClick={() => guard(() => setDetail((d) => (d + 1) % DETAILS.length))} style={{ ...chip }} aria-label="detail level">
           {DETAILS[detail].k}
         </button>
@@ -576,7 +576,7 @@ export function ColourByNumber() {
                   right: 8,
                   fontFamily: fonts.display,
                   fontWeight: 600,
-                  fontSize: 12,
+                  fontSize: 11,
                   color: c.ink,
                   background: c.card,
                   border: 'none',
@@ -626,7 +626,7 @@ export function ColourByNumber() {
                * colour — green means "getting there", not decoration */}
               <div style={{ width: `${(filledCount / total) * 100}%`, height: '100%', background: c.teal, transition: 'width .2s' }} />
             </div>
-            <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 12, color: c.hint, minWidth: 52, textAlign: 'right' }}>
+            <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 11, color: c.hint, minWidth: 52, textAlign: 'right' }}>
               {filledCount}/{total}
             </span>
           </div>
@@ -675,7 +675,7 @@ export function ColourByNumber() {
               >
                 {n}
                 {mode === 'number' && (
-                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 17, height: 17, padding: '0 3px', borderRadius: 999, background: potDone ? c.teal : c.card, color: potDone ? '#FCFBF7' : c.hint, border: 'none', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 700, fontSize: 9, lineHeight: '17px', textAlign: 'center' }}>{potDone ? '✓' : rem}</span>
+                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 17, height: 17, padding: '0 3px', borderRadius: 999, background: potDone ? c.teal : c.card, color: potDone ? '#FCFBF7' : c.hint, border: 'none', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 700, fontSize: 11, lineHeight: '17px', textAlign: 'center' }}>{potDone ? '✓' : rem}</span>
                 )}
               </button>
             )

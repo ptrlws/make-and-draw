@@ -55,14 +55,14 @@ export function GrownUps() {
       <div style={{ maxWidth: 620, margin: '0 auto', minHeight: '100%', padding: '0 18px 40px' }}>
         {/* header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 0 8px' }}>
-          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
+          <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
             ‹
           </IconButton>
           <div>
             <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: c.faint }}>
               A promise to
             </div>
-            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.6vw, 33px)', lineHeight: 1.05, letterSpacing: '-.015em', color: c.ink }}>
+            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 1.05, letterSpacing: '-.015em', color: c.ink }}>
               Grown-ups
             </div>
           </div>
@@ -82,10 +82,10 @@ export function GrownUps() {
             margin: '4px 0 18px',
           }}
         >
-          <span aria-hidden style={{ fontSize: 26, lineHeight: 1 }}>💡</span>
-          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 14, lineHeight: 1.45, color: c.sub }}>
+          <span aria-hidden style={{ fontSize: 25, lineHeight: 1 }}>💡</span>
+          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, lineHeight: 1.45, color: c.sub }}>
             Make &amp; Draw was{' '}
-            <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 19, color: c.ink }}>Esther&rsquo;s</span> idea.
+            <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 20, color: c.ink }}>Esther&rsquo;s</span> idea.
             <br />
             The whole studio began with her.
           </div>
@@ -110,14 +110,14 @@ export function GrownUps() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 22,
+                  fontSize: 20,
                 }}
               >
                 {p.icon}
               </div>
               <div>
-                <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 18, lineHeight: 1.2, letterSpacing: '-.01em', color: c.ink }}>{p.title}</div>
-                <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 14, lineHeight: 1.55, color: c.sub, marginTop: 6 }}>{p.body}</div>
+                <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 17, lineHeight: 1.2, letterSpacing: '-.01em', color: c.ink }}>{p.title}</div>
+                <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, lineHeight: 1.55, color: c.sub, marginTop: 6 }}>{p.body}</div>
               </div>
             </Card>
           ))}
@@ -128,7 +128,7 @@ export function GrownUps() {
           style={{
             fontFamily: fonts.body,
             fontWeight: 700,
-            fontSize: 13.5,
+            fontSize: 13,
             lineHeight: 1.5,
             color: c.sub,
             textAlign: 'center',

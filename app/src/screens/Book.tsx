@@ -95,10 +95,10 @@ export function Book() {
   return (
     <div style={root}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" style={{ fontFamily: fonts.display, fontSize: 24 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" style={{ fontFamily: fonts.display, fontSize: 25 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 24, letterSpacing: '-.01em', color: c.ink, flex: 1 }}>{poss(state.name)} collection</div>
+        <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 25, letterSpacing: '-.01em', color: c.ink, flex: 1 }}>{poss(state.name)} collection</div>
         <IconButton
           onClick={() => {
             // real sharing: OS share sheet where available, PNG download otherwise
@@ -122,8 +122,8 @@ export function Book() {
 
       {pages.length === 0 ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 28, textAlign: 'center' }}>
-          <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 30, letterSpacing: '-.01em', color: c.ink }}>Nothing here yet</div>
-          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 14, color: c.hint, maxWidth: 300 }}>
+          <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 32, letterSpacing: '-.01em', color: c.ink }}>Nothing here yet</div>
+          <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: c.hint, maxWidth: 300 }}>
             Your collection fills up as you make things — go dip a marble or colour a print.
           </div>
           {trash && (
@@ -136,7 +136,7 @@ export function Book() {
                 play('pop')
                 showToast('back in the book!')
               }}
-              style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 14, color: c.ink, background: c.card, border: 'none', borderRadius: 14, padding: '11px 18px', boxShadow: shadows.dropSm, cursor: 'pointer' }}
+              style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.ink, background: c.card, border: 'none', borderRadius: 14, padding: '11px 18px', boxShadow: shadows.dropSm, cursor: 'pointer' }}
             >
               ↶ undo remove
             </button>
@@ -186,8 +186,8 @@ export function Book() {
                 <img src={pages[0].img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               </div>
             )}
-            <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 12, letterSpacing: '.18em', textTransform: 'uppercase', color: c.faint }}>{poss(state.name)}</div>
-            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(38px, 12vw, 56px)', lineHeight: 0.95, letterSpacing: '-.015em', textAlign: 'center' }}>
+            <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.18em', textTransform: 'uppercase', color: c.faint }}>{poss(state.name)}</div>
+            <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 0.95, letterSpacing: '-.015em', textAlign: 'center' }}>
               Collection
             </div>
             <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: c.hint, marginTop: 6 }}>{plural(pages.length, 'piece')} · tap to open</div>
@@ -210,7 +210,7 @@ export function Book() {
                         justifyContent: 'center',
                         fontFamily: fonts.display,
                         fontWeight: 600,
-                        fontSize: 12,
+                        fontSize: 11,
                         color: c.hint,
                         opacity: 0.9,
                         transform: `rotate(${(i % 2 ? -1 : 1) * (8 + i * 3)}deg)`,
@@ -237,8 +237,8 @@ export function Book() {
             >
               {/* left caption page */}
               <div style={{ ...pane, borderRadius: '16px 0 0 16px', gap: 12, boxShadow: 'inset -12px 0 22px -18px rgba(64,56,47,.30)' }}>
-                <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 12, letterSpacing: '.16em', textTransform: 'uppercase', color: c.faint }}>{KICKER[cur.type]}</div>
-                <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(24px, 5vw, 32px)', letterSpacing: '-.01em', textAlign: 'center', lineHeight: 1.05, color: c.ink }}>{cur.title}</div>
+                <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 11, letterSpacing: '.16em', textTransform: 'uppercase', color: c.faint }}>{KICKER[cur.type]}</div>
+                <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 'clamp(25px, 6.5vw, 32px)', letterSpacing: '-.01em', textAlign: 'center', lineHeight: 1.05, color: c.ink }}>{cur.title}</div>
                 <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: c.hint }}>{note}</div>
               </div>
               {/* right art page — flips in on each turn */}
@@ -257,7 +257,7 @@ export function Book() {
                       right: 12,
                       fontFamily: fonts.display,
                       fontWeight: 600,
-                      fontSize: 11.5,
+                      fontSize: 11,
                       color: c.card,
                       background: c.ink,
                       border: 'none',
@@ -276,19 +276,19 @@ export function Book() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, paddingBottom: 18 }}>
-            <IconButton onClick={() => turn(-1)} ariaLabel="previous" size={54} style={{ fontFamily: fonts.display, fontSize: 26 }}>
+            <IconButton onClick={() => turn(-1)} ariaLabel="previous" size={54} style={{ fontFamily: fonts.display, fontSize: 25 }}>
               ‹
             </IconButton>
             <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 13, color: c.hint, minWidth: 90, textAlign: 'center' }}>
               {clamped + 1} of {pages.length}
             </div>
-            <IconButton onClick={() => turn(1)} ariaLabel="next" size={54} style={{ fontFamily: fonts.display, fontSize: 26 }}>
+            <IconButton onClick={() => turn(1)} ariaLabel="next" size={54} style={{ fontFamily: fonts.display, fontSize: 25 }}>
               ›
             </IconButton>
           </div>
           {confirmDel ? (
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', paddingBottom: 18, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: fonts.display, fontWeight: 550, fontSize: 14, color: c.ink }}>Remove this piece?</span>
+              <span style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.ink }}>Remove this piece?</span>
               <button
                 onClick={() => setConfirmDel(false)}
                 style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.ink, background: c.card, border: 'none', borderRadius: 13, padding: '9px 16px', minHeight: 40, boxShadow: shadows.dropSm, cursor: 'pointer' }}
@@ -362,7 +362,7 @@ export function Book() {
               <button
                 onClick={() => setConfirmDel(true)}
                 aria-label="remove this piece"
-                style={{ fontFamily: fonts.display, fontWeight: 550, fontSize: 13, color: c.hint, background: 'transparent', border: 'none', padding: '9px 10px', cursor: 'pointer' }}
+                style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 13, color: c.hint, background: 'transparent', border: 'none', padding: '9px 10px', cursor: 'pointer' }}
               >
                 remove
               </button>

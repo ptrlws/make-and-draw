@@ -32,7 +32,7 @@ function Loading() {
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: fonts.display,
-        fontSize: 22,
+        fontSize: 20,
         textTransform: 'uppercase',
         letterSpacing: '.12em',
         color: c.hint,
@@ -95,7 +95,7 @@ function CrashCard({ onReset }: { onReset: () => void }) {
           padding: '30px 26px',
         }}
       >
-        <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 26, letterSpacing: '-.015em', lineHeight: 1.15, color: c.ink }}>Whoops — ink spill!</div>
+        <div style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 25, letterSpacing: '-.015em', lineHeight: 1.15, color: c.ink }}>Whoops — ink spill!</div>
         <div style={{ fontFamily: fonts.body, fontWeight: 700, fontSize: 15, color: c.sub, margin: '12px 0 20px' }}>
           That bit went wrong, but your collection is safe.
         </div>
@@ -106,8 +106,8 @@ function CrashCard({ onReset }: { onReset: () => void }) {
           }}
           style={{
             fontFamily: fonts.body,
-            fontWeight: 800,
-            fontSize: 16,
+            fontWeight: 700,
+            fontSize: 15,
             color: '#FCFBF7',
             background: c.ink,
             border: 'none',

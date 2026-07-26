@@ -41,7 +41,7 @@ function drawStampOn(ctx: CanvasRenderingContext2D, W: number, H: number, nx: nu
 const chip: CSSProperties = {
   fontFamily: fonts.display,
   fontWeight: 600,
-  fontSize: 14,
+  fontSize: 13,
   letterSpacing: '-.005em',
   color: c.ink,
   background: c.card,
@@ -53,7 +53,7 @@ const chip: CSSProperties = {
 }
 
 /** Header actions run at chip scale rather than full RisoButton size. */
-const headerBtn: CSSProperties = { fontSize: 14, padding: '10px 16px', borderRadius: 12 }
+const headerBtn: CSSProperties = { fontSize: 13, padding: '10px 16px', borderRadius: 12 }
 
 export function PrintShop() {
   const { go, play, startFinish } = useGame()
@@ -259,10 +259,10 @@ export function PrintShop() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 22, fontWeight: 550, letterSpacing: '-.015em', color: c.ink, flex: 1 }}>Print shop</div>
+        <div style={{ fontFamily: fonts.display, fontSize: 20, fontWeight: 600, letterSpacing: '-.015em', color: c.ink, flex: 1 }}>Print shop</div>
         <RisoButton onClick={undo} variant="plain" style={headerBtn}>
           Undo
         </RisoButton>

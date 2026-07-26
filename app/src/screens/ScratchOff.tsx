@@ -68,7 +68,7 @@ function pointNormals(P: [number, number][]): [number, number][] {
 const chip: CSSProperties = {
   fontFamily: fonts.display,
   fontWeight: 600,
-  fontSize: 14,
+  fontSize: 13,
   letterSpacing: '-.005em',
   color: c.ink,
   background: c.card,
@@ -528,10 +528,10 @@ export function ScratchOff() {
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px' }}>
-        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 26 }}>
+        <IconButton onClick={() => go('home')} ariaLabel="back" size={52} style={{ fontFamily: fonts.display, fontSize: 25 }}>
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontWeight: 600, letterSpacing: '-.01em', color: c.ink, fontSize: 'clamp(15px, 4.6vw, 24px)', flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        <div style={{ fontFamily: fonts.display, fontWeight: 600, letterSpacing: '-.01em', color: c.ink, fontSize: 'clamp(17px, 4.6vw, 20px)', flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           Scratch art
         </div>
         <button onClick={undo} style={{ ...chip, padding: '9px 11px' }}>

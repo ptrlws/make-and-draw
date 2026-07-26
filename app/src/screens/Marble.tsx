@@ -10,7 +10,7 @@ import { INKS, c, fonts, shadows } from '../theme'
 const chip: CSSProperties = {
   fontFamily: fonts.display,
   fontWeight: 600,
-  fontSize: 14,
+  fontSize: 13,
   letterSpacing: '-.005em',
   color: c.ink,
   background: c.card,
@@ -137,11 +137,11 @@ export function Marble() {
           onClick={() => go('home')}
           ariaLabel="back"
           size={46}
-          style={{ fontFamily: fonts.display, fontSize: 22, fontWeight: 600, lineHeight: 1 }}
+          style={{ fontFamily: fonts.display, fontSize: 20, fontWeight: 600, lineHeight: 1 }}
         >
           ‹
         </IconButton>
-        <div style={{ fontFamily: fonts.display, fontSize: 'clamp(15px, 4.6vw, 26px)', fontWeight: 550, letterSpacing: '-.015em', color: c.ink, flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        <div style={{ fontFamily: fonts.display, fontSize: 'clamp(17px, 4.6vw, 20px)', fontWeight: 600, letterSpacing: '-.015em', color: c.ink, flex: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
           Marbling
         </div>
         {phase === 'tray' && !noGl && (
@@ -202,10 +202,10 @@ export function Marble() {
                 padding: 20,
               }}
             >
-              <div style={{ fontFamily: fonts.display, fontSize: 24, fontWeight: 550, letterSpacing: '-.015em', color: c.ink }}>
+              <div style={{ fontFamily: fonts.display, fontSize: 25, fontWeight: 600, letterSpacing: '-.015em', color: c.ink }}>
                 No ink today
               </div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 14, color: c.hint }}>
+              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint }}>
                 this device can't run the marbling tray — the other kits all still work!
               </div>
             </div>
@@ -293,7 +293,7 @@ export function Marble() {
           <div style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 15, color: c.ink }}>
             a marbled {dipLabel.toLowerCase()} — one of a kind
           </div>
-          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 12, color: c.hint, marginTop: -4 }}>
+          <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.hint, marginTop: -4 }}>
             drag to turn it around
           </div>
           <div style={{ display: 'flex', gap: 10 }}>

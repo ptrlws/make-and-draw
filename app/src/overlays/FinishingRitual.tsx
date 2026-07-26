@@ -108,7 +108,7 @@ export function FinishingRitual() {
             bottom: '16%',
             textAlign: 'center',
             fontFamily: fonts.hand,
-            fontSize: 26,
+            fontSize: 25,
             color: '#fff',
             textShadow: '0 2px 6px rgba(0,0,0,.4)',
             animation: 'rise .4s ease',

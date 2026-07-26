@@ -58,10 +58,10 @@ export function Home() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontFamily: fonts.display, fontSize: 'clamp(23px, 6vw, 30px)', lineHeight: 1.1, fontWeight: 550, letterSpacing: '-.015em', color: c.ink }}>
+              <div style={{ fontFamily: fonts.display, fontSize: 'clamp(25px, 6.5vw, 32px)', lineHeight: 1.1, fontWeight: 600, letterSpacing: '-.015em', color: c.ink }}>
                 {name ? `hello, ${name}` : 'hello'}
               </div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 14, color: c.hint, marginTop: 2 }}>
+              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint, marginTop: 2 }}>
                 what shall we make?
               </div>
             </div>
@@ -128,7 +128,7 @@ export function Home() {
                   style={{
                     fontFamily: fonts.body,
                     fontWeight: 600,
-                    fontSize: 12.5,
+                    fontSize: 13,
                     color: c.ink,
                     background: c.card,
                     border: 'none',
@@ -187,10 +187,10 @@ export function Home() {
                   )}
                 </div>
                 <div style={{ padding: '9px 5px 4px' }}>
-                  <div style={{ fontFamily: fonts.display, fontSize: 15, fontWeight: 550, letterSpacing: '-.005em', color: c.ink, lineHeight: 1.2 }}>
+                  <div style={{ fontFamily: fonts.display, fontSize: 15, fontWeight: 600, letterSpacing: '-.005em', color: c.ink, lineHeight: 1.2 }}>
                     {kit.label}
                   </div>
-                  <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11.5, color: c.faint, marginTop: 1 }}>
+                  <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 11, color: c.faint, marginTop: 1 }}>
                     {mine ? 'your latest' : kit.blurb}
                   </div>
                 </div>
@@ -235,10 +235,10 @@ export function Home() {
               <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 7, background: 'rgba(64,56,47,.10)' }} />
             </div>
             <div>
-              <div style={{ fontFamily: fonts.display, fontSize: 19, fontWeight: 550, color: c.ink, lineHeight: 1.15 }}>
+              <div style={{ fontFamily: fonts.display, fontSize: 20, fontWeight: 600, color: c.ink, lineHeight: 1.15 }}>
                 {poss(name)} collection
               </div>
-              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 12.5, color: c.hint, marginTop: 2 }}>
+              <div style={{ fontFamily: fonts.body, fontWeight: 500, fontSize: 13, color: c.hint, marginTop: 2 }}>
                 {state.gallery.length ? `${plural(state.gallery.length, 'piece')} kept` : 'nothing kept yet'}
               </div>
             </div>
@@ -252,7 +252,7 @@ export function Home() {
             style={{
               fontFamily: fonts.body,
               fontWeight: 600,
-              fontSize: 12,
+              fontSize: 11,
               letterSpacing: '.04em',
               color: c.hint,
               background: 'none',
