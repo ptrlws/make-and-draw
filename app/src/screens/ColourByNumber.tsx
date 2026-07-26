@@ -469,10 +469,14 @@ export function ColourByNumber() {
       </div>
 
       {/* stage */}
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-        <div style={{ position: 'relative', background: c.card, border: 'none', borderRadius: 18, boxShadow: shadows.card, padding: 8 }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflow: 'hidden' }}>
+        {/* the mount must be free to SHRINK: it is the flexible part of the
+         * column, so it takes its height from whatever the tools leave over
+         * and derives its width from the aspect ratio — otherwise a tall
+         * picture on a short screen overflows and covers the header. */}
+        <div style={{ position: 'relative', background: c.card, border: 'none', borderRadius: 18, boxShadow: shadows.card, padding: 8, maxWidth: '100%', maxHeight: '100%', minHeight: 0, display: 'flex' }}>
           <div
-            style={{ width: 'min(480px, 86vw, 57vh)', aspectRatio: `${WK.w} / ${WK.h}`, borderRadius: 12, overflow: 'hidden', background: '#f4f1e7', boxShadow: `inset 0 0 0 1px ${c.line}`, touchAction: 'none', animation: done ? 'wobble .8s ease-in-out .2s' : undefined, position: 'relative' }}
+            style={{ width: 'min(480px, 86vw)', maxWidth: '100%', maxHeight: '100%', aspectRatio: `${WK.w} / ${WK.h}`, borderRadius: 12, overflow: 'hidden', background: '#f4f1e7', boxShadow: `inset 0 0 0 1px ${c.line}`, touchAction: 'none', animation: done ? 'wobble .8s ease-in-out .2s' : undefined, position: 'relative' }}
             onPointerDown={onZoomDown}
             onPointerMove={onZoomMove}
             onPointerUp={onZoomUp}
@@ -618,7 +622,9 @@ export function ColourByNumber() {
         {mode === 'number' && total > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: 'min(300px, 82vw)' }}>
             <div style={{ flex: 1, height: 8, background: c.toggleOff, borderRadius: 999, overflow: 'hidden', border: 'none', boxShadow: `inset 0 0 0 1px ${c.line}` }}>
-              <div style={{ width: `${(filledCount / total) * 100}%`, height: '100%', background: c.ink, transition: 'width .2s' }} />
+              {/* progress and completion are the one place chrome earns a
+               * colour — green means "getting there", not decoration */}
+              <div style={{ width: `${(filledCount / total) * 100}%`, height: '100%', background: c.teal, transition: 'width .2s' }} />
             </div>
             <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 12, color: c.hint, minWidth: 52, textAlign: 'right' }}>
               {filledCount}/{total}
@@ -669,7 +675,7 @@ export function ColourByNumber() {
               >
                 {n}
                 {mode === 'number' && (
-                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 17, height: 17, padding: '0 3px', borderRadius: 999, background: potDone ? c.ink : c.card, color: potDone ? c.card : c.hint, border: 'none', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 700, fontSize: 9, lineHeight: '17px', textAlign: 'center' }}>{potDone ? '✓' : rem}</span>
+                  <span style={{ position: 'absolute', top: -6, right: -6, minWidth: 17, height: 17, padding: '0 3px', borderRadius: 999, background: potDone ? c.teal : c.card, color: potDone ? '#FCFBF7' : c.hint, border: 'none', boxShadow: shadows.dropSm, fontFamily: fonts.body, fontWeight: 700, fontSize: 9, lineHeight: '17px', textAlign: 'center' }}>{potDone ? '✓' : rem}</span>
                 )}
               </button>
             )
